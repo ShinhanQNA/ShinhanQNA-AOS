@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -49,8 +50,10 @@ fun OnboardingScreen(
             val maxW = maxWidth
             val isCompact = maxW < 360.dp
             val horizontalPadding = if (isCompact) 16.dp else 32.dp
-//            val titleStyle = if (isCompact) MaterialTheme.typography.h6 else MaterialTheme.typography.h4
-//            val descStyle = if (isCompact) MaterialTheme.typography.body2 else MaterialTheme.typography.body1
+
+            // 조건에 따른 텍스트 스타일 적용
+            val titleStyle = if (isCompact) 32.sp else 25.sp
+            val descStyle = if (isCompact) 25.sp else 20.sp
             val imageSize = if (isCompact) 120.dp else 200.dp
 
             HorizontalPager(
@@ -66,9 +69,9 @@ fun OnboardingScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = pages[page].title)
+                    Text(text = pages[page].title, fontSize = titleStyle)
                     Spacer(Modifier.height(8.dp))
-                    Text(text = pages[page].description)
+                    Text(text = pages[page].description, fontSize = descStyle)
                     Spacer(Modifier.height(16.dp))
                     Image(
                         painter = painterResource(id = pages[page].imageRes),
@@ -114,6 +117,7 @@ fun OnboardingScreen(
         }
     }
 }
+
 
 
 @Composable
