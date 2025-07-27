@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.example.shinhan_qna_aos.login.LoginScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingPrefs
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
@@ -63,9 +64,6 @@ fun MainEntry(modifier: Modifier = Modifier) {
             }
         )
     } else {
-        // 실제 홈/메인 화면 Composable
-        Column(
-            modifier = Modifier.fillMaxSize().background(Color.Red)
-        ) {}
+        LoginScreen()
     }
 }
