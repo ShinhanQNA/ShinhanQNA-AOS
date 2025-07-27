@@ -1,6 +1,5 @@
 package com.example.shinhan_qna_aos.login
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
