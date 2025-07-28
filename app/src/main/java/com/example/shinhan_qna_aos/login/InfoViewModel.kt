@@ -1,6 +1,5 @@
 package com.example.shinhan_qna_aos.login
 
-import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,7 +12,7 @@ class InfoViewModel : ViewModel() {
 
     // 상태 관리
     var state by mutableStateOf(
-        InfoData(
+        LoginData(
             grade = gradeOptions[0],
             major = majorOptions[0]
         )

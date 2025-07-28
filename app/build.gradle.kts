@@ -60,5 +60,6 @@ dependencies {
     implementation (libs.accompanist.pager)
     // 데이터 바인딩 의존성
     implementation (libs.androidx.datastore.preferences)
-
+    // 아이콘 추가
+    implementation("com.composables:icons-lucide:1.0.0")
 }

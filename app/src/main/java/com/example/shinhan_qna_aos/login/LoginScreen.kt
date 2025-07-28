@@ -80,7 +80,7 @@ fun LoginScreen() {
             Text(
                 text = "관리자 전용 페이지",
                 color = Color.Gray,
-                modifier = Modifier.clickable{ }
+                modifier = Modifier.clickable{ /**관리자 로그인**/ }
             )
         }
     }

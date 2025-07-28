@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import com.example.shinhan_qna_aos.R
 
 @Composable
-fun Information(
+fun InformationScreen(
     viewModel: InfoViewModel
 ) {
     val state = viewModel.state
@@ -123,7 +123,7 @@ fun Information(
         }
     }
 }
-// Name 입력 컴포저블
+// 이름 입력 컴포저블
 @Composable
 fun NameField(value: String, onValueChange: (String) -> Unit, fontSize: TextUnit, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
@@ -239,6 +239,7 @@ fun MajorDropdown(
     }
 }
 
+// 이미지 삽입 + 여기 지금 비트맵 압축 필요함
 @Composable
 fun ImageInsert(modifier: Modifier = Modifier,fontSize: TextUnit){
     Column(modifier = modifier) {
@@ -262,7 +263,7 @@ fun ImageInsert(modifier: Modifier = Modifier,fontSize: TextUnit){
         }
     }
 }
-
+// 가입 요청
 @Composable
 fun Request(modifier: Modifier = Modifier){
     Row(
@@ -283,5 +284,5 @@ fun Request(modifier: Modifier = Modifier){
 @Preview(showBackground = true)
 fun Informationpreview(){
     val viewModel = InfoViewModel()
-    Information(viewModel)
+    InformationScreen(viewModel)
 }
