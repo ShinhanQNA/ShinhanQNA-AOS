@@ -3,6 +3,8 @@ package com.example.shinhan_qna_aos
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -19,6 +21,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -49,7 +53,8 @@ fun MainScreen(){
         }
         Text(
             "배너광고",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(50.dp)
                 .background(Color.Red)
                 .align(Alignment.BottomCenter)
@@ -140,6 +145,7 @@ fun Selectboard() {
     )
     var selectedIndex by remember { mutableStateOf(0) }
     val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
+    val interactionSource = remember { MutableInteractionSource() }
 
     Column(
         modifier = Modifier
@@ -154,13 +160,16 @@ fun Selectboard() {
             horizontalArrangement = Arrangement.spacedBy(26.dp )
         ) {
             tabData.forEachIndexed { idx, (title, imgRes) ->
-                TextButton(
-                    onClick = { selectedIndex = idx },
-                    contentPadding = PaddingValues(horizontal = 0.dp),
+                Box(
                     modifier = Modifier
                         .weight(1f)
-                        .height(48.dp),
-                    shape = RoundedCornerShape(8.dp)
+                        .height(48.dp)
+                        .clickable(
+                            indication = null,
+                            interactionSource = interactionSource,
+                            onClick = { selectedIndex = idx }
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
                     TabWithAppleEmoji(
                         title = title,
@@ -229,13 +238,20 @@ fun TabWithAppleEmoji(
 }
 
 @Composable
-fun SaySomethingPage() { Text("말해봐요 페이지입니다.") }
+fun SaySomethingPage() {
+    Column(modifier = Modifier.fillMaxSize()){ Text("말해봐요 페이지입니다.") }
+}
 
 @Composable
-fun SelectedOpinionsPage() { Text("선정된 의견 페이지입니다.") }
+fun SelectedOpinionsPage() {
+    Column(modifier = Modifier.fillMaxSize()){ Text("선정된 의견 페이지입니다.") }
+}
 
 @Composable
-fun AnsweredPage() { Text("답변 왔어요 페이지입니다.") }
+fun AnsweredPage() {
+    Column(modifier = Modifier.fillMaxSize()){ Text("답변 왔어요 페이지입니다.") }
+}
+
 @Composable
 @Preview(showBackground = true)
 fun MainScreenPreview(){
