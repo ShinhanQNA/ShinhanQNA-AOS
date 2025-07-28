@@ -59,7 +59,7 @@ fun MainEntry(modifier: Modifier = Modifier) {
             onFinish = {
                 scope.launch {
                     OnboardingPrefs.setOnboarded(context, true)
-                    showOnboarding = false // 메인으로 전환!
+                    showOnboarding = false // 로그인으로 전환
                 }
             }
         )

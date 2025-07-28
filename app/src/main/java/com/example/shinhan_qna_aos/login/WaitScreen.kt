@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shinhan_qna_aos.R
 
+// 대기 화면
 @Composable
 fun WaitScreen (){
     BoxWithConstraints(
