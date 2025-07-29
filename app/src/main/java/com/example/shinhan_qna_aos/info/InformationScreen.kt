@@ -61,39 +61,51 @@ fun InformationScreen(
     viewModel: InfoViewModel
 ) {
     val state = viewModel.state
+    var expandedGrade by remember { mutableStateOf(false) }
+    var expandedMajor by remember { mutableStateOf(false) }
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
             .background(Color.White)
-            .padding(16.dp)
     ) {
-        val screenWidth = maxWidth
-        // 드롭다운 확장 상태
-        var expandedGrade by remember { mutableStateOf(false) }
-        var expandedMajor by remember { mutableStateOf(false) }
+        // Material3 기준 Breakpoint
+        val compactMax = 600.dp
+        val mediumMax = 840.dp
+
+        val (horizontalPadding, contentWidth, imageSize) = when {
+            maxWidth <= compactMax -> Triple(16.dp, .95f, 80.dp) // Compact
+            maxWidth <= mediumMax  -> Triple(32.dp, .7f, 112.dp) // Medium
+            else                   -> Triple(64.dp, .5f, 128.dp) // Expanded/Large
+        }
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = horizontalPadding, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.biglogo),
                 contentDescription = "Logo",
-                modifier = Modifier.size(128.dp)
+                modifier = Modifier.size(imageSize)
             )
             Spacer(modifier = Modifier.height(24.dp))
 
-            Column(verticalArrangement = Arrangement.spacedBy(20.dp)){
+            Column(
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                modifier = Modifier.fillMaxWidth(contentWidth)
+            ) {
                 NameField(
                     value = state.name,
                     onValueChange = viewModel::onNameChange,
-                    fontSize = 14.sp,
-                    modifier = Modifier.fillMaxWidth(0.8f)
+                    fontSize = 14.sp
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth(0.8f),
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     StudentIdField(
                         value = state.studentId,
@@ -118,25 +130,17 @@ fun InformationScreen(
                     options = viewModel.majorOptions,
                     expanded = expandedMajor,
                     onExpandedChange = { expandedMajor = it },
-                    fontSize = 14.sp,
-                    modifier = Modifier.fillMaxWidth(0.8f)
-                )
-                ImageInsert(
-                    modifier = Modifier.fillMaxWidth(0.8f),
                     fontSize = 14.sp
                 )
+                ImageInsert(fontSize = 14.sp)
             }
             Spacer(modifier = Modifier.height(36.dp))
-
-            Request(
-                modifier = Modifier.fillMaxWidth(0.8f),
-                fontSize = 14.sp
-            )
+            Request(fontSize = 14.sp)
         }
     }
 }
 
-// 공통 레이블 박스
+// 공통 레이블 + 필드
 @Composable
 fun LabeledField(
     label: String,
@@ -158,7 +162,7 @@ fun LabeledField(
     }
 }
 
-// 공통 입력 필드
+// 일반 입력 필드
 @Composable
 fun PlainInputField(
     value: String,
@@ -167,31 +171,26 @@ fun PlainInputField(
     keyboardType: KeyboardType = KeyboardType.Text,
     modifier: Modifier = Modifier
 ) {
-    Box(
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        singleLine = true,
+        textStyle = TextStyle(
+            color = Color.Black,
+            fontSize = fontSize,
+            fontFamily = pretendard,
+            lineHeight = fontSize
+        ),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         modifier = modifier
             .fillMaxWidth()
             .defaultMinSize(minHeight = 36.dp)
             .border(1.dp, Color(0xFFdfdfdf), RoundedCornerShape(10.dp))
             .padding(horizontal = 12.dp, vertical = 8.dp)
-    ) {
-        BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
-            singleLine = true,
-            textStyle = TextStyle(
-                color = Color.Black,
-                fontSize = fontSize,
-                fontFamily = pretendard,
-                lineHeight = fontSize,
-                platformStyle = PlatformTextStyle(includeFontPadding = false)
-            ),
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
+    )
 }
 
-// 드롭다운 박스
+// 드롭다운 필드 (공통)
 @Composable
 fun DropDownField(
     label: String,
@@ -226,17 +225,14 @@ fun DropDownField(
                 Icon(
                     painter = painterResource(lucide.chevron_down),
                     modifier = Modifier.size(18.dp),
-                    contentDescription = "드롭다운 열기",
+                    contentDescription = null,
                     tint = Color.Black
                 )
             }
-
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { onExpandedChange(false) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White)
+                modifier = Modifier.fillMaxWidth().background(Color.White)
             ) {
                 options.forEach { option ->
                     DropdownMenuItem(
@@ -252,130 +248,106 @@ fun DropDownField(
     }
 }
 
-// 이름 필드
+// 개별 필드/드롭다운 컴포저블(재사용)
 @Composable
-fun NameField(value: String, onValueChange: (String) -> Unit, fontSize: TextUnit, modifier: Modifier = Modifier) {
-    LabeledField("이름", fontSize, modifier) {
-        PlainInputField(
-            value = value,
-            onValueChange = onValueChange,
-            fontSize = fontSize
-        )
+fun NameField(value: String, onValueChange: (String) -> Unit, fontSize: TextUnit) =
+    LabeledField("이름", fontSize) {
+        PlainInputField(value, onValueChange, fontSize)
     }
+
+@Composable
+fun StudentIdField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    fontSize: TextUnit,
+    modifier: Modifier = Modifier
+) = LabeledField("학번", fontSize, modifier) {
+    PlainInputField(
+        value,
+        onValueChange = { newValue ->
+            if (newValue.length <= 6) {
+                 onValueChange(newValue)
+                }
+            },
+        fontSize,
+        keyboardType = KeyboardType.Number
+    )
 }
 
-// 학번 필드
-@Composable
-fun StudentIdField(value: String, onValueChange: (String) -> Unit, fontSize: TextUnit, modifier: Modifier = Modifier) {
-    LabeledField("학번", fontSize, modifier) {
-        PlainInputField(
-            value = value,
-            onValueChange = onValueChange,
-            fontSize = fontSize,
-            keyboardType = KeyboardType.Number
-        )
-    }
-}
-
-// 학년 드롭다운
 @Composable
 fun GradeDropdown(
-    selected: String, onSelectedChange: (String) -> Unit,
-    options: List<String>, expanded: Boolean, onExpandedChange: (Boolean) -> Unit,
-    fontSize: TextUnit, modifier: Modifier = Modifier
-) {
-    DropDownField(
-        label = "학년",
-        selected = selected,
-        onSelectedChange = onSelectedChange,
-        options = options,
-        expanded = expanded,
-        onExpandedChange = onExpandedChange,
-        fontSize = fontSize,
-        modifier = modifier
-    )
-}
+    selected: String,
+    onSelectedChange: (String) -> Unit,
+    options: List<String>,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    fontSize: TextUnit,
+    modifier: Modifier = Modifier
+) = DropDownField(
+    "학년", selected, onSelectedChange, options, expanded, onExpandedChange, fontSize, modifier
+)
 
-// 학과 드롭다운
 @Composable
 fun MajorDropdown(
-    selected: String, onSelectedChange: (String) -> Unit,
-    options: List<String>, expanded: Boolean, onExpandedChange: (Boolean) -> Unit,
-    fontSize: TextUnit, modifier: Modifier = Modifier
-) {
-    DropDownField(
-        label = "학과",
-        selected = selected,
-        onSelectedChange = onSelectedChange,
-        options = options,
-        expanded = expanded,
-        onExpandedChange = onExpandedChange,
-        fontSize = fontSize,
-        modifier = modifier
-    )
-}
+    selected: String,
+    onSelectedChange: (String) -> Unit,
+    options: List<String>,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    fontSize: TextUnit,
+    modifier: Modifier = Modifier
+) = DropDownField(
+    "학과", selected, onSelectedChange, options, expanded, onExpandedChange, fontSize, modifier
+)
 
-// 이미지 삽입 + 여기 지금 비트맵 압축 필요함
+// 이미지 첨부 영역
 @Composable
-fun ImageInsert(modifier: Modifier = Modifier,fontSize: TextUnit){
-    Column(modifier = modifier.fillMaxWidth()) {
-        Text("재학 확인서 첨부(학생증, 재학증명서)",
-            style = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Normal,
-                fontSize = fontSize
-            ),
+fun ImageInsert(fontSize: TextUnit){
+    Column(Modifier.fillMaxWidth()) {
+        Text(
+            "재학 확인서 첨부(학생증, 재학증명서)",
+            style = TextStyle(fontFamily = pretendard, fontWeight = FontWeight.Normal, fontSize = fontSize)
         )
-        Spacer(modifier=Modifier.height(8.dp))
+        Spacer(Modifier.height(8.dp))
         Row(
-            modifier = modifier.fillMaxWidth(),
+            Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
                     .defaultMinSize(minHeight = 36.dp)
-                    .background(
-                        color = Color.Black,
-                        shape = RoundedCornerShape(12.dp)
-                    )
+                    .background(color = Color.Black, shape = RoundedCornerShape(12.dp))
                     .padding(horizontal = 12.dp, vertical = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "사진 첨부",
-                    color = Color.White,
-                    style = TextStyle(
-                        fontFamily = pretendard,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = fontSize
-                    )
+                    "사진 첨부", color = Color.White,
+                    style = TextStyle(fontFamily = pretendard, fontWeight = FontWeight.Normal, fontSize = fontSize)
                 )
             }
-            Spacer(modifier=Modifier.width(10.dp))
-            Text(text = "url")
+            Spacer(Modifier.width(10.dp))
+            Text("url")
         }
     }
 }
-// 가입 요청
+
+// 가입 요청 버튼
 @Composable
-fun Request(modifier: Modifier = Modifier,fontSize: TextUnit) {
+fun Request(modifier: Modifier = Modifier, fontSize: TextUnit) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .background(color = Color.Black, shape = RoundedCornerShape(6.dp))
             .padding(horizontal = 18.dp, vertical = 12.dp)
     ) {
         Text(
             text = "가입요청",
             color = Color.White,
-            modifier = Modifier.clickable { /** 가입 요청 **/ },
-            style = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Normal,
-                fontSize = fontSize
-            )
+            modifier = Modifier.clickable { /* 가입 요청 로직 */ },
+            style = TextStyle(fontFamily = pretendard, fontWeight = FontWeight.Normal, fontSize = fontSize)
         )
     }
 }
+
 
 @Composable
 @Preview(showBackground = true)
