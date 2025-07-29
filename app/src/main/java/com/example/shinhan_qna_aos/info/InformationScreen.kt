@@ -2,6 +2,7 @@ package com.example.shinhan_qna_aos.info
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,11 +18,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,12 +42,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.ui.theme.pretendard
 
 @Composable
 fun InformationScreen(
@@ -53,10 +65,10 @@ fun InformationScreen(
             .padding(16.dp)
     ) {
         val screenWidth = maxWidth
-        val isCompact = screenWidth < 360.dp
-        val bodyFontSize = if (isCompact) 10.sp else 16.sp
-        val titleFontSize = if (isCompact) 16.sp else 20.sp
-        val imageSize = if (isCompact) 60.dp else 100.dp
+//        val isCompact = screenWidth < 360.dp
+//        val bodyFontSize = if (isCompact) 10.sp else 16.sp
+//        val titleFontSize = if (isCompact) 16.sp else 20.sp
+//        val imageSize = if (isCompact) 60.dp else 100.dp
 
         // 드롭다운 확장 상태
         var expandedGrade by remember { mutableStateOf(false) }
@@ -70,14 +82,14 @@ fun InformationScreen(
             Image(
                 painter = painterResource(id = R.drawable.biglogo),
                 contentDescription = "Logo",
-                modifier = Modifier.size(imageSize)
+                modifier = Modifier.size(128.dp)
             )
             Spacer(modifier = Modifier.height(24.dp))
 
             NameField(
                 value = state.name,
                 onValueChange = viewModel::onNameChange,
-                fontSize = titleFontSize,
+                fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth(0.8f)
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -89,7 +101,7 @@ fun InformationScreen(
                 StudentIdField(
                     value = state.studentId,
                     onValueChange = viewModel::onStudentIdChange,
-                    fontSize = titleFontSize,
+                    fontSize = 14.sp,
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(12.dp))
@@ -99,7 +111,7 @@ fun InformationScreen(
                     options = viewModel.gradeOptions,
                     expanded = expandedGrade,
                     onExpandedChange = { expandedGrade = it },
-                    fontSize = titleFontSize,
+                    fontSize = 14.sp,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -110,16 +122,16 @@ fun InformationScreen(
                 options = viewModel.majorOptions,
                 expanded = expandedMajor,
                 onExpandedChange = { expandedMajor = it },
-                fontSize = titleFontSize,
+                fontSize = 14.sp,
                 modifier = Modifier.fillMaxWidth(0.8f)
             )
             Spacer(modifier = Modifier.height(12.dp))
             ImageInsert(
                 modifier = Modifier.fillMaxWidth(0.8f),
-                fontSize = bodyFontSize
+                fontSize = 14.sp
             )
             Spacer(modifier = Modifier.height(12.dp))
-            Request(modifier = Modifier)
+            Request(modifier = Modifier,14.sp)
         }
     }
 }
@@ -127,13 +139,20 @@ fun InformationScreen(
 @Composable
 fun NameField(value: String, onValueChange: (String) -> Unit, fontSize: TextUnit, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        Text("이름", fontSize = fontSize, modifier = Modifier.padding(start = 4.dp, bottom = 4.dp))
+        Text("이름",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = fontSize
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         )
     }
 }
@@ -142,7 +161,13 @@ fun NameField(value: String, onValueChange: (String) -> Unit, fontSize: TextUnit
 @Composable
 fun StudentIdField(value: String, onValueChange: (String) -> Unit, fontSize: TextUnit, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        Text("학번", fontSize = fontSize, modifier = Modifier.padding(start = 4.dp, bottom = 4.dp))
+        Text("학번",
+            style = TextStyle(
+            fontFamily = pretendard,
+            fontWeight = FontWeight.Normal,
+            fontSize = fontSize
+            ),
+        )
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
@@ -166,7 +191,13 @@ fun GradeDropdown(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        Text("학년", fontSize = fontSize, modifier = Modifier.padding(start = 4.dp, bottom = 4.dp))
+        Text("학년",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = fontSize
+            ),
+        )
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = onExpandedChange,
@@ -209,7 +240,13 @@ fun MajorDropdown(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        Text("학과", fontSize = fontSize, modifier = Modifier.padding(start = 4.dp, bottom = 4.dp))
+        Text("학과",
+            style = TextStyle(
+            fontFamily = pretendard,
+            fontWeight = FontWeight.Normal,
+            fontSize = fontSize
+        ),
+            )
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = onExpandedChange,
@@ -243,7 +280,13 @@ fun MajorDropdown(
 @Composable
 fun ImageInsert(modifier: Modifier = Modifier,fontSize: TextUnit){
     Column(modifier = modifier) {
-        Text("재학 확인서 첨부(학생증, 재학증명서)", fontSize = fontSize, modifier = Modifier.padding(start = 4.dp, bottom = 4.dp))
+        Text("재학 확인서 첨부(학생증, 재학증명서)",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = fontSize
+            ),
+            )
         Row(
             modifier = modifier,
             verticalAlignment = Alignment.CenterVertically
@@ -256,7 +299,12 @@ fun ImageInsert(modifier: Modifier = Modifier,fontSize: TextUnit){
             ) {
                 Text(
                     text = "사진 첨부",
-                    color = Color.White
+                    color = Color.White,
+                    style = TextStyle(
+                        fontFamily = pretendard,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = fontSize
+                    )
                 )
             }
             Text(text = "url")
@@ -265,7 +313,7 @@ fun ImageInsert(modifier: Modifier = Modifier,fontSize: TextUnit){
 }
 // 가입 요청
 @Composable
-fun Request(modifier: Modifier = Modifier){
+fun Request(modifier: Modifier = Modifier,fontSize: TextUnit){
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -274,7 +322,12 @@ fun Request(modifier: Modifier = Modifier){
             Text(
                 text = "가입요청",
                 color = Color.White,
-                modifier = Modifier.clickable { /** 가입 요청 **/ }
+                modifier = Modifier.clickable { /** 가입 요청 **/ },
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = fontSize
+                )
             )
         }
     }
