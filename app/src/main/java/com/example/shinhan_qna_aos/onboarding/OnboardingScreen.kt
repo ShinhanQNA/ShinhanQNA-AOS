@@ -2,32 +2,44 @@ package com.example.shinhan_qna_aos.onboarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun OnboardingScreen(
@@ -37,86 +49,91 @@ fun OnboardingScreen(
     val pagerState = rememberPagerState()
     val pages = viewModel.pages
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .systemBarsPadding() // 상태바 + 내비게이션바 침범 방지
+            .systemBarsPadding()
     ) {
-        BoxWithConstraints(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            val maxW = maxWidth
-            val isCompact = maxW < 360.dp
-            val horizontalPadding = if (isCompact) 16.dp else 32.dp
+        val maxW = maxWidth
+        val maxH = maxHeight
 
-            // 조건에 따른 텍스트 스타일 적용
-            val titleStyle = if (isCompact) 32.sp else 25.sp
-            val descStyle = if (isCompact) 25.sp else 20.sp
-            val imageSize = if (isCompact) 120.dp else 200.dp
+        HorizontalPager(
+            count = pages.size,
+            state = pagerState,
+            userScrollEnabled = true,
+        ) { page ->
 
-            HorizontalPager(
-                count = pages.size,
-                state = pagerState,
-                userScrollEnabled = true,
-                modifier = Modifier.fillMaxSize()
-            ) { page ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = horizontalPadding),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(text = pages[page].title, fontSize = titleStyle)
-                    Spacer(Modifier.height(8.dp))
-                    Text(text = pages[page].description, fontSize = descStyle)
-                    Spacer(Modifier.height(16.dp))
-                    Image(
-                        painter = painterResource(id = pages[page].imageRes),
-                        contentDescription = null,
-                        modifier = Modifier.size(imageSize)
-                    )
-                }
-            }
+            val pageData = pages[page]
 
-            // 닷 인디케이터 (하단 중앙 위치)
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 80.dp), // 버튼 위에 충분한 공간 확보
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween,
             ) {
-                repeat(pages.size) { idx ->
-                    val selected = pagerState.currentPage == idx
-                    Box(
-                        Modifier
-                            .padding(4.dp)
-                            .size(if (selected) 12.dp else 8.dp)
-                            .background(
-                                if (selected) Color.Black else Color.LightGray,
-                                shape = CircleShape
-                            )
-                    )
+                if (pagerState.currentPage == pages.lastIndex) {
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = maxW * 0.05f, start = maxW * 0.05f, end = maxW * 0.05f),
+                        contentAlignment = Alignment.TopEnd
+                    ){
+                        Button(
+                            onClick = onFinish,
+                            colors = ButtonDefaults.buttonColors(Color.White),
+                            modifier = Modifier.border(1.dp,Color(0xffDFDFDF),RoundedCornerShape(12.dp))
+                                .size(maxW*0.2f,maxH*0.05f)
+                        ) {
+                            Text("확인",
+                                color = Color.Black
+                                )
+                        }
+                    }
                 }
-            }
 
-            // 마지막 페이지에만 "시작하기" 버튼 (하단 우측에 배치)
-            if (pagerState.currentPage == pages.lastIndex) {
-                Button(
-                    onClick = onFinish,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(end = 16.dp, bottom = 24.dp)
-                ) {
-                    Text("시작하기")
-                }
+                Image(
+                    painter = painterResource(id = pageData.imageRes),
+                    contentDescription = null,
+                )
+
+                DotIndicator(
+                    size = pages.size,
+                    current = pagerState.currentPage,
+                    maxWidth = maxW
+                )
             }
         }
     }
 }
 
+@Composable
+private fun DotIndicator(size: Int, current: Int, maxWidth: Dp) {
+    val selectedWidth = maxWidth * 0.15f
+    val unselectedWidth = maxWidth * 0.06f
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(maxWidth * 0.1f)
+            .background(Color.White),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(size) { idx ->
+            val isSelected = current == idx
+            Box(
+                Modifier
+                    .padding(maxWidth * 0.01f)
+                    .size(
+                        width = if (isSelected) selectedWidth else unselectedWidth,
+                        height = maxWidth * 0.013f
+                    )
+                    .background(
+                        color = if (isSelected) Color(0xff00A5C2) else Color(0xffD9D9D9),
+                        shape = RoundedCornerShape(maxWidth * 0.02f)
+                    )
+            )
+        }
+    }
+}
 
 
 @Composable
@@ -124,4 +141,5 @@ fun OnboardingScreen(
 fun preview(){
     val viewModel = OnboardingViewModel()
     OnboardingScreen(onFinish = {}, viewModel = viewModel)
+//    DotIndicator(2,1)
 }
