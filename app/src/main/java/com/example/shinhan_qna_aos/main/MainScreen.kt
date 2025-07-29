@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos
+package com.example.shinhan_qna_aos.main
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,9 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,17 +16,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,12 +29,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.shinhan_qna_aos.R
 import com.jihan.lucide_icons.lucide
 
 @Composable
@@ -206,9 +198,9 @@ fun Selectboard() {
 
         // 페이지별 본문 표시
         when (selectedIndex) {
-            0 -> SaySomethingPage()
-            1 -> SelectedOpinionsPage()
-            2 -> AnsweredPage()
+            0 -> SaySomthingScreen()
+            1 -> SelectedOpinionsScreen()
+            2 -> AnsweredScreen()
         }
     }
 }
@@ -237,20 +229,6 @@ fun TabWithAppleEmoji(
     }
 }
 
-@Composable
-fun SaySomethingPage() {
-    Column(modifier = Modifier.fillMaxSize()){ Text("말해봐요 페이지입니다.") }
-}
-
-@Composable
-fun SelectedOpinionsPage() {
-    Column(modifier = Modifier.fillMaxSize()){ Text("선정된 의견 페이지입니다.") }
-}
-
-@Composable
-fun AnsweredPage() {
-    Column(modifier = Modifier.fillMaxSize()){ Text("답변 왔어요 페이지입니다.") }
-}
 
 @Composable
 @Preview(showBackground = true)
