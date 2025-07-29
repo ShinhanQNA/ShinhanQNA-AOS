@@ -1,9 +1,10 @@
-package com.example.shinhan_qna_aos.login
+package com.example.shinhan_qna_aos.info
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.shinhan_qna_aos.login.LoginData
 
 class InfoViewModel : ViewModel() {
     // 드롭다운 선택지
