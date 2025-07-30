@@ -2,6 +2,7 @@ package com.example.shinhan_qna_aos
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,8 +14,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +44,7 @@ fun TitleContentLikeButton(title: String, content: String, likeCount: Int) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(color = Color.White)
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         Text(title,
@@ -86,6 +92,7 @@ fun TitleContentButton(title: String, content: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(color = Color.White)
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         Text(
@@ -118,6 +125,7 @@ fun SelectDataButton(year: Int,month:Int, week:Int, count:Int){
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(color = Color.White)
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         Text(
@@ -168,8 +176,45 @@ fun SelectDataButton(year: Int,month:Int, week:Int, count:Int){
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(
+    title: String,
+    onNavigationClick: () -> Unit
+) {
+    TopAppBar(
+        title = {
+            Box(modifier = Modifier.fillMaxWidth().padding(end = 24.dp)) {
+                Text(
+                    text = title,
+                    modifier = Modifier.align(Alignment.Center),
+                    style = TextStyle(
+                        fontFamily = pretendard,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = Color.Black
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        },
+        navigationIcon = {
+            Icon(
+                painter = painterResource(id = lucide.chevron_left),
+                contentDescription = "Navigation Icon",
+                modifier = Modifier.size(24.dp).clickable { onNavigationClick() }
+            )
+        },
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).background(color = Color.White),
+        colors = TopAppBarDefaults.topAppBarColors(Color.White)
+    )
+}
+
 @Composable
 @Preview(showBackground = true)
 fun ReUiPreview(){
-    SelectDataButton(2003,3,2,9)
+//    SelectDataButton(2003,3,2,9)
+    TitleContentLikeButton("ddd","ddd",3)
+//    TopBar("공지",{})
 }
