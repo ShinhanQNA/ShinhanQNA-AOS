@@ -64,6 +64,7 @@ fun MainTopbar(){
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
+            .background(Color.White)
             .padding(vertical = 18.dp, horizontal = 20.dp)
     ){
         Image(
@@ -144,7 +145,8 @@ fun Selectboard() {
 
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(

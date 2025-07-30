@@ -1,5 +1,6 @@
 package com.example.shinhan_qna_aos.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -8,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.shinhan_qna_aos.SelectData
@@ -60,6 +62,7 @@ fun SelectedDetailScreen() {
         TopBar("nnnn년 mm월 i주차", onNavigationClick = {})
         LazyColumn(modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(bottom = 50.dp)) {
             items(dataList) { data ->
                 TitleContentLikeButton(

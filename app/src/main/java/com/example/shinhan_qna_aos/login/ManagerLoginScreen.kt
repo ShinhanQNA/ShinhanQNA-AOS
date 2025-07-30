@@ -44,12 +44,6 @@ fun ManagerLogin(
             .background(Color.White)
     ) {
         val screenWidth = maxWidth
-        val isCompact = screenWidth < 360.dp
-
-        // 반응형 텍스트 스타일
-        val titleStyle = if (isCompact) 32.sp else 25.sp
-        val descStyle = if (isCompact) 25.sp else 20.sp
-        val imageSize = if (isCompact) 60.dp else 100.dp
 
         Column (
             modifier = Modifier.fillMaxSize().padding(horizontal = 58.dp),
