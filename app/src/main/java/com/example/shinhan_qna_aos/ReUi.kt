@@ -1,5 +1,8 @@
 package com.example.shinhan_qna_aos
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,13 +26,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.shinhan_qna_aos.main.SaySomthingScreen
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 // 데이터 클래스 임의
 data class TitleContentLike(val title: String, val content: String, val likeCount: Int)
 data class TitleContent(val title: String, val content: String)
+data class SelectData(val year: Int,val month: Int, val week: Int, val count: Int)
 
 @Composable
 fun TitleContentLikeButton(title: String, content: String, likeCount: Int) {
@@ -109,8 +114,62 @@ fun TitleContentButton(title: String, content: String) {
 }
 
 @Composable
+fun SelectDataButton(year: Int,month:Int, week:Int, count:Int){
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+    ) {
+        Text(
+            text = "${year}년 ${month}월 ${week}주차",
+            color = Color.Black,
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            ),
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            "의견 ${count}개",
+            color = Color(0xffA5A5A5),
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
+            ),
+            maxLines = 1
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Box(
+            modifier = Modifier
+                .background(Color(0xffFF9F43), RoundedCornerShape(20.dp))
+                .padding(horizontal = 12.dp, vertical = 2.dp)
+        ){
+            Row(verticalAlignment = Alignment.CenterVertically){
+                Image(
+                    painter = painterResource(R.drawable.ellipse),
+                    contentDescription = "원",
+                    modifier = Modifier.size(10.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    "대기",
+                    color = Color.White,
+                    style = TextStyle(
+                        fontFamily = pretendard,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp
+                    ),
+                    maxLines = 1
+                )
+            }
+        }
+    }
+}
+
+@Composable
 @Preview(showBackground = true)
 fun ReUiPreview(){
-    TitleContentButton("제목", "오늘은 어쩌고오" )
-
+    SelectDataButton(2003,3,2,9)
 }
