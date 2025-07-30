@@ -72,26 +72,55 @@ fun InformationScreen(
             .systemBarsPadding()
             .background(Color.White)
     ) {
-        val maxwidth = maxWidth
-        val maxheight  = maxHeight
+        // 현재 화면의 폭과 높이 구하기
+        val maxWidthPx = maxWidth
+        val maxHeightPx = maxHeight
+        // 화면 비율(가로/세로)
+        val aspectRatio = maxWidthPx / maxHeightPx
 
+        /**
+         * 반응형 파라미터 계산:
+         * - Compact: 600dp 이하 (모바일)
+         * - Medium: 601~840dp (태블릿)
+         * - Expanded: 841dp 이상 (데스크탑)
+         *
+         * 화면 비율이 1보다 작으면 세로형(모바일), 1보다 크면 가로형(태블릿/데스크탑)
+         */
+        val (horizontalPadding, contentWidthFraction, logoSize) = when {
+            maxWidthPx <= 600.dp -> { // Compact (mobile)
+                val size = if (aspectRatio < 1f) 80.dp else 96.dp // 세로면 작게
+                Triple(40.dp, 0.88f, size)
+            }
+            maxWidthPx <= 840.dp -> { // Medium (tablet)
+                val size = if (aspectRatio < 1f) 112.dp else 100.dp
+                Triple(32.dp, 0.7f, size)
+            }
+            else -> { // Expanded (desktop)
+                val size = if (aspectRatio < 1.2f) 128.dp else 110.dp
+                Triple(64.dp, 0.5f, size)
+            }
+        }
+
+        // 실제 UI 코드 시작
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 50.dp, vertical = 16.dp),
+                .padding(horizontal = horizontalPadding, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            // 반응형 로고 이미지
             Image(
                 painter = painterResource(id = R.drawable.biglogo),
                 contentDescription = "Logo",
-                modifier = Modifier.size(128.dp)
+                modifier = Modifier.size(logoSize)
             )
             Spacer(modifier = Modifier.height(24.dp))
 
+            // 내부 콘텐츠 (Name, StudentId, Grade, Major, Image)
             Column(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(contentWidthFraction)
             ) {
                 NameField(
                     value = state.name,
@@ -116,7 +145,7 @@ fun InformationScreen(
                         expanded = expandedGrade,
                         onExpandedChange = { expandedGrade = it },
                         fontSize = 14.sp,
-                        modifier = Modifier.weight(0.4f)
+                        modifier = Modifier.weight(0.45f)
                     )
                 }
                 MajorDropdown(
@@ -330,9 +359,9 @@ fun ImageInsert(fontSize: TextUnit){
 
 // 가입 요청 버튼
 @Composable
-fun Request(modifier: Modifier = Modifier, fontSize: TextUnit) {
+fun Request(fontSize: TextUnit) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .background(color = Color.Black, shape = RoundedCornerShape(6.dp))
             .padding(horizontal = 18.dp, vertical = 12.dp)
     ) {
