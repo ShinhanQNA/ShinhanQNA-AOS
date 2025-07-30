@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -41,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
@@ -70,33 +72,26 @@ fun InformationScreen(
             .systemBarsPadding()
             .background(Color.White)
     ) {
-        // Material3 기준 Breakpoint
-        val compactMax = 600.dp
-        val mediumMax = 840.dp
-
-        val (horizontalPadding, contentWidth, imageSize) = when {
-            maxWidth <= compactMax -> Triple(16.dp, .95f, 80.dp) // Compact
-            maxWidth <= mediumMax  -> Triple(32.dp, .7f, 112.dp) // Medium
-            else                   -> Triple(64.dp, .5f, 128.dp) // Expanded/Large
-        }
+        val maxwidth = maxWidth
+        val maxheight  = maxHeight
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = horizontalPadding, vertical = 16.dp),
+                .padding(horizontal = 50.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.biglogo),
                 contentDescription = "Logo",
-                modifier = Modifier.size(imageSize)
+                modifier = Modifier.size(128.dp)
             )
             Spacer(modifier = Modifier.height(24.dp))
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
-                modifier = Modifier.fillMaxWidth(contentWidth)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 NameField(
                     value = state.name,
@@ -232,7 +227,9 @@ fun DropDownField(
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { onExpandedChange(false) },
-                modifier = Modifier.fillMaxWidth().background(Color.White)
+                modifier = Modifier
+                    .widthIn(min = 180.dp)
+                    .background(Color.White, RoundedCornerShape(10.dp))
             ) {
                 options.forEach { option ->
                     DropdownMenuItem(
@@ -265,7 +262,7 @@ fun StudentIdField(
     PlainInputField(
         value,
         onValueChange = { newValue ->
-            if (newValue.length <= 6) {
+            if (newValue.length <= 8) {
                  onValueChange(newValue)
                 }
             },

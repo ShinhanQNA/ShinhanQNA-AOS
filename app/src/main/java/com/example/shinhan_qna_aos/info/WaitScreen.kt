@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.login
+package com.example.shinhan_qna_aos.info
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,10 +16,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.ui.theme.pretendard
 
 // 대기 화면
 @Composable
@@ -32,26 +38,44 @@ fun WaitScreen (){
         val screenWidth = maxWidth
         val isCompact = screenWidth < 360.dp
 
-        // 조건에 따른 텍스트 스타일 적용
-        val titleStyle = if (isCompact) 32.sp else 25.sp
-        val descStyle = if (isCompact) 25.sp else 20.sp
-        val imageSize = if (isCompact) 60.dp else 100.dp
-
         Column (
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(painter = painterResource(R.drawable.biglogo), contentDescription = null)
+            Image(painter = painterResource(R.drawable.biglogo),
+                contentDescription = null,
+                modifier=Modifier.size(128.dp)
+            )
+            Spacer(modifier = Modifier.height(36.dp))
             Text(
                 text = "가입 요청 완료",
-                fontSize = titleStyle
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                ),
+                lineHeight = 28.sp
                 )
+            Spacer(modifier = Modifier.height(36.dp))
+            Text(
+                text = "[사용자 이름]님의 가입 신청 내용을 안전하게 전달했어요.",
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp
+                ),
+                lineHeight = 20.sp
+            )
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = "[사용자 이름]님의 가입 신청 내용을 안전하게 전달했어요.\n" +
-                        "\n" +
-                        "관리자 확인까지 잠시 시간이 걸릴 수 있습니다."
+                text = "관리자 확인까지 잠시 시간이 걸릴 수 있습니다.",
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp
+                ),
+                lineHeight = 20.sp
             )
         }
     }
