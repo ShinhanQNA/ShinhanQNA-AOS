@@ -218,7 +218,7 @@ fun PlainInputField(
 @Composable
 fun DropDownField(
     label: String,
-    selected: String,
+    selected: String?,
     onSelectedChange: (String) -> Unit,
     options: List<String>,
     expanded: Boolean,
@@ -240,7 +240,7 @@ fun DropDownField(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = selected,
+                    text = selected?:"",
                     fontSize = fontSize,
                     fontFamily = pretendard,
                     color = Color.Black,
@@ -302,7 +302,7 @@ fun StudentIdField(
 
 @Composable
 fun GradeDropdown(
-    selected: String,
+    selected: String?,
     onSelectedChange: (String) -> Unit,
     options: List<String>,
     expanded: Boolean,
@@ -315,7 +315,7 @@ fun GradeDropdown(
 
 @Composable
 fun MajorDropdown(
-    selected: String,
+    selected: String?,
     onSelectedChange: (String) -> Unit,
     options: List<String>,
     expanded: Boolean,

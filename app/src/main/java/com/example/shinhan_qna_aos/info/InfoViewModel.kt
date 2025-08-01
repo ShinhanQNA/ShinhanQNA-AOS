@@ -14,8 +14,8 @@ class InfoViewModel : ViewModel() {
     // 상태 관리
     var state by mutableStateOf(
         LoginData(
-            grade = gradeOptions[0],
-            major = majorOptions[0]
+            grade = null,
+            major = null
         )
     )
 
