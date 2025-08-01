@@ -5,7 +5,7 @@ import com.example.shinhan_qna_aos.R
 
 class OnboardingViewModel : ViewModel() {
     val pages = listOf(
-        OnboardingData(R.drawable.onboarding1),
-        OnboardingData(R.drawable.onboarding2)
+        OnboardingData(R.drawable.android_mockup1),
+        OnboardingData(R.drawable.android_mockup2)
     )
 }

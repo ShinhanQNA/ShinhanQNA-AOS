@@ -215,6 +215,6 @@ fun TopBar(
 @Preview(showBackground = true)
 fun ReUiPreview(){
 //    SelectDataButton(2003,3,2,9)
-    TitleContentLikeButton("ddd","ddd",3)
-//    TopBar("공지",{})
+//    TitleContentLikeButton("ddd","ddd",3)
+    TopBar("공지",{})
 }
