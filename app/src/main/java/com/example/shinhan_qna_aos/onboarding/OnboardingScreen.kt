@@ -66,35 +66,92 @@ fun OnboardingScreen(
 
             val pageData = pages[page]
 
+//            Column(
+//                modifier = Modifier.fillMaxSize(),
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//                verticalArrangement =  if (pagerState.currentPage == pages.lastIndex) {Arrangement.SpaceBetween} else Arrangement.Bottom,
+//            ) {
+//                if (pagerState.currentPage == pages.lastIndex) {
+//                    Box(modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(top = maxW * 0.05f, start = maxW * 0.05f, end = maxW * 0.05f),
+//                        contentAlignment = Alignment.TopEnd
+//                    ){
+//                        Button(
+//                            onClick = onFinish,
+//                            colors = ButtonDefaults.buttonColors(Color.White),
+//                            modifier = Modifier
+//                                .border(1.dp, Color(0xffDFDFDF), RoundedCornerShape(12.dp))
+//                                .size(maxW * 0.2f, maxH * 0.05f)
+//                        ) {
+//                            Text("확인",
+//                                color = Color.Black,
+//                                style = TextStyle(
+//                                    fontFamily = pretendard,
+//                                    fontWeight = FontWeight.Normal,
+//                                    fontSize = 14.sp
+//                                ),
+//                            )
+//                        }
+//                    }
+//                }
+//
+//                Column( verticalArrangement = Arrangement.Bottom){
+//                    Image(
+//                        painter = painterResource(id = pageData.imageRes),
+//                        contentDescription = null,
+//                    )
+//
+//                    DotIndicator(
+//                        size = pages.size,
+//                        current = pagerState.currentPage,
+//                        maxWidth = maxW
+//                    )
+//                }
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = if (pagerState.currentPage == pages.lastIndex) maxW * 0.05f else 0.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween,
+                verticalArrangement = if (pagerState.currentPage == pages.lastIndex)
+                    Arrangement.SpaceBetween
+                else
+                    Arrangement.Bottom
             ) {
                 if (pagerState.currentPage == pages.lastIndex) {
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = maxW * 0.05f, start = maxW * 0.05f, end = maxW * 0.05f),
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = maxW * 0.05f, start = maxW * 0.05f, end = maxW * 0.05f),
                         contentAlignment = Alignment.TopEnd
-                    ){
+                    ) {
                         Button(
                             onClick = onFinish,
                             colors = ButtonDefaults.buttonColors(Color.White),
-                            modifier = Modifier.border(1.dp,Color(0xffDFDFDF),RoundedCornerShape(12.dp))
-                                .size(maxW*0.2f,maxH*0.05f)
+                            modifier = Modifier
+                                .border(1.dp, Color(0xffDFDFDF), RoundedCornerShape(12.dp))
+                                .size(maxW * 0.2f, maxH * 0.05f)
                         ) {
-                            Text("확인",
-                                color = Color.Black
+                            Text(
+                                "확인",
+                                color = Color.Black,
+                                style = TextStyle(
+                                    fontFamily = pretendard,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 14.sp
                                 )
+                            )
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.weight(1f))
 
                 Image(
                     painter = painterResource(id = pageData.imageRes),
                     contentDescription = null,
                 )
-
+                
                 DotIndicator(
                     size = pages.size,
                     current = pagerState.currentPage,
