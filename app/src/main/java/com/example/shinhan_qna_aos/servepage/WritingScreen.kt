@@ -202,7 +202,8 @@ fun WritingContentField(
                 fontFamily = pretendard,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.TopStart)
+                    .align(Alignment.TopStart),
+                lineHeight = 20.sp
             )
         }
         BasicTextField(
