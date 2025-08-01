@@ -35,11 +35,23 @@ import com.jihan.lucide_icons.lucide
 fun AlarmScreen (){
     Column {
         TopBar("알림",{})
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(bottom = 50.dp)) {
-            items(6) { data ->
-                AlarmButton()
-                Divider()
+        Box(){
+            LazyColumn(modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 50.dp)) {
+                items(6) { data ->
+                    AlarmButton()
+                    Divider()
+                }
             }
+            Text(
+                "배너광고",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(Color.Red)
+                    .align(Alignment.BottomCenter)
+            )
         }
     }
 }
@@ -47,7 +59,9 @@ fun AlarmScreen (){
 @Composable
 fun AlarmButton() {
     Row(
-        modifier = Modifier.fillMaxWidth().background(Color.White)
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
             .padding(horizontal = 20.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically
