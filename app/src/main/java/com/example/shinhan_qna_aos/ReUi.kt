@@ -179,14 +179,14 @@ fun SelectDataButton(year: Int,month:Int, week:Int, count:Int){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
-    title: String,
+    title : String?,
     onNavigationClick: () -> Unit
 ) {
     TopAppBar(
         title = {
             Box(modifier = Modifier.fillMaxWidth().padding(end = 24.dp)) {
                 Text(
-                    text = title,
+                    text = title ?: "",
                     modifier = Modifier.align(Alignment.Center),
                     style = TextStyle(
                         fontFamily = pretendard,
