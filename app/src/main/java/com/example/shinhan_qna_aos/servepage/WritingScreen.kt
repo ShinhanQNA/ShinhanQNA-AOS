@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.etc
+package com.example.shinhan_qna_aos.servepage
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,36 +39,68 @@ import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun WritingScreen(viewModel: WritingViewModel){
+fun WritingScreen(viewModel: WritingViewModel) {
     val state = viewModel.state
-    Box {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-                .padding(bottom = 50.dp)
-        ) {
-            TopBar("게시글 작성", {})
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        TopBar("게시글 작성", {})
 
-            LazyColumn(
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    WritingTitleField(
-                        value = state.title,
-                        onValueChange = viewModel::onTitleChange,
-                        fontSize = 14.sp
+        LazyColumn(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                WritingTitleField(
+                    value = state.title,
+                    onValueChange = viewModel::onTitleChange,
+                    fontSize = 14.sp
+                )
+            }
+            item {
+                WritingContentField(
+                    value = state.content,
+                    onValueChange = viewModel::onContentChange,
+                    fontSize = 14.sp
+                )
+            }
+            item {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier
+                        .background(
+                            Color.Black,
+                            RoundedCornerShape(12.dp)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                ) {
+                    Icon(
+                        painter = painterResource(lucide.images),
+                        contentDescription = "사진 첨부",
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.White
+                    )
+                    Text(
+                        text = "사진 첨부",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 14.sp
+                        )
                     )
                 }
-                item {
-                    WritingContentField(
-                        value = state.content,
-                        onValueChange = viewModel::onContentChange,
-                        fontSize = 14.sp
-                    )
-                }
-                item {
+            }
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    WriteInfo()
+                    Spacer(modifier = Modifier.height(50.dp))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -77,16 +109,16 @@ fun WritingScreen(viewModel: WritingViewModel){
                                 Color.Black,
                                 RoundedCornerShape(12.dp)
                             )
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                            .padding(horizontal = 18.dp, vertical = 12.dp)
                     ) {
                         Icon(
-                            painter = painterResource(lucide.images),
-                            contentDescription = "사진 첨부",
+                            painter = painterResource(lucide.cloud_upload),
+                            contentDescription = "작성하기",
                             modifier = Modifier.size(20.dp),
                             tint = Color.White
                         )
                         Text(
-                            text = "사진 첨부",
+                            text = "작성하기",
                             color = Color.White,
                             style = TextStyle(
                                 fontFamily = pretendard,
@@ -96,54 +128,8 @@ fun WritingScreen(viewModel: WritingViewModel){
                         )
                     }
                 }
-                item {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        WriteInfo()
-                        Spacer(modifier = Modifier.height(50.dp))
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            modifier = Modifier
-                                .background(
-                                    Color.Black,
-                                    RoundedCornerShape(12.dp)
-                                )
-                                .padding(horizontal = 18.dp, vertical = 12.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(lucide.cloud_upload),
-                                contentDescription = "작성하기",
-                                modifier = Modifier.size(20.dp),
-                                tint = Color.White
-                            )
-                            Text(
-                                text = "작성하기",
-                                color = Color.White,
-                                style = TextStyle(
-                                    fontFamily = pretendard,
-                                    fontWeight = FontWeight.Normal,
-                                    fontSize = 14.sp
-                                )
-                            )
-                        }
-                    }
-                }
             }
         }
-
-        Text(
-            "배너광고",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .background(Color.Red)
-                .align(Alignment.BottomCenter),
-            color = Color.White,
-            textAlign = TextAlign.Center
-        )
     }
 }
 
