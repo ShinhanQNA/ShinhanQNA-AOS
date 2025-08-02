@@ -56,7 +56,7 @@ data class TitleContentLike(
 )
 
 data class TitleContent(val title: String, val content: String)
-data class SelectData(val year: Int,val month: Int, val week: Int, val count: Int)
+data class SelectData(val year: Int,val month: Int, val week: Int, val count: Int, val responseState: String = "응답 상태")
 data class StringData(val content:String)
 
 @Composable
@@ -244,56 +244,110 @@ fun TitleContentButton(title: String, content: String) {
 }
 
 @Composable
-fun SelectDataButton(year: Int,month:Int, week:Int, count:Int){
-    Column(
+fun SelectDataButton(
+        year: Int,
+        month:Int,
+        week:Int,
+        count:Int,
+        isAdmin: Boolean,
+         responseState: String,
+         responseOptions: List<String> = listOf("대기", "응답중", "응답 완료"),
+         onResponseStateChange: (String) -> Unit) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = Color.White)
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "${year}년 ${month}월 ${week}주차",
-            color = Color.Black,
-            style = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            ),
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            "의견 ${count}개",
-            color = Color(0xffA5A5A5),
-            style = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp
-            ),
-            maxLines = 1
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Box(
-            modifier = Modifier
-                .background(Color(0xffFF9F43), RoundedCornerShape(20.dp))
-                .padding(horizontal = 12.dp, vertical = 2.dp)
-        ){
-            Row(verticalAlignment = Alignment.CenterVertically){
-                Image(
-                    painter = painterResource(R.drawable.ellipse),
-                    contentDescription = "원",
-                    modifier = Modifier.size(10.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    "대기",
-                    color = Color.White,
-                    style = TextStyle(
+        var expanded by remember { mutableStateOf(false) }
+        Column {
+            Text(
+                text = "${year}년 ${month}월 ${week}주차",
+                color = Color.Black,
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                ),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "의견 ${count}개",
+                color = Color(0xffA5A5A5),
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp
+                ),
+                maxLines = 1
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .background(Color(0xffFF9F43), RoundedCornerShape(20.dp))
+                    .padding(horizontal = 12.dp, vertical = 2.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(R.drawable.ellipse),
+                        contentDescription = "원",
+                        modifier = Modifier.size(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        "대기",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp
+                        ),
+                        maxLines = 1
+                    )
+                }
+            }
+        }
+        // 오른쪽: 관리자 응답 상태 드롭다운
+        if (isAdmin) {
+            Box {
+                Row(
+                    modifier = Modifier
+                        .border(1.dp, Color(0xFFdfdfdf), RoundedCornerShape(10.dp))
+                        .clickable { expanded = true }
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        // responseState가 기본 값이면 회색, 아니면 검정
+                        text = if (responseState.isBlank() || responseState == "응답 상태") "응답 상태" else responseState,
+                        fontSize = 13.sp,
                         fontFamily = pretendard,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp
-                    ),
-                    maxLines = 1
-                )
+                        color = Color.Black
+                    )
+                    Icon(
+                        painter = painterResource(lucide.chevron_down),
+                        contentDescription = "응답 상태 선택",
+                        modifier = Modifier.size(18.dp),
+                        tint = Color.Black
+                    )
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    responseOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option, fontFamily = pretendard, fontSize = 14.sp) },
+                            onClick = {
+                                onResponseStateChange(option)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -392,7 +446,7 @@ fun DetailContent(){
 @Composable
 @Preview(showBackground = true)
 fun ReUiPreview(){
-//    var response by remember { mutableStateOf("응답 상태") }
+    var response by remember { mutableStateOf("응답 상태") }
 //
 //    TitleContentLikeButton(
 //        title = "테스트 제목",
@@ -405,7 +459,7 @@ fun ReUiPreview(){
 //        responseOptions = listOf("대기", "응답중", "응답 완료"),
 //        onResponseStateChange = { response = it }
 //    )
-
+    SelectDataButton(2024,3,2,9,true,response,responseOptions = listOf("대기", "응답중", "응답 완료"), onResponseStateChange = { response = it })
 //    TopBar("공지",{})
 //    Spacer(modifier = Modifier.height(16.dp))
 //    UserLikeButton(45)

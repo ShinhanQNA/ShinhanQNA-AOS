@@ -60,15 +60,22 @@ fun SelectedOpinionsScreen() {
         SelectData(2003,3,2,9),
         SelectData(2003,3,2,9)
     )
+    val isAdmin = true
+    val responseOptions = listOf("대기", "응답중", "응답 완료")
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .padding(bottom = 50.dp)){
         items(dataList) { data ->
+            var responseState by remember { mutableStateOf(data.responseState) }
             SelectDataButton(
                 year = data.year,
                 month = data.month,
                 week = data.week,
-                count = data.count
+                count = data.count,
+                isAdmin = isAdmin,
+                responseState = responseState,
+                responseOptions = responseOptions,
+                onResponseStateChange = { responseState = it }
             )
             Divider()
         }
