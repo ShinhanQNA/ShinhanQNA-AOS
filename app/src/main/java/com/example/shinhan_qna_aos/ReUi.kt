@@ -444,6 +444,49 @@ fun DetailContent(){
 }
 
 @Composable
+fun Caution(){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            "개인정보처리방침",
+            color = Color(0xffa5a5a5),
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                fontSize = 12.sp
+            ),
+            modifier = Modifier.clickable { }
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            "이용약관",
+            color = Color(0xffa5a5a5),
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 12.sp
+            ),
+            modifier = Modifier.clickable { }
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            "법적고지",
+            color = Color(0xffa5a5a5),
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 12.sp
+            ),
+            modifier = Modifier.clickable { }
+        )
+    }
+}
+
+@Composable
 @Preview(showBackground = true)
 fun ReUiPreview(){
     var response by remember { mutableStateOf("응답 상태") }
