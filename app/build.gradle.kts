@@ -26,6 +26,9 @@ android {
         // 카카오
         buildConfigField("String", "KAKAO_APP_KEY", "\"${localProperties["KAKAO_APP_KEY"]}\"")
         manifestPlaceholders["KAKAO_APP_KEY"] = "${localProperties["KAKAO_APP_KEY"]}"
+        //구글
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProperties["GOOGLE_WEB_CLIENT_ID"]}\"")
+        buildConfigField("String", "GOOGLE_APP_CLIENT_ID", "\"${localProperties["GOOGLE_APP_CLIENT_ID"]}\"")
     }
     buildTypes {
         release {
@@ -72,7 +75,18 @@ dependencies {
     implementation (libs.androidx.datastore.preferences)
     // 아이콘 추가
     implementation(libs.lucide.icons)
-    //카카오 로그인 모듈 설치
-    implementation("com.kakao.sdk:v2-all:2.20.6")
-    implementation("com.kakao.sdk:v2-user:2.21.5")
+    // Google 로그인용
+    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation("com.google.android.gms:play-services-auth:21.4.0")
+    // Kakao SDK (implementation 버전 확인 필수)
+    implementation("com.kakao.sdk:v2-user:2.21.5")  // 사용자 정보, 로그인
+    implementation("com.kakao.sdk:v2-auth:2.21.5")  // 로그인
+
+    // Kotlin Coroutine
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    //API
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
 }
