@@ -58,7 +58,7 @@ data class TitleContentLike(
 data class TitleContent(val title: String, val content: String)
 data class SelectData(val year: Int,val month: Int, val week: Int, val count: Int, val responseState: String = "응답 상태")
 data class StringData(val content:String)
-
+data class TitleYearData(val name: String,val studentid: String, val grade: String,val major: String,val year: Int,val month: Int,val day: Int)
 @Composable
 fun TitleContentLikeButton(
     title: String,
@@ -487,6 +487,37 @@ fun Caution(){
 }
 
 @Composable
+fun TitleYearButton(name: String, studentid:String, grade:String ,major:String,year: Int, month:Int, day:Int) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = Color.White)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+    ) {
+        Text(
+            "${name}/${studentid}/${grade}/${major}/",
+            color = Color.Black,
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            ),
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            "${year}년 ${month}월 ${day}일",
+            color = Color(0xffA5A5A5),
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
+            ),
+        )
+    }
+}
+
+@Composable
 @Preview(showBackground = true)
 fun ReUiPreview(){
     var response by remember { mutableStateOf("응답 상태") }
@@ -502,9 +533,10 @@ fun ReUiPreview(){
 //        responseOptions = listOf("대기", "응답중", "응답 완료"),
 //        onResponseStateChange = { response = it }
 //    )
-    SelectDataButton(2024,3,2,9,true,response,responseOptions = listOf("대기", "응답중", "응답 완료"), onResponseStateChange = { response = it })
+//    SelectDataButton(2024,3,2,9,true,response,responseOptions = listOf("대기", "응답중", "응답 완료"), onResponseStateChange = { response = it })
 //    TopBar("공지",{})
 //    Spacer(modifier = Modifier.height(16.dp))
 //    UserLikeButton(45)
 //    DetailContent()
+    TitleYearButton("이름","학번","학년","전공",2003,2,2)
 }
