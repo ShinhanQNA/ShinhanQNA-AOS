@@ -519,6 +519,40 @@ fun TitleYearButton(name: String, studentid:String, grade:String ,major:String,y
 }
 
 @Composable
+fun ManagerStudentInfo(title: String, info: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            title,
+            style = TextStyle(
+                color = Color.Black,
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
+            )
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.dp, Color(0xffdfdfdf), RoundedCornerShape(10.dp))
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+        ) {
+            Text(
+                info,
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 15.sp,
+                    color = Color.Black
+                ),
+            )
+        }
+    }
+}
+
+@Composable
 @Preview(showBackground = true)
 fun ReUiPreview(){
     var response by remember { mutableStateOf("응답 상태") }
