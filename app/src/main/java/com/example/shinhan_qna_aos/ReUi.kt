@@ -59,6 +59,7 @@ data class TitleContent(val title: String, val content: String)
 data class SelectData(val year: Int,val month: Int, val week: Int, val count: Int, val responseState: String = "응답 상태")
 data class StringData(val content:String)
 data class TitleYearData(val name: String,val studentid: String, val grade: String,val major: String,val year: Int,val month: Int,val day: Int)
+
 @Composable
 fun TitleContentLikeButton(
     title: String,
