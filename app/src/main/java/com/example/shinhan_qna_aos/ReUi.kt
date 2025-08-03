@@ -62,67 +62,66 @@ data class SelectData(val year: Int,val month: Int, val week: Int, val count: In
 data class StringData(val content:String)
 data class TitleYearData(val name: String,val studentid: String, val grade: String,val major: String,val year: Int,val month: Int,val day: Int)
 
+val TitleTextStyle = TextStyle(
+    fontFamily = pretendard,
+    fontWeight = FontWeight.Bold,
+    fontSize = 20.sp,
+    color = Color.Black
+)
+
+val ContentTextStyle = TextStyle(
+    fontFamily = pretendard,
+    fontWeight = FontWeight.Normal,
+    fontSize = 14.sp,
+    color = Color(0xffA5A5A5)
+)
+
+// 게시글 + 좋아요/신고/차단 + 관리자 드롭다운
 @Composable
 fun TitleContentLikeButton(
     title: String,
     content: String,
     likeCount: Int,
-    isAdmin: Boolean,
-    flagsCount: Int,
-    banCount: Int,
-    onResponseStateChange: (String) -> Unit,
+    flagsCount: Int = 0,
+    banCount: Int = 0,
+    isAdmin: Boolean = false,
+    responseState: String = "응답 상태",
+    onResponseStateChange: (String) -> Unit = {}
 ) {
-    var response by remember { mutableStateOf("응답 상태") }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = Color.White)
+            .background(Color.White)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 왼쪽: 게시글 본문 영역
         Column {
-            Text(
-                title,
-                color = Color.Black,
-                style = TextStyle(
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                ),
-            )
+            Text(title, style = TitleTextStyle)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 content,
-                color = Color(0xffA5A5A5),
-                style = TextStyle(
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp
-                ),
+                style = ContentTextStyle,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 InfoIconCount(lucide.thumbs, "좋아요 표시", likeCount, Color.Black, 16)
-                Spacer(modifier = Modifier.width(8.dp))
                 if (isAdmin) {
                     InfoIconCount(R.drawable.flag, "신고 표시", flagsCount, Color(0xffFF9F43), 16)
-                    Spacer(modifier = Modifier.width(8.dp))
                     InfoIconCount(lucide.ban, "차단 표시", banCount, Color(0xffFC4F4F), 16)
                 }
             }
         }
 
-        // 오른쪽: 관리자 응답 상태 드롭다운
         if (isAdmin) {
-            ManagerDropDown(response,responseOptions = listOf("대기", "응답중", "응답 완료"),onResponseStateChange)
+            ManagerDropDown(responseState, onResponseStateChange = onResponseStateChange)
         }
     }
 }
 
+// 일반 게시글 컴포저블
 @Composable
 fun TitleContentButton(title: String, content: String) {
     Column(
@@ -131,72 +130,35 @@ fun TitleContentButton(title: String, content: String) {
             .background(color = Color.White)
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        Text(
-            title,
-            color = Color.Black,
-            style = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            ),
-        )
+        Text(title, style = TitleTextStyle)
         Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            content,
-            color = Color(0xffA5A5A5),
-            style = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp
-            ),
-            maxLines = 2,
-            minLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
+        Text(content, style = ContentTextStyle, maxLines = 2, minLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 
 @Composable
 fun SelectDataButton(
     year: Int,
-    month:Int,
-    week:Int,
-    count:Int,
-    isAdmin: Boolean,
-    onResponseStateChange: (String) -> Unit
+    month: Int,
+    week: Int,
+    count: Int,
+    isAdmin: Boolean = false,
+    responseState: String = "응답 상태",
+    onResponseStateChange: (String) -> Unit = {}
 ) {
-    var response by remember { mutableStateOf("응답 상태") }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = Color.White)
+            .background(Color.White)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        var expanded by remember { mutableStateOf(false) }
         Column {
-            Text(
-                text = "${year}년 ${month}월 ${week}주차",
-                color = Color.Black,
-                style = TextStyle(
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                ),
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                "의견 ${count}개",
-                color = Color(0xffA5A5A5),
-                style = TextStyle(
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp
-                ),
-                maxLines = 1
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+            Text("${year}년 ${month}월 ${week}주차", style = TitleTextStyle)
+            Spacer(Modifier.height(8.dp))
+            Text("의견 $count 개", style = ContentTextStyle, maxLines = 1)
+            Spacer(Modifier.height(8.dp))
             Box(
                 modifier = Modifier
                     .background(Color(0xffFF9F43), RoundedCornerShape(20.dp))
@@ -205,30 +167,21 @@ fun SelectDataButton(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(
                         painter = painterResource(R.drawable.ellipse),
-                        contentDescription = "원",
+                        contentDescription = "상태 아이콘",
                         modifier = Modifier.size(10.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        "대기",
-                        color = Color.White,
-                        style = TextStyle(
-                            fontFamily = pretendard,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp
-                        ),
-                        maxLines = 1
-                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text("대기", style = TextStyle(fontFamily = pretendard, fontWeight = FontWeight.Bold, fontSize = 12.sp, color =  Color.White))
                 }
             }
         }
-        // 오른쪽: 관리자 응답 상태 드롭다운
         if (isAdmin) {
-            ManagerDropDown(response,responseOptions = listOf("대기", "응답중", "응답 완료"),onResponseStateChange)
+            ManagerDropDown(responseState, onResponseStateChange = onResponseStateChange)
         }
     }
 }
 
+// 관리자용 응답 상태 드롭다운
 @Composable
 fun ManagerDropDown(
     responseState: String,
@@ -275,7 +228,7 @@ fun ManagerDropDown(
         }
     }
 }
-
+// 탑바
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
@@ -297,7 +250,6 @@ fun TopBar(
                         color = Color.Black
                     ),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
                 )
             }
         },
@@ -318,6 +270,7 @@ fun TopBar(
     )
 }
 
+// 상세보기 [제목 + 내용]
 @Composable
 fun DetailContent(){
     val datas = listOf( StringData(" Text(\n" +
@@ -490,9 +443,10 @@ fun LikeFlagBan(likeCount: Int, flagsCount: Int, banCount: Int) {
     }
 }
 
+// 공통 아이콘+숫자 표시 컴포저블
 @Composable
 fun InfoIconCount(
-    icon: Int, // draw resource or vector
+    icon: Int,
     desc: String,
     count: Int,
     color: Color,
@@ -518,24 +472,24 @@ fun InfoIconCount(
     }
 }
 
-//@Composable
-//@Preview(showBackground = true)
-//fun ReUiPreview(){
-////    var response by remember { mutableStateOf("응답 상태") }
-////
-////    TitleContentLikeButton(
-////        title = "테스트 제목",
-////        content = "테스트 본문내용",
-////        likeCount = 10,
-////        isAdmin = true,
-////        flagsCount = 2,
-////        banCount = 1,
-////        onResponseStateChange = { response = it }
-////    )
-////    SelectDataButton(2024,3,2,9,true,response,responseOptions = listOf("대기", "응답중", "응답 완료"), onResponseStateChange = { response = it })
-////    TopBar("공지",{})
-////    Spacer(modifier = Modifier.height(16.dp))
-////    UserLikeButton(45)
-////    DetailContent()
-////    TitleYearButton("이름","학번","학년","전공",2003,2,2)
-//}
+@Composable
+@Preview(showBackground = true)
+fun ReUiPreview(){
+//    var response by remember { mutableStateOf("응답 상태") }
+//
+//    TitleContentLikeButton(
+//        title = "테스트 제목",
+//        content = "테스트 본문내용",
+//        likeCount = 10,
+//        isAdmin = true,
+//        flagsCount = 2,
+//        banCount = 1,
+//        onResponseStateChange = { response = it }
+//    )
+    SelectDataButton(2024,3,2,9,true, onResponseStateChange = {})
+//    TopBar("공지",{})
+//    Spacer(modifier = Modifier.height(16.dp))
+//    UserLikeButton(45)
+//    DetailContent()
+//    TitleYearButton("이름","학번","학년","전공",2003,2,2)
+}
