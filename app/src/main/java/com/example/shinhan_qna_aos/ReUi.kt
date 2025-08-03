@@ -188,7 +188,7 @@ fun ManagerDropDown(
     responseOptions: List<String> = listOf("대기", "응답중", "응답 완료"),
     onResponseStateChange: (String) -> Unit
 ){
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }  // 드롭다운 확장 상태 내부 관리
     Box {
         Row(
             modifier = Modifier
@@ -199,7 +199,6 @@ fun ManagerDropDown(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                // responseState가 기본 값이면 회색, 아니면 검정
                 text = if (responseState.isBlank() || responseState == "응답 상태") "응답 상태" else responseState,
                 fontSize = 13.sp,
                 fontFamily = pretendard,
@@ -319,49 +318,32 @@ fun DetailContent(){
     }
 }
 
+// 개인정보처리방침, 이용약관, 법적고지 텍스트 영역 컴포저블
 @Composable
-fun Caution(){
+fun Caution() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
         horizontalArrangement = Arrangement.Center,
     ) {
-        Text(
-            "개인정보처리방침",
-            color = Color(0xffa5a5a5),
-            style = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Bold,
-                fontSize = 12.sp
-            ),
-            modifier = Modifier.clickable { }
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            "이용약관",
-            color = Color(0xffa5a5a5),
-            style = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp
-            ),
-            modifier = Modifier.clickable { }
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            "법적고지",
-            color = Color(0xffa5a5a5),
-            style = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp
-            ),
-            modifier = Modifier.clickable { }
-        )
+        val items = listOf("개인정보처리방침", "이용약관", "법적고지")
+        items.forEachIndexed { index, item ->
+            Text(
+                text = item,
+                color = Color(0xffa5a5a5),
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = if (index == 0) FontWeight.Bold else FontWeight.Normal,
+                    fontSize = 12.sp
+                ),
+                modifier = Modifier.clickable { /* TODO: 클릭 처리 */ }
+            )
+            if (index < items.lastIndex) Spacer(modifier = Modifier.width(8.dp))
+        }
     }
 }
-
+// 제목이 학생 이름, 학번, 학년, 전공 + 날짜
 @Composable
 fun TitleYearButton(name: String, studentid:String, grade:String ,major:String,year: Int, month:Int, day:Int) {
     Column(
@@ -393,6 +375,7 @@ fun TitleYearButton(name: String, studentid:String, grade:String ,major:String,y
     }
 }
 
+// 관리자 학생 정보 단일 필드 컴포저블
 @Composable
 fun ManagerStudentInfo(title: String, info: String, modifier: Modifier = Modifier) {
     Column(
@@ -426,7 +409,7 @@ fun ManagerStudentInfo(title: String, info: String, modifier: Modifier = Modifie
         }
     }
 }
-
+// 좋아요, 신고, 차단 아이콘과 카운트 컴포저블
 @Composable
 fun LikeFlagBan(likeCount: Int, flagsCount: Int, banCount: Int) {
     Row(
@@ -486,7 +469,7 @@ fun ReUiPreview(){
 //        banCount = 1,
 //        onResponseStateChange = { response = it }
 //    )
-    SelectDataButton(2024,3,2,9,true, onResponseStateChange = {})
+//    SelectDataButton(2024,3,2,9,true, onResponseStateChange = {})
 //    TopBar("공지",{})
 //    Spacer(modifier = Modifier.height(16.dp))
 //    UserLikeButton(45)
