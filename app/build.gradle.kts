@@ -62,4 +62,6 @@ dependencies {
     implementation (libs.androidx.datastore.preferences)
     // 아이콘 추가
     implementation(libs.lucide.icons)
+    //카카오 로그인 모듈 설치
+    implementation("com.kakao.sdk:v2-user:2.21.5")
 }
