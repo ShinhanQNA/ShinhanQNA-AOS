@@ -1,5 +1,6 @@
 package com.example.shinhan_qna_aos
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shinhan_qna_aos.ui.theme.pretendard
@@ -68,12 +70,9 @@ fun TitleContentLikeButton(
     isAdmin: Boolean,
     flagsCount: Int,
     banCount: Int,
-    responseState: String,
-    responseOptions: List<String> = listOf("대기", "응답중", "응답 완료"),
     onResponseStateChange: (String) -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
+    var response by remember { mutableStateOf("응답 상태") }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -107,106 +106,19 @@ fun TitleContentLikeButton(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(lucide.thumbs),
-                    contentDescription = "좋아요 표시",
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    likeCount.toString(),
-                    color = Color.Black,
-                    style = TextStyle(
-                        fontFamily = pretendard,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 14.sp
-                    ),
-                )
+                InfoIconCount(lucide.thumbs, "좋아요 표시", likeCount, Color.Black, 16)
                 Spacer(modifier = Modifier.width(8.dp))
                 if (isAdmin) {
-                    // 신고 수
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(R.drawable.flag),
-                            contentDescription = "신고 표시",
-                            modifier = Modifier.size(16.dp),
-                            tint = Color(0xffFF9F43)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            flagsCount.toString(),
-                            color = Color(0xffFF9F43),
-                            style = TextStyle(
-                                fontFamily = pretendard,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 14.sp
-                            ),
-                        )
-                    }
-                    // 차단 수
+                    InfoIconCount(R.drawable.flag, "신고 표시", flagsCount, Color(0xffFF9F43), 16)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(lucide.ban),
-                            contentDescription = "차단 표시",
-                            modifier = Modifier.size(16.dp),
-                            tint = Color(0xffFC4F4F)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            banCount.toString(),
-                            color = Color(0xffFC4F4F),
-                            style = TextStyle(
-                                fontFamily = pretendard,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 14.sp
-                            ),
-                        )
-                    }
+                    InfoIconCount(lucide.ban, "차단 표시", banCount, Color(0xffFC4F4F), 16)
                 }
             }
         }
 
         // 오른쪽: 관리자 응답 상태 드롭다운
         if (isAdmin) {
-            Box {
-                Row(
-                    modifier = Modifier
-                        .border(1.dp, Color(0xFFdfdfdf), RoundedCornerShape(10.dp))
-                        .clickable { expanded = true }
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        // responseState가 기본 값이면 회색, 아니면 검정
-                        text = if (responseState.isBlank() || responseState == "응답 상태") "응답 상태" else responseState,
-                        fontSize = 13.sp,
-                        fontFamily = pretendard,
-                        color =  Color.Black
-                    )
-                    Icon(
-                        painter = painterResource(lucide.chevron_down),
-                        contentDescription = "응답 상태 선택",
-                        modifier = Modifier.size(18.dp),
-                        tint = Color.Black
-                    )
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    responseOptions.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option, fontFamily = pretendard, fontSize = 14.sp) },
-                            onClick = {
-                                onResponseStateChange(option)
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
+            ManagerDropDown(response,responseOptions = listOf("대기", "응답중", "응답 완료"),onResponseStateChange)
         }
     }
 }
@@ -246,14 +158,14 @@ fun TitleContentButton(title: String, content: String) {
 
 @Composable
 fun SelectDataButton(
-        year: Int,
-        month:Int,
-        week:Int,
-        count:Int,
-        isAdmin: Boolean,
-         responseState: String,
-         responseOptions: List<String> = listOf("대기", "응답중", "응답 완료"),
-         onResponseStateChange: (String) -> Unit) {
+    year: Int,
+    month:Int,
+    week:Int,
+    count:Int,
+    isAdmin: Boolean,
+    onResponseStateChange: (String) -> Unit
+) {
+    var response by remember { mutableStateOf("응답 상태") }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -312,43 +224,53 @@ fun SelectDataButton(
         }
         // 오른쪽: 관리자 응답 상태 드롭다운
         if (isAdmin) {
-            Box {
-                Row(
-                    modifier = Modifier
-                        .border(1.dp, Color(0xFFdfdfdf), RoundedCornerShape(10.dp))
-                        .clickable { expanded = true }
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        // responseState가 기본 값이면 회색, 아니면 검정
-                        text = if (responseState.isBlank() || responseState == "응답 상태") "응답 상태" else responseState,
-                        fontSize = 13.sp,
-                        fontFamily = pretendard,
-                        color = Color.Black
-                    )
-                    Icon(
-                        painter = painterResource(lucide.chevron_down),
-                        contentDescription = "응답 상태 선택",
-                        modifier = Modifier.size(18.dp),
-                        tint = Color.Black
-                    )
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    responseOptions.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option, fontFamily = pretendard, fontSize = 14.sp) },
-                            onClick = {
-                                onResponseStateChange(option)
-                                expanded = false
-                            }
-                        )
+            ManagerDropDown(response,responseOptions = listOf("대기", "응답중", "응답 완료"),onResponseStateChange)
+        }
+    }
+}
+
+@Composable
+fun ManagerDropDown(
+    responseState: String,
+    responseOptions: List<String> = listOf("대기", "응답중", "응답 완료"),
+    onResponseStateChange: (String) -> Unit
+){
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        Row(
+            modifier = Modifier
+                .border(1.dp, Color(0xFFdfdfdf), RoundedCornerShape(10.dp))
+                .clickable { expanded = true }
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                // responseState가 기본 값이면 회색, 아니면 검정
+                text = if (responseState.isBlank() || responseState == "응답 상태") "응답 상태" else responseState,
+                fontSize = 13.sp,
+                fontFamily = pretendard,
+                color =  Color.Black
+            )
+            Icon(
+                painter = painterResource(lucide.chevron_down),
+                contentDescription = "응답 상태 선택",
+                modifier = Modifier.size(18.dp),
+                tint = Color.Black
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            responseOptions.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option, fontFamily = pretendard, fontSize = 14.sp) },
+                    onClick = {
+                        onResponseStateChange(option)
+                        expanded = false
                     }
-                }
+                )
             }
         }
     }
@@ -410,7 +332,7 @@ fun DetailContent(){
             "            content,\n" +
             "            color = Color(0xffA5A5A5),\n" +
             "            style = TextStyle(\n"
-         )
+    )
     )
     Column (
         modifier = Modifier
@@ -553,25 +475,67 @@ fun ManagerStudentInfo(title: String, info: String, modifier: Modifier = Modifie
 }
 
 @Composable
-@Preview(showBackground = true)
-fun ReUiPreview(){
-    var response by remember { mutableStateOf("응답 상태") }
-//
-//    TitleContentLikeButton(
-//        title = "테스트 제목",
-//        content = "테스트 본문내용",
-//        likeCount = 10,
-//        isAdmin = false,
-//        flagsCount = 2,
-//        banCount = 1,
-//        responseState = response,
-//        responseOptions = listOf("대기", "응답중", "응답 완료"),
-//        onResponseStateChange = { response = it }
-//    )
-//    SelectDataButton(2024,3,2,9,true,response,responseOptions = listOf("대기", "응답중", "응답 완료"), onResponseStateChange = { response = it })
-//    TopBar("공지",{})
-//    Spacer(modifier = Modifier.height(16.dp))
-//    UserLikeButton(45)
-//    DetailContent()
-    TitleYearButton("이름","학번","학년","전공",2003,2,2)
+fun LikeFlagBan(likeCount: Int, flagsCount: Int, banCount: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(24.dp)
+            .padding(horizontal = 20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        InfoIconCount(lucide.thumbs, "좋아요 표시", likeCount, Color.Black, 16)
+        InfoIconCount(R.drawable.flag, "신고 표시", flagsCount, Color(0xffFF9F43), 16)
+        InfoIconCount(lucide.ban, "차단 표시", banCount, Color(0xffFC4F4F), 16)
+    }
 }
+
+@Composable
+fun InfoIconCount(
+    icon: Int, // draw resource or vector
+    desc: String,
+    count: Int,
+    color: Color,
+    fontSize: Int
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = desc,
+            modifier = Modifier.size(16.dp),
+            tint = color
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            count.toString(),
+            color = color,
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = fontSize.sp
+            ),
+        )
+    }
+}
+
+//@Composable
+//@Preview(showBackground = true)
+//fun ReUiPreview(){
+////    var response by remember { mutableStateOf("응답 상태") }
+////
+////    TitleContentLikeButton(
+////        title = "테스트 제목",
+////        content = "테스트 본문내용",
+////        likeCount = 10,
+////        isAdmin = true,
+////        flagsCount = 2,
+////        banCount = 1,
+////        onResponseStateChange = { response = it }
+////    )
+////    SelectDataButton(2024,3,2,9,true,response,responseOptions = listOf("대기", "응답중", "응답 완료"), onResponseStateChange = { response = it })
+////    TopBar("공지",{})
+////    Spacer(modifier = Modifier.height(16.dp))
+////    UserLikeButton(45)
+////    DetailContent()
+////    TitleYearButton("이름","학번","학년","전공",2003,2,2)
+//}

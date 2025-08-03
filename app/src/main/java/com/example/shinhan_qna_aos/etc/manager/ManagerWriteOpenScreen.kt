@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shinhan_qna_aos.DetailContent
+import com.example.shinhan_qna_aos.LikeFlagBan
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.ui.theme.pretendard
@@ -63,50 +64,6 @@ fun ManagerWriteOpenScreen(
                 .height(50.dp)
                 .background(Color.Red)
                 .align(Alignment.BottomCenter)
-        )
-    }
-}
-
-@Composable
-fun LikeFlagBan(likeCount: Int, flagsCount: Int, banCount: Int) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(24.dp)
-            .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        InfoIconCount(lucide.thumbs, "좋아요 표시", likeCount, Color.Black, 16)
-        InfoIconCount(R.drawable.flag, "신고 표시", flagsCount, Color(0xffFF9F43), 14)
-        InfoIconCount(lucide.ban, "차단 표시", banCount, Color(0xffFC4F4F), 14)
-    }
-}
-
-@Composable
-fun InfoIconCount(
-    icon: Int, // draw resource or vector
-    desc: String,
-    count: Int,
-    color: Color,
-    fontSize: Int
-) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = desc,
-            modifier = Modifier.size(16.dp),
-            tint = color
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            count.toString(),
-            color = color,
-            style = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Normal,
-                fontSize = fontSize.sp
-            ),
         )
     }
 }

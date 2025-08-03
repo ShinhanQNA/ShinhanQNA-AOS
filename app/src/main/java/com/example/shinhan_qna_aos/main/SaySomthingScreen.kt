@@ -32,9 +32,6 @@ fun SaySomthingScreen() {
     )
     val isAdmin = true // ViewModel 등 실제 로그인 상태에 따라 분기!
 
-    // 응답상태 옵션
-    val responseOptions = listOf("대기", "응답중", "응답 완료") // viemodel!!
-
     LazyColumn(modifier = Modifier.fillMaxSize().background(Color.White).padding(bottom = 50.dp)) {
         items(dataList) { data ->
             // 리스트 각각의 응답상태를 기억(로컬 컴포즈 state)
@@ -46,8 +43,6 @@ fun SaySomthingScreen() {
                 isAdmin = isAdmin,
                 flagsCount = data.flagsCount,
                 banCount = data.banCount,
-                responseState = responseState,
-                responseOptions = responseOptions,
                 onResponseStateChange = { responseState = it }
             )
             Divider()

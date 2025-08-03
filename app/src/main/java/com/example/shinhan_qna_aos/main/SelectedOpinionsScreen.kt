@@ -73,8 +73,6 @@ fun SelectedOpinionsScreen() {
                 week = data.week,
                 count = data.count,
                 isAdmin = isAdmin,
-                responseState = responseState,
-                responseOptions = responseOptions,
                 onResponseStateChange = { responseState = it }
             )
             Divider()
@@ -188,8 +186,6 @@ fun SelectedDetailScreen() {
                         isAdmin = isAdmin,
                         flagsCount = data.flagsCount,
                         banCount = data.banCount,
-                        responseState = responseState,
-                        responseOptions = responseOptions,
                         onResponseStateChange = { responseState = it }
                     )
                     Divider()

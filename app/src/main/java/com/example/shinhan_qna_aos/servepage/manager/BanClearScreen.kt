@@ -12,15 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -32,21 +25,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shinhan_qna_aos.ManagerStudentInfo
-import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.TitleContentLike
 import com.example.shinhan_qna_aos.TitleContentLikeButton
 import com.example.shinhan_qna_aos.TitleYearButton
 import com.example.shinhan_qna_aos.TitleYearData
 import com.example.shinhan_qna_aos.TopBar
-import com.example.shinhan_qna_aos.ui.theme.pretendard
-import com.jihan.lucide_icons.lucide
 
 @Composable
 fun BanClearScreen(){
@@ -107,9 +94,6 @@ fun BanClearDetailScreen(){
     )
     val isAdmin = true // ViewModel 등 실제 로그인 상태에 따라 분기!
 
-    // 응답상태 옵션
-    val responseOptions = listOf("대기", "응답중", "응답 완료") // viemodel!!
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -141,8 +125,6 @@ fun BanClearDetailScreen(){
                     isAdmin = isAdmin,
                     flagsCount = data.flagsCount,
                     banCount = data.banCount,
-                    responseState = responseState,
-                    responseOptions = responseOptions,
                     onResponseStateChange = { responseState = it }
                 )
                 Divider()
