@@ -1,3 +1,10 @@
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -16,8 +23,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // 카카오
+        buildConfigField("String", "KAKAO_APP_KEY", "\"${localProperties["KAKAO_APP_KEY"]}\"")
+        manifestPlaceholders["KAKAO_APP_KEY"] = "${localProperties["KAKAO_APP_KEY"]}"
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -36,6 +45,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -63,5 +73,6 @@ dependencies {
     // 아이콘 추가
     implementation(libs.lucide.icons)
     //카카오 로그인 모듈 설치
+    implementation("com.kakao.sdk:v2-all:2.20.6")
     implementation("com.kakao.sdk:v2-user:2.21.5")
 }
