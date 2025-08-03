@@ -1,6 +1,7 @@
 package com.example.shinhan_qna_aos.API
 
 import com.example.shinhan_qna_aos.BuildConfig
+import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -12,7 +13,11 @@ object APIRetrofit {
     private const val BASE_URL = "https://your-server.com/"
 //        BuildConfig.BASE_URL
 
-    private val gson = GsonBuilder().setLenient().create()
+    private val gson = GsonBuilder()
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES) // access_token → accessToken 자동 매핑
+        .setLenient()
+        .create()
+
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }

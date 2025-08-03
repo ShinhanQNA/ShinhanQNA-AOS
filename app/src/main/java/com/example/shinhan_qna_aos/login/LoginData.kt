@@ -14,13 +14,14 @@ data class ManagerLoginData(
     val managerPassword: String = ""
 )
 
-// 자동 매핑
+// 서버 로그인 성공 시 응답 데이터 (access_token, refresh_token, expires_in)
 data class LoginBackendResponse(
-    @SerializedName("access_token") val accessToken: String,
-    @SerializedName("refresh_token") val refreshToken: String,
-    @SerializedName("expires_in") val expiresIn: Int
+    val accessToken: String,
+    val refreshToken: String,
+    val expiresIn: Int
 )
 
+// 서버에서 로그인 실패 시 반환하는 에러 데이터
 data class ApiErrorResponse(
     val status: Int,
     val message: String

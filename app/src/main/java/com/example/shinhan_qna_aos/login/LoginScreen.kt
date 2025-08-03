@@ -1,6 +1,8 @@
 package com.example.shinhan_qna_aos.login
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,31 +25,69 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.shinhan_qna_aos.BuildConfig
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.ui.theme.pretendard
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen() {
     val context = LocalContext.current
-
-    // 로그인 성공/실패 상태를 기억(상태 관리는 필요에 따라 ViewModel에서도 가능)
     var loginSuccess by remember { mutableStateOf<Boolean?>(null) }
 
-    // LoginManager 생성 (간단 예시)
+    // LoginManager 생성: 카카오 로그인용
     val loginManager = remember {
         LoginManager(context) { success ->
             loginSuccess = success
         }
     }
 
-    // 로그인 성공/실패에 따른 Toast 및 메시지 표시
+    // 구글 로그인용 Launcher
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            account.idToken?.let { idToken ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    val repository = AuthRepository()
+                    val loginResult = repository.loginWithGoogle(idToken)
+                    withContext(Dispatchers.Main) {
+                        loginSuccess = loginResult.isSuccess
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            loginSuccess = false
+        }
+    }
+
+    // GoogleSignInClient 생성
+    val gso = remember {
+        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(BuildConfig.GOOGLE_WEB_CLIENT_ID)
+            .requestEmail()
+            .build()
+    }
+    val googleSignInClient = remember {
+        GoogleSignIn.getClient(context, gso)
+    }
+
+    // 로그인 성공/실패 시 Toast
     LaunchedEffect(loginSuccess) {
         loginSuccess?.let { success ->
             if (success) {
-                Toast.makeText(context, "카카오 로그인 성공!", Toast.LENGTH_SHORT).show()
-                // TODO: 로그인 성공 시 다음 화면 이동 등 처리
+//                Toast.makeText(context, "구글 로그인 성공!", Toast.LENGTH_SHORT).show()
+                // TODO: 성공 시 다음 화면 이동 등 구현
             } else {
-                Toast.makeText(context, "카카오 로그인 실패", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, "구글 로그인 실패", Toast.LENGTH_SHORT).show()
             }
             loginSuccess = null // 상태 초기화
         }
@@ -56,13 +96,12 @@ fun LoginScreen() {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .systemBarsPadding() // 상태바+내비게이션 영역 침범 방지
+            .systemBarsPadding()
             .background(Color.White)
             .padding(top = 64.dp, start = 40.dp, end = 40.dp, bottom = 48.dp),
         contentAlignment = Alignment.Center
     ) {
-        val screenWidth = maxWidth
-
+        val maxwidth=maxWidth
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -74,7 +113,6 @@ fun LoginScreen() {
                 modifier = Modifier.size(128.dp)
             )
 
-            /**관리자 로그인**/
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -86,19 +124,19 @@ fun LoginScreen() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            // 클릭 시 카카오 로그인 실행
                             loginManager.loginWithKakao()
                         }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // 구글 로그인 버튼 (아직 미구현)
+                // 구글 로그인 버튼
                 Image(
                     painter = painterResource(R.drawable.google_login),
                     contentDescription = "구글 로그인",
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .clickable {
-                            // TODO: 구글 로그인 처리
+                            googleSignInLauncher.launch(googleSignInClient.signInIntent)
                         }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -111,7 +149,7 @@ fun LoginScreen() {
                         fontWeight = FontWeight.Normal,
                         fontSize = 12.sp
                     ),
-                    modifier = Modifier.clickable { /**관리자 로그인**/ }
+                    modifier = Modifier.clickable { /* 관리자 로그인 처리 */ }
                 )
             }
         }
