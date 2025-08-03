@@ -1,6 +1,5 @@
 package com.example.shinhan_qna_aos
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,12 +17,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -41,7 +37,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shinhan_qna_aos.ui.theme.pretendard
@@ -420,9 +415,9 @@ fun LikeFlagBan(likeCount: Int, flagsCount: Int, banCount: Int) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        InfoIconCount(lucide.thumbs, "좋아요 표시", likeCount, Color.Black, 16)
-        InfoIconCount(R.drawable.flag, "신고 표시", flagsCount, Color(0xffFF9F43), 16)
-        InfoIconCount(lucide.ban, "차단 표시", banCount, Color(0xffFC4F4F), 16)
+        InfoIconCount(lucide.thumbs, "좋아요 표시", likeCount, Color.Black, 14)
+        InfoIconCount(R.drawable.flag, "신고 표시", flagsCount, Color(0xffFF9F43), 14)
+        InfoIconCount(lucide.ban, "차단 표시", banCount, Color(0xffFC4F4F), 14)
     }
 }
 
@@ -453,26 +448,4 @@ fun InfoIconCount(
             ),
         )
     }
-}
-
-@Composable
-@Preview(showBackground = true)
-fun ReUiPreview(){
-//    var response by remember { mutableStateOf("응답 상태") }
-//
-//    TitleContentLikeButton(
-//        title = "테스트 제목",
-//        content = "테스트 본문내용",
-//        likeCount = 10,
-//        isAdmin = true,
-//        flagsCount = 2,
-//        banCount = 1,
-//        onResponseStateChange = { response = it }
-//    )
-//    SelectDataButton(2024,3,2,9,true, onResponseStateChange = {})
-//    TopBar("공지",{})
-//    Spacer(modifier = Modifier.height(16.dp))
-//    UserLikeButton(45)
-//    DetailContent()
-//    TitleYearButton("이름","학번","학년","전공",2003,2,2)
 }
