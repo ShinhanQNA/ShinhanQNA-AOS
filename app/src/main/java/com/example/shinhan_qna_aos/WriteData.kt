@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.servepage
+package com.example.shinhan_qna_aos
 
 data class WriteData (
     val title: String? ="",

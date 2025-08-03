@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.servepage
+package com.example.shinhan_qna_aos
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

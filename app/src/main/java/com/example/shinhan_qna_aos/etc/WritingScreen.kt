@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.servepage
+package com.example.shinhan_qna_aos.etc
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,12 +29,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shinhan_qna_aos.TopBar
+import com.example.shinhan_qna_aos.WritingViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
