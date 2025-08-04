@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.shinhan_qna_aos.BuildConfig
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 
@@ -28,7 +29,6 @@ import com.example.shinhan_qna_aos.ui.theme.pretendard
 fun LoginScreen() {
     val context = LocalContext.current
     var loginSuccess by remember { mutableStateOf<Boolean?>(null) }
-
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
