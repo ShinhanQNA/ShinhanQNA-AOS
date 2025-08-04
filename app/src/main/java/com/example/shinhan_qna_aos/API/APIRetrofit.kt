@@ -10,8 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object APIRetrofit {
-    private const val BASE_URL = "https://your-server.com/"
-//        BuildConfig.BASE_URL
+    private const val BASE_URL =  BuildConfig.BASE_URL
 
     private val gson = GsonBuilder()
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES) // access_token → accessToken 자동 매핑

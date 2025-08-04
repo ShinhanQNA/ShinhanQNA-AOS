@@ -29,6 +29,8 @@ android {
         //구글
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProperties["GOOGLE_WEB_CLIENT_ID"]}\"")
         buildConfigField("String", "GOOGLE_APP_CLIENT_ID", "\"${localProperties["GOOGLE_APP_CLIENT_ID"]}\"")
+
+        buildConfigField("String","BASE_URL","\"${localProperties["BASE_URL"]}\"")
     }
     buildTypes {
         release {
