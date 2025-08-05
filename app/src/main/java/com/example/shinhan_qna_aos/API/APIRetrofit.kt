@@ -12,12 +12,16 @@ import java.util.concurrent.TimeUnit
 object APIRetrofit {
     private const val BASE_URL =  BuildConfig.BASE_URL
 
+    // 서버의 JSON 필드명이 snake_case인 경우, Gson이 camelCase로 자동 변환하도록 설정
+    // 예: access_token -> accessToken
     private val gson = GsonBuilder()
-        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES) // access_token → accessToken 자동 매핑
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         .setLenient()
         .create()
 
+    // HTTP 통신 로그를 보기 위한 인터셉터
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        // BODY 레벨로 설정하면 요청/응답 라인, 헤더, 바디를 모두 볼 수 있습니다.
         level = HttpLoggingInterceptor.Level.BODY
     }
 
@@ -25,6 +29,7 @@ object APIRetrofit {
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
         .connectTimeout(30, TimeUnit.SECONDS)
+        // 로깅 인터셉터를 추가하여 모든 API 통신을 로그로 확인
         .addInterceptor(loggingInterceptor)
         .build()
 

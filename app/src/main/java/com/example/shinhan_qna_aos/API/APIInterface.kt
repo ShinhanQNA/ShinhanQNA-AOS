@@ -11,8 +11,13 @@ interface APIInterface {
 
     @Headers("Content-Type: application/json")
     @POST("/oauth/callback/kakao")
-    suspend fun kakaoAuthcode(
-        @Header("Authorization") code: String
+    suspend fun kakaoOpenIdToken(
+        @Header("Authorization") openIdToken: String
     ): Response<LoginBackendResponse>
 
+    @Headers("Content-Type: application/json")
+    @POST("/oauth/callback/google") // 백엔드 API 엔드포인트에 맞게 수정
+    suspend fun googleAuthCode(
+        @Header("Authorization") code: String
+    ): Response<LoginBackendResponse>
 }
