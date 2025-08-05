@@ -1,5 +1,8 @@
 package com.example.shinhan_qna_aos.login
 
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,10 +10,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,14 +20,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.shinhan_qna_aos.API.APIRetrofit
 import com.example.shinhan_qna_aos.BuildConfig
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.ui.theme.pretendard
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen() {
     val context = LocalContext.current
-    var loginSuccess by remember { mutableStateOf<Boolean?>(null) }
+    val kakaoAuthUrl =
+        "https://kauth.kakao.com/oauth/authorize" +
+                "?client_id=${BuildConfig.KAKAO_REST_API}" + // REST API 키
+                "&redirect_uri=${BuildConfig.LOCAL_URL}/oauth/callback/kakao" + // 딥링크 URI와 일치
+                "&response_type=code"
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -60,7 +68,8 @@ fun LoginScreen() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(kakaoAuthUrl))
+                            context.startActivity(intent)
                         }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -92,6 +101,22 @@ fun LoginScreen() {
     }
 }
 
+fun sendKakaoAuthCodeToServer(code: String, TAG: String) {
+    val authCodeHeader = "kakaotcode $code"
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val response = APIRetrofit.apiService.kakaoAuthcode(authCodeHeader)
+            if (response.isSuccessful) {
+                Log.d(TAG, "서버 인증 성공: ${response.body()}")
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.d(TAG, "서버 인증 실패: $errorBody")
+            }
+        } catch (e: Exception) {
+            Log.d(TAG, "네트워크 오류: ${e.message}")
+        }
+    }
+}
 
 @Composable
 @Preview(showBackground = true)

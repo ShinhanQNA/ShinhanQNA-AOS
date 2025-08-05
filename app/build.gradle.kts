@@ -31,7 +31,10 @@ android {
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProperties["GOOGLE_WEB_CLIENT_ID"]}\"")
         buildConfigField("String", "GOOGLE_APP_CLIENT_ID", "\"${localProperties["GOOGLE_APP_CLIENT_ID"]}\"")
 
+        buildConfigField("String","LOCAL_URL","\"${localProperties["LOCAL_URL"]}\"")
+        manifestPlaceholders["LOCAL_URL"] = "${localProperties["LOCAL_URL"]}"
         buildConfigField("String","BASE_URL","\"${localProperties["BASE_URL"]}\"")
+
     }
     buildTypes {
         release {

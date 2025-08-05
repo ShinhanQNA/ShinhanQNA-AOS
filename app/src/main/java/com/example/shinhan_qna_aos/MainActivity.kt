@@ -1,13 +1,10 @@
 package com.example.shinhan_qna_aos
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.shinhan_qna_aos.login.LoginScreen
+import com.example.shinhan_qna_aos.login.sendKakaoAuthCodeToServer
 import com.example.shinhan_qna_aos.onboarding.OnboardingPrefs
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
@@ -25,14 +23,29 @@ import com.example.shinhan_qna_aos.ui.theme.Shinhan_QNA_AOSTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private val TAG = "kakao"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            Shinhan_QNA_AOSTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainEntry(modifier = Modifier.padding(innerPadding).systemBarsPadding())
-                }
+        setContent { MainEntry() }
+        handleKaKaoRedirect(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleKaKaoRedirect(intent)
+    }
+
+    private fun handleKaKaoRedirect(intent: Intent?) {
+        Log.d(TAG, "handleKaKaoRedirect called, intent = $intent")
+        Log.d(TAG, "intent data = ${intent?.data}")
+
+        // http://서버주소/oauth/callback/kakao?code=O_8-FePDEWQ 이런 형태에서 code만 추출
+        intent?.data?.let { uri ->
+            val code = uri.getQueryParameter("code")
+            Log.d(TAG, "받은 인가코드만: $code") // 이 라인이 logcat에 출력됨
+            if (code != null) {
+                sendKakaoAuthCodeToServer(code, TAG)
             }
         }
     }
