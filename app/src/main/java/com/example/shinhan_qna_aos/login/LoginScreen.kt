@@ -20,21 +20,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.shinhan_qna_aos.API.APIRetrofit
 import com.example.shinhan_qna_aos.BuildConfig
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.ui.theme.pretendard
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen() {
     val context = LocalContext.current
+    // OpenID Connect를 위한 스코프 추가
     val kakaoAuthUrl =
         "https://kauth.kakao.com/oauth/authorize" +
                 "?client_id=${BuildConfig.KAKAO_REST_API}" + // REST API 키
-                "&redirect_uri=${BuildConfig.LOCAL_URL}/oauth/callback/kakao" + // 딥링크 URI와 일치
+                "&redirect_uri=${BuildConfig.LOCAL_URL}/oauth/callback/kakao" + // 백엔드 서버 주소
                 "&response_type=code"
 
     BoxWithConstraints(
@@ -97,23 +94,6 @@ fun LoginScreen() {
                     modifier = Modifier.clickable { /* 관리자 로그인 처리 */ }
                 )
             }
-        }
-    }
-}
-
-fun sendKakaoAuthCodeToServer(code: String, TAG: String) {
-    val authCodeHeader = "kakaotcode $code"
-    CoroutineScope(Dispatchers.IO).launch {
-        try {
-            val response = APIRetrofit.apiService.kakaoAuthcode(authCodeHeader)
-            if (response.isSuccessful) {
-                Log.d(TAG, "서버 인증 성공: ${response.body()}")
-            } else {
-                val errorBody = response.errorBody()?.string()
-                Log.d(TAG, "서버 인증 실패: $errorBody")
-            }
-        } catch (e: Exception) {
-            Log.d(TAG, "네트워크 오류: ${e.message}")
         }
     }
 }

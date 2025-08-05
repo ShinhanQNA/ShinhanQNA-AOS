@@ -14,12 +14,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.example.shinhan_qna_aos.API.APIRetrofit
 import com.example.shinhan_qna_aos.login.LoginScreen
-import com.example.shinhan_qna_aos.login.sendKakaoAuthCodeToServer
 import com.example.shinhan_qna_aos.onboarding.OnboardingPrefs
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
-import com.example.shinhan_qna_aos.ui.theme.Shinhan_QNA_AOSTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -40,13 +42,30 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "handleKaKaoRedirect called, intent = $intent")
         Log.d(TAG, "intent data = ${intent?.data}")
 
-        // http://서버주소/oauth/callback/kakao?code=O_8-FePDEWQ 이런 형태에서 code만 추출
+        // 백엔드 서버에서 리다이렉트된 URI에서 'code' 파라미터를 추출
         intent?.data?.let { uri ->
             val code = uri.getQueryParameter("code")
-            Log.d(TAG, "받은 인가코드만: $code") // 이 라인이 logcat에 출력됨
+            Log.d(TAG, "받은 인가코드: $code")
             if (code != null) {
                 sendKakaoAuthCodeToServer(code, TAG)
             }
+        }
+    }
+}
+
+fun sendKakaoAuthCodeToServer(code: String, TAG: String) {
+    val authCodeHeader = "kakaotoken $code"
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val response = APIRetrofit.apiService.kakaoAuthcode(authCodeHeader)
+            if (response.isSuccessful) {
+                Log.d(TAG, "서버 인증 성공: ${response.body()}")
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.d(TAG, "서버 인증 실패: $errorBody")
+            }
+        } catch (e: Exception) {
+            Log.d(TAG, "네트워크 오류: ${e.message}")
         }
     }
 }
