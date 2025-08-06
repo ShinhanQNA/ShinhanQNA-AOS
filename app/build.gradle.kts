@@ -1,3 +1,10 @@
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -16,8 +23,19 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
+        // 카카오
+        buildConfigField("String", "KAKAO_APP_KEY", "\"${localProperties["KAKAO_APP_KEY"]}\"")
+        buildConfigField("String", "KAKAO_REST_API", "\"${localProperties["KAKAO_REST_API"]}\"")
+        manifestPlaceholders["KAKAO_APP_KEY"] = "${localProperties["KAKAO_APP_KEY"]}"
+        //구글
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProperties["GOOGLE_WEB_CLIENT_ID"]}\"")
+        buildConfigField("String", "GOOGLE_APP_CLIENT_ID", "\"${localProperties["GOOGLE_APP_CLIENT_ID"]}\"")
 
+        buildConfigField("String","LOCAL_URL","\"${localProperties["LOCAL_URL"]}\"")
+        manifestPlaceholders["LOCAL_URL"] = "${localProperties["LOCAL_URL"]}"
+        buildConfigField("String","BASE_URL","\"${localProperties["BASE_URL"]}\"")
+
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -36,6 +54,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -62,4 +81,18 @@ dependencies {
     implementation (libs.androidx.datastore.preferences)
     // 아이콘 추가
     implementation(libs.lucide.icons)
+    // Google 로그인용
+    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation("com.google.android.gms:play-services-auth:21.4.0")
+    // Kakao SDK (implementation 버전 확인 필수)
+    implementation("com.kakao.sdk:v2-user:2.21.5")  // 사용자 정보, 로그인
+    implementation("com.kakao.sdk:v2-auth:2.21.5")  // 로그인
+
+    // Kotlin Coroutine
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    //API
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
 }

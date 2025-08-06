@@ -19,8 +19,11 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,15 +38,58 @@ import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.launch
 
+//@OptIn(ExperimentalPagerApi::class)
+//@Composable
+//fun OnboardingScreen(
+//    viewModel: OnboardingViewModel,
+//    onFinish: () -> Unit
+//) {
+//    val pagerState = rememberPagerState()
+//    val pages = viewModel.pages
+//
+//    BoxWithConstraints(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Color.White)
+//            .systemBarsPadding()
+//    ) {
+//        val maxW = maxWidth
+//        val maxH = maxHeight
+//
+//        HorizontalPager(
+//            count = pages.size,
+//            state = pagerState,
+//            userScrollEnabled = true,
+//        ) { page ->
+//            // 페이지 종류에 따라 분리
+//            when (page) {
+//                0 -> OnboardingPage1(
+//                    currentPage = pagerState.currentPage,
+//                    total = pages.size,
+//                    maxW = maxW
+//                )
+//                1 -> OnboardingPage2(
+//                    currentPage = pagerState.currentPage,
+//                    total = pages.size,
+//                    maxW = maxW,
+//                    maxH = maxH,
+//                    onFinish = onFinish
+//                )
+//            }
+//        }
+//    }
+//}
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun OnboardingScreen(
     viewModel: OnboardingViewModel,
     onFinish: () -> Unit
 ) {
-    val pagerState = rememberPagerState()
     val pages = viewModel.pages
+    val pagerState = rememberPagerState(initialPage = 0)
+    val coroutineScope = rememberCoroutineScope()
 
     BoxWithConstraints(
         modifier = Modifier
@@ -53,31 +99,64 @@ fun OnboardingScreen(
     ) {
         val maxW = maxWidth
         val maxH = maxHeight
+        // Dot Indicator 아래쪽에 구현
+        val selectedWidth = maxWidth * 0.15f
+        val unselectedWidth = maxWidth * 0.06f
+        Column(modifier = Modifier.fillMaxSize()) {
 
-        HorizontalPager(
-            count = pages.size,
-            state = pagerState,
-            userScrollEnabled = true,
-        ) { page ->
-            // 페이지 종류에 따라 분리
-            when (page) {
-                0 -> OnboardingPage1(
-                    currentPage = pagerState.currentPage,
-                    total = pages.size,
-                    maxW = maxW
-                )
-                1 -> OnboardingPage2(
-                    currentPage = pagerState.currentPage,
-                    total = pages.size,
-                    maxW = maxW,
-                    maxH = maxH,
-                    onFinish = onFinish
-                )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // HorizontalPager로 swipe 가능한 페이지 전환
+            HorizontalPager(
+                count = pages.size,
+                state = pagerState,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) { pageIndex ->
+                when (pageIndex) {
+                    0 -> OnboardingPage1(
+                        currentPage = pageIndex,
+                        total = pages.size,
+                        maxW = maxW
+                    )
+                    1 -> OnboardingPage2(
+                        currentPage = pageIndex,
+                        total = pages.size,
+                        maxW = maxW,
+                        maxH = maxH,
+                        onFinish = onFinish
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(maxW * 0.1f)
+                    .background(Color.White),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(pages.size) { index ->
+                    val isSelected = pagerState.currentPage == index
+                    Box(
+                        modifier = Modifier
+                            .padding(maxW * 0.01f)
+                            .size(
+                                width = if (isSelected) selectedWidth else unselectedWidth,
+                                height = maxW * 0.013f
+                            )
+                            .background(
+                                color = if (isSelected) Color(0xff00A5C2) else Color(0xffD9D9D9),
+                                shape = RoundedCornerShape(maxW * 0.02f)
+                            )
+                    )
+                }
             }
         }
     }
 }
-
 
 @Composable
 fun OnboardingPage1(
@@ -223,7 +302,6 @@ fun OnboardingPage1(
             contentDescription = null,
             modifier = Modifier.fillMaxWidth()
         )
-        DotIndicator(size = total, current = currentPage, maxWidth = maxW)
     }
 }
 
@@ -384,37 +462,6 @@ fun OnboardingPage2(
             painter = painterResource(id = R.drawable.android_mockup2),
             contentDescription = null,
         )
-        DotIndicator(size = total, current = currentPage, maxWidth = maxW)
-    }
-}
-
-@Composable
-private fun DotIndicator(size: Int, current: Int, maxWidth: Dp) {
-    val selectedWidth = maxWidth * 0.15f
-    val unselectedWidth = maxWidth * 0.06f
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(maxWidth * 0.1f)
-            .background(Color.White),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        repeat(size) { idx ->
-            val isSelected = current == idx
-            Box(
-                Modifier
-                    .padding(maxWidth * 0.01f)
-                    .size(
-                        width = if (isSelected) selectedWidth else unselectedWidth,
-                        height = maxWidth * 0.013f
-                    )
-                    .background(
-                        color = if (isSelected) Color(0xff00A5C2) else Color(0xffD9D9D9),
-                        shape = RoundedCornerShape(maxWidth * 0.02f)
-                    )
-            )
-        }
     }
 }
 

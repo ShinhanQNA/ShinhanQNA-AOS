@@ -130,7 +130,7 @@ fun TitleContentButton(title: String, content: String) {
         Text(content, style = ContentTextStyle, maxLines = 2, minLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
-
+// 주차 선정 의견
 @Composable
 fun SelectDataButton(
     year: Int,
