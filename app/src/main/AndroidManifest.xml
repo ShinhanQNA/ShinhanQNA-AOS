@@ -37,7 +37,9 @@
                 <!-- 여기에 앱에서 사용할 커스텀 스킴과 호스트 지정 -->
                 <data
                     android:scheme="${MY_SCHEME}"
-                    android:host="login/success" />
+                    android:host="login"
+                    android:path="/success"
+                    />
             </intent-filter>
         </activity>
     </application>

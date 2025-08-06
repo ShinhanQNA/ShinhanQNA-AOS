@@ -19,7 +19,7 @@ sealed class LoginResult {
     data class Success(
         val accessToken: String,
         val refreshToken: String,
-        val expires_in: Int
+        val expiresIn: Int
     ) : LoginResult()
     data class Failure(val errorMsg: String) : LoginResult()
 }

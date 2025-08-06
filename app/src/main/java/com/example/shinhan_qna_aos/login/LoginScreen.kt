@@ -21,11 +21,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.main.MainScreen
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel) {
+fun LoginScreen(viewModel: LoginViewModel,navController:NavController) {
     val context = LocalContext.current
     val loginResult by viewModel.loginResult.collectAsState()
     // 로그인 결과 표시 (토큰 수신 성공/실패)
@@ -37,8 +39,12 @@ fun LoginScreen(viewModel: LoginViewModel) {
                 Log.d(
                     "LoginScreen", "로그인 성공! 액세스 토큰: ${(loginResult as LoginResult.Success).accessToken} " +
                             "리프레시 토큰: ${(loginResult as LoginResult.Success).refreshToken} " +
-                            "만료 시간: ${(loginResult as LoginResult.Success).expires_in} 초"
+                            "만료 시간: ${(loginResult as LoginResult.Success).expiresIn} 초"
                 )
+                navController.navigate("main") {
+                    // 로그인 화면을 백스택에서 제거하여 뒤로가기 시 다시 로그인 화면으로 안 돌아가게 처리
+                    popUpTo("login") { inclusive = true }
+                }
             }
             is LoginResult.Failure -> {
                 Log.e("LoginScreen", "로그인 실패: ${(loginResult as LoginResult.Failure).errorMsg}")
@@ -111,7 +117,5 @@ fun LoginScreen(viewModel: LoginViewModel) {
 @Composable
 @Preview(showBackground = true)
 fun loginpreview(){
-    val repository = LoginRepository()
-    val loginViewModel = LoginViewModel(repository)
-    LoginScreen(loginViewModel)
+
 }

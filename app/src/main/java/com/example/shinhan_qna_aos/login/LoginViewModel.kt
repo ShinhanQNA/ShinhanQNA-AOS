@@ -5,21 +5,22 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class LoginViewModel(
-    private val repository: LoginRepository
+    val repository: LoginRepository
 ) : ViewModel() {
 
     private val _loginResult = MutableStateFlow<LoginResult>(LoginResult.Idle)
     val loginResult: StateFlow<LoginResult> = _loginResult
 
     // 앱스킴으로 토큰 받음
-    fun onReceivedTokens(accessToken: String?, refreshToken: String?, expires_in: Int) {
-        Log.d("LoginViewModel", "onReceivedTokens 호출: accessToken=$accessToken, refreshToken=$refreshToken, expires_in=$expires_in")
+    fun onReceivedTokens(accessToken: String?, refreshToken: String?, expiresIn: Int) {
+        Log.d("LoginViewModel", "onReceivedTokens 호출: accessToken=$accessToken, refreshToken=$refreshToken, expires_in=$expiresIn")
         if (!accessToken.isNullOrBlank() && !refreshToken.isNullOrBlank()) {
-            _loginResult.value = LoginResult.Success(accessToken, refreshToken, expires_in)
+            _loginResult.value = LoginResult.Success(accessToken, refreshToken, expiresIn)
             Log.d("LoginViewModel", "LoginResult.Success 세팅 완료")
         } else {
             _loginResult.value = LoginResult.Failure("Invalid token from deep link")
@@ -41,5 +42,16 @@ class LoginViewModel(
         Log.d("LoginViewModel", "구글 로그인 URL: $url")
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         context.startActivity(intent)
+    }
+}
+
+class LoginViewModelFactory(
+    private val repository: LoginRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
+            return LoginViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
