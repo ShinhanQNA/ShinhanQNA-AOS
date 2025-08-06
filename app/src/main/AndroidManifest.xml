@@ -7,7 +7,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name=".login.GlobalApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -30,18 +29,15 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <!-- 카카오 SDK를 위한 AuthCodeHandlerActivity -->
-        <activity
-            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
-            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- 카카오 SDK 딥링크 처리 -->
-                <data android:host="oauth"
-                    android:scheme="kakao${KAKAO_APP_KEY}" />
+
+                <!-- 여기에 앱에서 사용할 커스텀 스킴과 호스트 지정 -->
+                <data
+                    android:scheme="${MY_SCHEME}"
+                    android:host="login/success" />
             </intent-filter>
         </activity>
     </application>

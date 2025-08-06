@@ -1,11 +1,6 @@
 package com.example.shinhan_qna_aos.login
 
-import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,6 +8,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,34 +22,30 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shinhan_qna_aos.R
-import com.example.shinhan_qna_aos.login.loginserver.sendGoogleAuthCodeToServer
-import com.example.shinhan_qna_aos.login.loginserver.sendKakaoOpenIdTokenToServer
 import com.example.shinhan_qna_aos.ui.theme.pretendard
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.kakao.sdk.user.UserApiClient
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(viewModel: LoginViewModel) {
     val context = LocalContext.current
-    val TAG = "kakao"
+    val loginResult by viewModel.loginResult.collectAsState()
+    // 로그인 결과 표시 (토큰 수신 성공/실패)
 
-    val googleSignInClient = getGoogleSignInClient(context)
-
-    // Google 로그인 결과를 처리하는 런처
-    val googleAuthLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            val account = task.getResult(com.google.android.gms.common.api.ApiException::class.java)
-            val authCode = account.serverAuthCode
-            Log.d("GoogleLogin", "받은 인가코드: $authCode")
-
-            if (authCode != null) {
-                sendGoogleAuthCodeToServer(authCode, "google")
+    LaunchedEffect(loginResult) {
+        Log.d("LoginScreen", "==== loginResult 변경됨: $loginResult ====")
+        when (loginResult) {
+            is LoginResult.Success -> {
+                Log.d(
+                    "LoginScreen", "로그인 성공! 액세스 토큰: ${(loginResult as LoginResult.Success).accessToken} " +
+                            "리프레시 토큰: ${(loginResult as LoginResult.Success).refreshToken} " +
+                            "만료 시간: ${(loginResult as LoginResult.Success).expires_in} 초"
+                )
             }
-        } catch (e: com.google.android.gms.common.api.ApiException) {
-            Log.e("GoogleLogin", "Google 로그인 실패: ${e.statusCode}")
+            is LoginResult.Failure -> {
+                Log.e("LoginScreen", "로그인 실패: ${(loginResult as LoginResult.Failure).errorMsg}")
+            }
+            else -> {
+                Log.d("LoginScreen", "Idle 또는 기타 상태")
+            }
         }
     }
 
@@ -63,7 +57,7 @@ fun LoginScreen() {
             .padding(top = 64.dp, start = 40.dp, end = 40.dp, bottom = 48.dp),
         contentAlignment = Alignment.Center
     ) {
-        val maxwidth =maxWidth
+        val maxw = maxWidth
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -85,46 +79,7 @@ fun LoginScreen() {
                     contentDescription = "카카오 로그인",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
-                            // 카카오톡이 설치되어 있다면 카카오톡으로 로그인, 아니면 카카오 계정으로 로그인
-                            if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
-                                UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
-                                    if (error != null) {
-                                        Log.e(TAG, "카카오톡 로그인 실패", error)
-                                        // 카카오 계정으로 로그인 시도
-                                        UserApiClient.instance.loginWithKakaoAccount(context) { accountToken, accountError ->
-                                            if (accountError != null) {
-                                                Log.e(TAG, "카카오 계정 로그인 실패", accountError)
-                                            } else if (accountToken != null) {
-                                                Log.d(TAG, "카카오 계정 로그인 성공")
-                                                // 토큰에서 idToken을 추출하여 서버로 전송
-                                                accountToken.idToken?.let { idToken ->
-                                                    sendKakaoOpenIdTokenToServer(idToken, TAG)
-                                                }
-                                            }
-                                        }
-                                    } else if (token != null) {
-                                        Log.d(TAG, "카카오톡 로그인 성공")
-                                        // 토큰에서 idToken을 추출하여 서버로 전송
-                                        token.idToken?.let { idToken ->
-                                            sendKakaoOpenIdTokenToServer(idToken, TAG)
-                                        }
-                                    }
-                                }
-                            } else {
-                                UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
-                                    if (error != null) {
-                                        Log.e(TAG, "카카오 계정 로그인 실패", error)
-                                    } else if (token != null) {
-                                        Log.d(TAG, "카카오 계정 로그인 성공")
-                                        // 토큰에서 idToken을 추출하여 서버로 전송
-                                        token.idToken?.let { idToken ->
-                                            sendKakaoOpenIdTokenToServer(idToken, TAG)
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        .clickable { viewModel.openKakaoLogin(context) }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -134,9 +89,7 @@ fun LoginScreen() {
                     contentDescription = "구글 로그인",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
-                            googleAuthLauncher.launch(googleSignInClient.signInIntent)
-                        }
+                        .clickable { viewModel.openGoogleLogin(context) }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -154,8 +107,11 @@ fun LoginScreen() {
         }
     }
 }
+
 @Composable
 @Preview(showBackground = true)
 fun loginpreview(){
-    LoginScreen()
+    val repository = LoginRepository()
+    val loginViewModel = LoginViewModel(repository)
+    LoginScreen(loginViewModel)
 }

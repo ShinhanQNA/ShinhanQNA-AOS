@@ -14,15 +14,12 @@ data class ManagerLoginData(
     val managerPassword: String = ""
 )
 
-// 서버 로그인 성공 시 응답 데이터 (access_token, refresh_token, expires_in)
-data class LoginBackendResponse(
-    val accessToken: String,
-    val refreshToken: String,
-    val expiresIn: Int
-)
-
-// 서버에서 로그인 실패 시 반환하는 에러 데이터
-data class ApiErrorResponse(
-    val status: Int,
-    val message: String
-)
+sealed class LoginResult {
+    object Idle : LoginResult() // 로그인 대기중
+    data class Success(
+        val accessToken: String,
+        val refreshToken: String,
+        val expires_in: Int
+    ) : LoginResult()
+    data class Failure(val errorMsg: String) : LoginResult()
+}
