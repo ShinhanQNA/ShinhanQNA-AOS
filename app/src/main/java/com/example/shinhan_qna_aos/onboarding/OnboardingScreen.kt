@@ -34,53 +34,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 
-//@OptIn(ExperimentalPagerApi::class)
-//@Composable
-//fun OnboardingScreen(
-//    viewModel: OnboardingViewModel,
-//    onFinish: () -> Unit
-//) {
-//    val pagerState = rememberPagerState()
-//    val pages = viewModel.pages
-//
-//    BoxWithConstraints(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(Color.White)
-//            .systemBarsPadding()
-//    ) {
-//        val maxW = maxWidth
-//        val maxH = maxHeight
-//
-//        HorizontalPager(
-//            count = pages.size,
-//            state = pagerState,
-//            userScrollEnabled = true,
-//        ) { page ->
-//            // 페이지 종류에 따라 분리
-//            when (page) {
-//                0 -> OnboardingPage1(
-//                    currentPage = pagerState.currentPage,
-//                    total = pages.size,
-//                    maxW = maxW
-//                )
-//                1 -> OnboardingPage2(
-//                    currentPage = pagerState.currentPage,
-//                    total = pages.size,
-//                    maxW = maxW,
-//                    maxH = maxH,
-//                    onFinish = onFinish
-//                )
-//            }
-//        }
-//    }
-//}
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun OnboardingScreen(
@@ -89,7 +49,6 @@ fun OnboardingScreen(
 ) {
     val pages = viewModel.pages
     val pagerState = rememberPagerState(initialPage = 0)
-    val coroutineScope = rememberCoroutineScope()
 
     BoxWithConstraints(
         modifier = Modifier
@@ -99,14 +58,15 @@ fun OnboardingScreen(
     ) {
         val maxW = maxWidth
         val maxH = maxHeight
-        // Dot Indicator 아래쪽에 구현
-        val selectedWidth = maxWidth * 0.15f
-        val unselectedWidth = maxWidth * 0.06f
+
+        val selectedWidth = maxW * 0.15f
+        val unselectedWidth = maxW * 0.06f
+        val dotHeight = maxW * 0.013f
+        val dotPadding = maxW * 0.01f
+        val indicatorHeight = maxW * 0.1f
+
         Column(modifier = Modifier.fillMaxSize()) {
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // HorizontalPager로 swipe 가능한 페이지 전환
             HorizontalPager(
                 count = pages.size,
                 state = pagerState,
@@ -116,13 +76,10 @@ fun OnboardingScreen(
             ) { pageIndex ->
                 when (pageIndex) {
                     0 -> OnboardingPage1(
-                        currentPage = pageIndex,
-                        total = pages.size,
-                        maxW = maxW
+                        maxW = maxW,
+                        maxH = maxH
                     )
                     1 -> OnboardingPage2(
-                        currentPage = pageIndex,
-                        total = pages.size,
                         maxW = maxW,
                         maxH = maxH,
                         onFinish = onFinish
@@ -133,7 +90,7 @@ fun OnboardingScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(maxW * 0.1f)
+                    .height(indicatorHeight)
                     .background(Color.White),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
@@ -142,10 +99,10 @@ fun OnboardingScreen(
                     val isSelected = pagerState.currentPage == index
                     Box(
                         modifier = Modifier
-                            .padding(maxW * 0.01f)
+                            .padding(dotPadding)
                             .size(
                                 width = if (isSelected) selectedWidth else unselectedWidth,
-                                height = maxW * 0.013f
+                                height = dotHeight
                             )
                             .background(
                                 color = if (isSelected) Color(0xff00A5C2) else Color(0xffD9D9D9),
@@ -159,27 +116,28 @@ fun OnboardingScreen(
 }
 
 @Composable
-fun OnboardingPage1(
-    currentPage: Int,
-    total: Int,
-    maxW: Dp
-) {
+fun OnboardingPage1(maxW: Dp, maxH: Dp) {
+    // 텍스트 크기 비율을 maxW에 따라 동적으로 계산
+    val titleFontSize = maxW.value * 0.045f.sp // 16.sp, 18.sp를 대체
+    val bodyFontSize = maxW.value * 0.035f.sp // 15.sp를 대체
+    val disclaimerFontSize = maxW.value * 0.024f.sp // 9.sp를 대체
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 40.dp),
+            .padding(horizontal = maxW * 0.1f),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ) {
-        Column(horizontalAlignment = Alignment.Start){
-            Row(verticalAlignment = Alignment.Bottom){
+        Column(horizontalAlignment = Alignment.Start) {
+            Row(verticalAlignment = Alignment.Bottom) {
                 Text(
                     "작은 의견도 편하게 ",
                     color = Color.Black,
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp
+                        fontSize = titleFontSize * 0.9f // 비율 조정
                     ),
                 )
                 Text(
@@ -188,7 +146,7 @@ fun OnboardingPage1(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp
+                        fontSize = titleFontSize
                     ),
                 )
                 Text(
@@ -197,11 +155,11 @@ fun OnboardingPage1(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp
+                        fontSize = titleFontSize * 0.9f
                     ),
                 )
             }
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(maxH * 0.03f))
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
                     "교수님",
@@ -209,7 +167,7 @@ fun OnboardingPage1(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp
+                        fontSize = titleFontSize
                     ),
                 )
                 Text(
@@ -218,7 +176,7 @@ fun OnboardingPage1(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp
+                        fontSize = titleFontSize * 0.9f
                     ),
                 )
                 Text(
@@ -227,7 +185,7 @@ fun OnboardingPage1(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp
+                        fontSize = titleFontSize * 0.9f
                     ),
                 )
                 Text(
@@ -236,43 +194,44 @@ fun OnboardingPage1(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp
+                        fontSize = titleFontSize * 0.9f
                     ),
                 )
             }
-            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(maxH * 0.005f))
             Text(
                 "여러분의 질문이나 건의에 대해 정성스럽게 답해드려요",
                 color = Color.Black,
                 style = TextStyle(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 15.sp
+                    fontSize = bodyFontSize
                 ),
-                lineHeight = 28.sp
+                lineHeight = bodyFontSize * 1.8f
             )
-            Spacer(modifier = Modifier.height(120.dp))
+            Spacer(modifier = Modifier.height(maxH * 0.13f))
             Column(
                 modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(maxH*0.012f),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
                 Text(
                     "관리자가 게시글을 관리하고 있으니, 모두가 존중받을 수 있도록 깨끗하고 예의 바르게",
                     color = Color(0xffA5A5A5),
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 9.sp
+                        fontSize = disclaimerFontSize
                     ),
                 )
-                Row() {
+                Row {
                     Text(
                         "작성해 주세요. ",
                         color = Color(0xffA5A5A5),
                         style = TextStyle(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 9.sp
+                            fontSize = disclaimerFontSize
                         ),
                     )
                     Text(
@@ -281,7 +240,7 @@ fun OnboardingPage1(
                         style = TextStyle(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 9.sp
+                            fontSize = disclaimerFontSize
                         ),
                     )
                     Text(
@@ -290,13 +249,13 @@ fun OnboardingPage1(
                         style = TextStyle(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.SemiBold,
-                            fontSize = 9.sp
+                            fontSize = disclaimerFontSize
                         ),
                     )
                 }
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(maxH * 0.01f))
         Image(
             painter = painterResource(R.drawable.android_mockup1),
             contentDescription = null,
@@ -307,12 +266,14 @@ fun OnboardingPage1(
 
 @Composable
 fun OnboardingPage2(
-    currentPage: Int,
-    total: Int,
     maxW: Dp,
     maxH: Dp,
     onFinish: () -> Unit
 ) {
+    // 텍스트 크기 비율을 maxW에 따라 동적으로 계산
+    val buttonTextSize = maxW.value * 0.04f.sp // 14.sp를 대체
+    val bodyTextSize = maxW.value * 0.04f.sp // 17.sp, 19.sp를 대체
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -341,15 +302,15 @@ fun OnboardingPage2(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.Normal,
-                        fontSize = 14.sp
+                        fontSize = buttonTextSize
                     )
                 )
             }
         }
-        Spacer(modifier=Modifier.weight(1f))
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)){
+        Spacer(modifier = Modifier.weight(1f))
+        Column(verticalArrangement = Arrangement.spacedBy(maxH * 0.015f)) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = maxW * 0.1f),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.Bottom
             ) {
@@ -359,7 +320,7 @@ fun OnboardingPage2(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
+                        fontSize = bodyTextSize
                     ),
                 )
                 Text(
@@ -368,7 +329,7 @@ fun OnboardingPage2(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 19.sp
+                        fontSize = bodyTextSize * 1.2f // 비율 조정
                     ),
                 )
                 Text(
@@ -377,7 +338,7 @@ fun OnboardingPage2(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 17.sp
+                        fontSize = bodyTextSize
                     ),
                 )
                 Text(
@@ -386,7 +347,7 @@ fun OnboardingPage2(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 19.sp
+                        fontSize = bodyTextSize * 1.2f
                     ),
                 )
                 Text(
@@ -395,12 +356,12 @@ fun OnboardingPage2(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 17.sp
+                        fontSize = bodyTextSize
                     ),
                 )
             }
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = maxW * 0.1f),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.Bottom
             ) {
@@ -410,7 +371,7 @@ fun OnboardingPage2(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
+                        fontSize = bodyTextSize * 1.2f
                     ),
                 )
                 Text(
@@ -419,7 +380,7 @@ fun OnboardingPage2(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 17.sp
+                        fontSize = bodyTextSize
                     ),
                 )
                 Text(
@@ -428,12 +389,12 @@ fun OnboardingPage2(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
+                        fontSize = bodyTextSize
                     ),
                 )
             }
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = maxW * 0.1f),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.Bottom
             ) {
@@ -443,7 +404,7 @@ fun OnboardingPage2(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
+                        fontSize = bodyTextSize
                     ),
                 )
                 Text(
@@ -452,12 +413,12 @@ fun OnboardingPage2(
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 17.sp
+                        fontSize = bodyTextSize
                     ),
                 )
             }
         }
-        Spacer(modifier=Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(1f))
         Image(
             painter = painterResource(id = R.drawable.android_mockup2),
             contentDescription = null,
