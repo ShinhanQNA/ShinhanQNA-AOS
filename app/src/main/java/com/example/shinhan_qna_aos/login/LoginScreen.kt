@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.R
-import com.example.shinhan_qna_aos.main.MainScreen
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 
 @Composable
@@ -41,7 +40,7 @@ fun LoginScreen(viewModel: LoginViewModel,navController:NavController) {
                             "리프레시 토큰: ${(loginResult as LoginResult.Success).refreshToken} " +
                             "만료 시간: ${(loginResult as LoginResult.Success).expiresIn} 초"
                 )
-                navController.navigate("main") {
+                navController.navigate("info") {
                     // 로그인 화면을 백스택에서 제거하여 뒤로가기 시 다시 로그인 화면으로 안 돌아가게 처리
                     popUpTo("login") { inclusive = true }
                 }

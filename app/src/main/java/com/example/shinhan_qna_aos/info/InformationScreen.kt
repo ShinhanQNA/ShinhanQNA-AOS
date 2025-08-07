@@ -54,6 +54,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
@@ -378,6 +379,6 @@ fun Request(fontSize: TextUnit) {
 @Composable
 @Preview(showBackground = true)
 fun Informationpreview(){
-    val viewModel = InfoViewModel()
+    val viewModel : InfoViewModel = viewModel()
     InformationScreen(viewModel)
 }

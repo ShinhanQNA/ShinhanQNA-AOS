@@ -6,36 +6,32 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.login.LoginRepository
 import com.example.shinhan_qna_aos.login.LoginViewModel
-import com.example.shinhan_qna_aos.login.LoginViewModelFactory
-import com.example.shinhan_qna_aos.onboarding.OnboardingPrefs
-import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
+    val loginRepository = LoginRepository()
+
     private val loginViewModel: LoginViewModel by viewModels {
-        // 반드시 직접 만든 Factory 넘기기!
-        LoginViewModelFactory(LoginRepository())
+        SimpleViewModelFactory { LoginViewModel(loginRepository) }
     }
+    private val infoViewModel: InfoViewModel by viewModels {
+        SimpleViewModelFactory { InfoViewModel() }
+    }
+    private val onboardingViewModel: OnboardingViewModel by viewModels {
+        SimpleViewModelFactory { OnboardingViewModel() }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppNavigation(loginViewModel)
+            AppNavigation(loginViewModel,infoViewModel,onboardingViewModel)
         }
         // 최초 진입 시 딥링크 체크
         handleDeepLink(intent)
@@ -61,31 +57,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-    @Composable
-fun MainEntry(navController: NavController) {
-    val context = LocalContext.current
-    var showOnboarding by remember { mutableStateOf(true) }
-    val scope = rememberCoroutineScope()
-        val onboardingViewModel: OnboardingViewModel = viewModel()
-        // 첫 진입시 온보딩 완료 여부 체크
-    LaunchedEffect(Unit) {
-        showOnboarding = !OnboardingPrefs.isOnboarded(context)
-    }
-
-    if (showOnboarding) {
-        OnboardingScreen(
-            viewModel = onboardingViewModel,
-            onFinish = {
-                scope.launch {
-                    OnboardingPrefs.setOnboarded(context, true)
-                    showOnboarding = false // 로그인으로 전환
-                }
-            }
-        )
-    } else {
-        navController.navigate("login") {
-            // 로그인 화면을 백스택에서 제거하여 뒤로가기 시 다시 로그인 화면으로 안 돌아가게 처리
-            popUpTo("login") { inclusive = true }
-        }
-    }
+// 공통적으로 쓸 수 있는 공용 Factory 패턴
+class SimpleViewModelFactory<T: ViewModel>(
+    private val creator: () -> T
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T = creator() as T
 }
