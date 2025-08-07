@@ -4,9 +4,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.constraintlayout.widget.StateSet.TAG
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.API.APIInterface
@@ -24,109 +26,127 @@ import java.io.FileOutputStream
 
 class InfoViewModel : ViewModel() {
 
-    // 드롭다운 옵션: 학년, 전공
     val gradeOptions = listOf("1학년", "2학년", "3학년", "4학년")
     val majorOptions = listOf("소프트웨어융합학과")
 
-    // 전체 상태 관리 (Compose가 관찰 가능하도록 선언)
     var state by mutableStateOf(
-        LoginData(
-            studentId = "",
-            name = "",
-            grade = null,
-            major = null,
-            role = "사용자",
-            imageUri = null
-        )
+        LoginData()
     )
 
-    // 압축된 이미지 파일 저장소
     var compressedImageFile: File? by mutableStateOf(null)
 
-    // API 호출 및 로딩 상태, 메시지
     var apiResponseMessage by mutableStateOf<String?>(null)
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf<String?>(null)
 
-    // 상태 변경 함수
-    fun onNameChange(newName: String) { state = state.copy(name = newName) }
-    fun onStudentIdChange(newId: String) { state = state.copy(studentId = newId) }
-    fun onGradeChange(newGrade: String) { state = state.copy(grade = newGrade) }
-    fun onMajorChange(newMajor: String) { state = state.copy(major = newMajor) }
+    companion object {
+        private const val TAG = "InfoViewModel"
+    }
 
-    // 이미지 Uri 변화 시 호출: 이미지 압축 수행
-    fun onImageChange(context: Context, uri: Uri?) {
+    fun onNameChange(newName: String) {
+        state = state.copy(name = newName)
+    }
+
+    fun onStudentIdChange(newId: String) {
+        val idInt = newId.toIntOrNull() ?: 0
+        state = state.copy(studentId = idInt)
+    }
+
+    fun onGradeChange(newGrade: String) {
+        val yearInt = newGrade.replace("학년", "").toIntOrNull() ?: 0
+        state = state.copy(year = yearInt)
+    }
+
+    fun onMajorChange(newMajor: String) {
+        state = state.copy(department = newMajor)
+    }
+
+    fun onImageChange(context: Context, uri: Uri) {
+        Log.d(TAG, "onImageChange called with uri=$uri")
         state = state.copy(imageUri = uri)
-        if (uri == null) {
-            compressedImageFile = null
-            return
-        }
-
         viewModelScope.launch {
             compressedImageFile = compressImage(context, uri, 10)
+            Log.d(TAG, "onImageChange: compressedImageFile=${compressedImageFile?.absolutePath}")
         }
     }
 
-    // 이미지 압축 함수 (10MB 이하로 반복 압축)
     private suspend fun compressImage(context: Context, imageUri: Uri, maxFileSizeMB: Int): File? {
         return withContext(Dispatchers.IO) {
             try {
-                val inputStream = context.contentResolver.openInputStream(imageUri) ?: return@withContext null
+                val inputStream = context.contentResolver.openInputStream(imageUri)
+                if (inputStream == null) {
+                    Log.e(TAG, "compressImage: InputStream is null")
+                    return@withContext null
+                }
                 val originalBitmap = BitmapFactory.decodeStream(inputStream)
                 inputStream.close()
-
-                val compressedFile = File(context.cacheDir, "compressed_image.jpg")
-
+                if (originalBitmap == null) {
+                    Log.e(TAG, "compressImage: Failed to decode bitmap from Uri")
+                    return@withContext null
+                }
+                val compressedFile = File(context.cacheDir, "compressed_image_${System.currentTimeMillis()}.jpg")
                 var quality = 100
-                var fileSizeKB: Int
-
+                var fileSizeKB: Long
                 do {
-                    val outputStream = FileOutputStream(compressedFile)
-                    originalBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-                    outputStream.flush()
-                    outputStream.close()
-
-                    fileSizeKB = (compressedFile.length() / 1024).toInt()
+                    if (compressedFile.exists()) compressedFile.delete()
+                    FileOutputStream(compressedFile).use { outputStream ->
+                        val compressed = originalBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+                        if (!compressed) {
+                            Log.e(TAG, "compressImage: Bitmap compression failed at quality=$quality")
+                            return@withContext null
+                        }
+                        outputStream.flush()
+                    }
+                    fileSizeKB = compressedFile.length() / 1024
+                    Log.d(TAG, "compressImage loop: quality=$quality, size=${fileSizeKB}KB")
                     quality -= 5
                 } while (fileSizeKB > maxFileSizeMB * 1024 && quality > 5)
-
+                Log.d(TAG, "compressImage finished: file=${compressedFile.absolutePath}, size=${fileSizeKB}KB")
                 compressedFile
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(TAG, "compressImage: Exception during compression", e)
                 null
             }
         }
     }
 
-    // 학생 정보 인증 API 호출
     fun submitStudentInfo(api: APIInterface, accessToken: String, context: Context) {
         viewModelScope.launch {
             isLoading = true
             errorMessage = null
             apiResponseMessage = null
 
-            try {
-                // 각 필드를 RequestBody로 변환
-                val studentIdPart = state.studentId.toRequestBody("text/plain".toMediaType())
-                val namePart = state.name.toRequestBody("text/plain".toMediaType())
-                val departmentPart = (state.major ?: "").toRequestBody("text/plain".toMediaType())
-                val yearPart = (state.grade ?: "").toRequestBody("text/plain".toMediaType())
-                val rolePart = (state.role).toRequestBody("text/plain".toMediaType())
+            Log.d(TAG, "submitStudentInfo started with state: $state")
 
-                // 압축된 이미지가 없으면 오류 처리
+            if (state.imageUri == Uri.EMPTY || compressedImageFile == null) {
+                errorMessage = "사진 첨부는 필수입니다."
+                Log.e(TAG, errorMessage!!)
+                isLoading = false
+                return@launch
+            }
+
+            try {
+                Log.d(TAG, "Preparing multipart request body")
+                val studentIdPart = state.studentId.toString().toRequestBody("text/plain".toMediaType())
+                val namePart = state.name.toRequestBody("text/plain".toMediaType())
+                val departmentPart = state.department.toRequestBody("text/plain".toMediaType())
+                val yearPart = state.year.toString().toRequestBody("text/plain".toMediaType())
+                val rolePart = state.role.toRequestBody("text/plain".toMediaType())
+
                 val imagePart = compressedImageFile?.let { file ->
-                    val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+                    Log.d(TAG, "Image file for upload: ${file.absolutePath}, size=${file.length() / 1024}KB")
+                    val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
                     MultipartBody.Part.createFormData("image", file.name, requestFile)
                 }
 
                 if (imagePart == null) {
-                    isLoading = false
                     errorMessage = "사진이 존재하지 않습니다."
+                    Log.e(TAG, errorMessage!!)
+                    isLoading = false
                     return@launch
                 }
 
-                // API 호출
-                val response: Response<InfoData> = api.InfoStudent(
+                val response = api.InfoStudent(
                     accessToken = "Bearer $accessToken",
                     studentId = studentIdPart,
                     name = namePart,
@@ -138,23 +158,19 @@ class InfoViewModel : ViewModel() {
 
                 if (response.isSuccessful) {
                     apiResponseMessage = response.body()?.message ?: "성공"
+                    Log.d(TAG, "API call successful: $apiResponseMessage")
                 } else {
+                    val errBody = response.errorBody()?.string()
                     when (response.code()) {
-                        401 -> {
-                            val errorBody = response.errorBody()?.string()
-                            errorMessage = errorBody ?: "사진이 존재하지 않습니다."
-                        }
-                        500 -> {
-                            val errorBody = response.errorBody()?.string()
-                            errorMessage = errorBody ?: "서버 에러가 발생했습니다."
-                        }
-                        else -> {
-                            errorMessage = "알 수 없는 오류: ${response.code()}"
-                        }
+                        401 -> Log.e(TAG, "Unauthorized (401): $errBody")
+                        500 -> Log.e(TAG, "Server error (500): $errBody")
+                        else -> Log.e(TAG, "Unknown error ${response.code()}: $errBody")
                     }
+                    errorMessage = errBody ?: "알 수 없는 오류: ${response.code()}"
                 }
             } catch (e: Exception) {
                 errorMessage = "통신 오류가 발생했습니다: ${e.localizedMessage}"
+                Log.e(TAG, "Exception while calling API", e)
             } finally {
                 isLoading = false
             }
@@ -162,16 +178,3 @@ class InfoViewModel : ViewModel() {
     }
 }
 
-object FileUtil {
-    // Uri를 임시 파일로 변환하는 함수
-    fun from(context: Context, uri: Uri): File {
-        val inputStream = context.contentResolver.openInputStream(uri)
-            ?: throw IllegalArgumentException("Uri를 열 수 없습니다.")
-        val file = File(context.cacheDir, "temp_image")
-        val outputStream = FileOutputStream(file)
-        inputStream.copyTo(outputStream)
-        outputStream.close()
-        inputStream.close()
-        return file
-    }
-}

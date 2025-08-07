@@ -1,8 +1,5 @@
 package com.example.shinhan_qna_aos.info
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -28,20 +26,11 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,12 +39,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -69,10 +55,6 @@ import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.login.TokenManager
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileOutputStream
 
 @Composable
 fun InformationScreen(
@@ -83,42 +65,30 @@ fun InformationScreen(
     var expandedGrade by remember { mutableStateOf(false) }
     var expandedMajor by remember { mutableStateOf(false) }
 
+    val isFormValid = remember(state) {
+        state.name.isNotBlank()
+                && state.studentId != 0
+                && state.year != 0
+                && state.department.isNotBlank()
+                && state.imageUri != Uri.EMPTY
+    }
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
             .background(Color.White)
     ) {
-        // 현재 화면의 폭과 높이 구하기
         val maxWidthPx = maxWidth
         val maxHeightPx = maxHeight
-        // 화면 비율(가로/세로)
         val aspectRatio = maxWidthPx / maxHeightPx
 
-        /**
-         * 반응형 파라미터 계산:
-         * - Compact: 600dp 이하 (모바일)
-         * - Medium: 601~840dp (태블릿)
-         * - Expanded: 841dp 이상 (데스크탑)
-         *
-         * 화면 비율이 1보다 작으면 세로형(모바일), 1보다 크면 가로형(태블릿/데스크탑)
-         */
         val (horizontalPadding, contentWidthFraction, logoSize) = when {
-            maxWidthPx <= 600.dp -> { // Compact (mobile)
-                val size = if (aspectRatio < 1f) 80.dp else 96.dp // 세로면 작게
-                Triple(40.dp, 0.88f, size)
-            }
-            maxWidthPx <= 840.dp -> { // Medium (tablet)
-                val size = if (aspectRatio < 1f) 112.dp else 100.dp
-                Triple(32.dp, 0.7f, size)
-            }
-            else -> { // Expanded (desktop)
-                val size = if (aspectRatio < 1.2f) 128.dp else 110.dp
-                Triple(64.dp, 0.5f, size)
-            }
+            maxWidthPx <= 600.dp -> Triple(40.dp, 0.88f, if (aspectRatio < 1f) 80.dp else 96.dp)
+            maxWidthPx <= 840.dp -> Triple(32.dp, 0.7f, if (aspectRatio < 1f) 112.dp else 100.dp)
+            else -> Triple(64.dp, 0.5f, if (aspectRatio < 1.2f) 128.dp else 110.dp)
         }
 
-        // 실제 UI 코드 시작
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -126,7 +96,6 @@ fun InformationScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // 반응형 로고 이미지
             Image(
                 painter = painterResource(id = R.drawable.biglogo),
                 contentDescription = "Logo",
@@ -134,7 +103,6 @@ fun InformationScreen(
             )
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 내부 콘텐츠 (Name, StudentId, Grade, Major, Image)
             Column(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 modifier = Modifier.fillMaxWidth(contentWidthFraction)
@@ -142,7 +110,7 @@ fun InformationScreen(
                 NameField(
                     value = state.name,
                     onValueChange = viewModel::onNameChange,
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -152,11 +120,11 @@ fun InformationScreen(
                         value = state.studentId,
                         onValueChange = viewModel::onStudentIdChange,
                         fontSize = 14.sp,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(0.55f)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     GradeDropdown(
-                        selected = state.grade,
+                        selected = state.year,
                         onSelectedChange = viewModel::onGradeChange,
                         options = viewModel.gradeOptions,
                         expanded = expandedGrade,
@@ -166,17 +134,17 @@ fun InformationScreen(
                     )
                 }
                 MajorDropdown(
-                    selected = state.major,
+                    selected = state.department,
                     onSelectedChange = viewModel::onMajorChange,
                     options = viewModel.majorOptions,
                     expanded = expandedMajor,
                     onExpandedChange = { expandedMajor = it },
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
                 )
                 ImageInsert(viewModel = viewModel, fontSize = 14.sp)
             }
             Spacer(modifier = Modifier.height(36.dp))
-            Request(fontSize = 14.sp,viewModel,tokenManager)
+            Request(fontSize = 14.sp, viewModel = viewModel, tokenManager = tokenManager, enabled = isFormValid)
         }
     }
 }
@@ -300,39 +268,50 @@ fun NameField(value: String, onValueChange: (String) -> Unit, fontSize: TextUnit
 
 @Composable
 fun StudentIdField(
-    value: String,
+    value: Int,
     onValueChange: (String) -> Unit,
     fontSize: TextUnit,
     modifier: Modifier = Modifier
 ) = LabeledField("학번", fontSize, modifier) {
+    val displayValue = if (value == 0) "" else value.toString()
     PlainInputField(
-        value,
+        value = displayValue,
         onValueChange = { newValue ->
-            if (newValue.length <= 8) {
-                 onValueChange(newValue)
-                }
-            },
-        fontSize,
-        keyboardType = KeyboardType.Number
+            if (newValue.length <= 8 && newValue.all { it.isDigit() }) {
+                onValueChange(newValue)
+            }
+        },
+        fontSize = fontSize,
+        keyboardType = KeyboardType.Number,
     )
 }
 
 @Composable
 fun GradeDropdown(
-    selected: String?,
+    selected: Int,
     onSelectedChange: (String) -> Unit,
     options: List<String>,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     fontSize: TextUnit,
     modifier: Modifier = Modifier
-) = DropDownField(
-    "학년", selected, onSelectedChange, options, expanded, onExpandedChange, fontSize, modifier
-)
+) {
+    val selectedText = if (selected == 0) "" else "${selected}학년"
+    DropDownField(
+        label = "학년",
+        selected = selectedText,
+        onSelectedChange = onSelectedChange,
+        options = options,
+        expanded = expanded,
+        onExpandedChange = onExpandedChange,
+        fontSize = fontSize,
+        modifier = modifier
+    )
+}
 
 @Composable
 fun MajorDropdown(
-    selected: String?,
+    selected: String,
     onSelectedChange: (String) -> Unit,
     options: List<String>,
     expanded: Boolean,
@@ -340,19 +319,25 @@ fun MajorDropdown(
     fontSize: TextUnit,
     modifier: Modifier = Modifier
 ) = DropDownField(
-    "학과", selected, onSelectedChange, options, expanded, onExpandedChange, fontSize, modifier
+    label = "학과",
+    selected = selected,
+    onSelectedChange = onSelectedChange,
+    options = options,
+    expanded = expanded,
+    onExpandedChange = onExpandedChange,
+    fontSize = fontSize,
+    modifier = modifier
 )
-
 // 이미지 첨부 영역
 @Composable
 fun ImageInsert(viewModel: InfoViewModel, fontSize: TextUnit) {
     val context = LocalContext.current
     val imageUri = viewModel.state.imageUri
 
-    // 사진첩에서 이미지 고르기 위한 ActivityResultLauncher 준비
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        viewModel.onImageChange(context, uri)
-    }
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let { viewModel.onImageChange(context, it) }
+        }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -360,18 +345,20 @@ fun ImageInsert(viewModel: InfoViewModel, fontSize: TextUnit) {
             style = TextStyle(
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,
-                fontSize = fontSize
+                fontSize = fontSize,
             )
         )
         Spacer(modifier = Modifier.height(8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Button(
-                onClick = { launcher.launch("image/*") }, // 클릭 시 사진첩 열기
+                onClick = { launcher.launch("image/*") },
                 colors = ButtonDefaults.buttonColors(Color.Black),
-                modifier = Modifier.defaultMinSize(minHeight = 36.dp)
+                modifier = Modifier.defaultMinSize(minHeight = 36.dp),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(0.dp),
             ) {
                 Text(
                     text = "사진 첨부",
@@ -379,15 +366,16 @@ fun ImageInsert(viewModel: InfoViewModel, fontSize: TextUnit) {
                     style = TextStyle(
                         fontFamily = pretendard,
                         fontWeight = FontWeight.Normal,
-                        fontSize = fontSize
-                    )
+                        fontSize = fontSize,
+                    ),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                 )
             }
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = imageUri?.lastPathSegment ?: "첨부된 사진이 없습니다.",
+                text = imageUri.lastPathSegment ?: "첨부된 사진이 없습니다.",
                 maxLines = 1,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         }
     }
@@ -395,16 +383,24 @@ fun ImageInsert(viewModel: InfoViewModel, fontSize: TextUnit) {
 
 // 가입 요청 버튼
 @Composable
-fun Request(fontSize: TextUnit, viewModel: InfoViewModel,tokenManager: TokenManager) {
+fun Request(
+    fontSize: TextUnit,
+    viewModel: InfoViewModel,
+    tokenManager: TokenManager,
+    enabled: Boolean
+) {
     val context = LocalContext.current
     val api = APIRetrofit.apiService
     val accessToken = tokenManager.accessToken
 
     Box(
         modifier = Modifier
-            .background(color = Color.Black, shape = RoundedCornerShape(6.dp))
+            .background(
+                color = if (enabled) Color.Black else Color(0xffC2C2C2),
+                shape = RoundedCornerShape(6.dp)
+            )
             .padding(horizontal = 18.dp, vertical = 12.dp)
-            .clickable {
+            .clickable(enabled = enabled) {
                 viewModel.submitStudentInfo(api, accessToken!!, context)
             }
     ) {
@@ -414,12 +410,11 @@ fun Request(fontSize: TextUnit, viewModel: InfoViewModel,tokenManager: TokenMana
             style = TextStyle(
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,
-                fontSize = fontSize
+                fontSize = fontSize,
             )
         )
     }
 }
-
 
 
 @Composable
