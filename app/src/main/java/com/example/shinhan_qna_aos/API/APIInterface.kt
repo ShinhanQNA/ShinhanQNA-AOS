@@ -16,8 +16,8 @@ interface APIInterface {
     @Headers("Content-Type: application/json")
     @POST("/token/reissue")
     suspend fun ReToken(
-        @Header("Refresh-Token") refreshToken:String,
-    ):Response<ReToken>
+        @Header("Refresh-Token") refreshToken: String
+    ): Response<ReToken>
 
     // 학생 정보
     @Headers("Content-Type: multipart/form-data")

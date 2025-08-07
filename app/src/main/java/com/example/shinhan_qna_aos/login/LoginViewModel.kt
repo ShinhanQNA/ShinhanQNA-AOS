@@ -41,7 +41,6 @@ class LoginViewModel(
             val isRefreshTokenExpired = tokenManager.isRefreshTokenExpired()
 
             when {
-                // case 1: accessToken, refreshToken 모두 만료 → 재로그인 유도
                 isAccessTokenExpired && isRefreshTokenExpired -> {
                     tokenManager.clearTokens()
                     _loginResult.value = LoginResult.Failure(
@@ -49,59 +48,54 @@ class LoginViewModel(
                         message = "토큰이 만료되어 재로그인이 필요합니다."
                     )
                 }
-                // case 2: accessToken 만료, refreshToken 유효 → accessToken 재발급 시도
                 isAccessTokenExpired && !isRefreshTokenExpired -> {
                     val refreshToken = tokenManager.refreshToken
-                    if (refreshToken != null) {
-                        val response = runCatching { apiInterface.ReToken(refreshToken) }.getOrNull()
+                    if (refreshToken.isNullOrBlank()) {
+                        _loginResult.value = LoginResult.Failure(
+                            status = 400,
+                            message = "유효한 Refresh token이 존재하지 않습니다."
+                        )
+                        return@launch
+                    }
 
-                        if (response != null) {
-                            if (response.isSuccessful) {
-                                val newToken = response.body()
-                                if (newToken != null) {
-                                    tokenManager.accessToken = newToken.accessToken
-                                    tokenManager.accessTokenExpiresAt = System.currentTimeMillis() + newToken.expiresIn * 1000L
-                                    _loginResult.value = LoginResult.Success(
-                                        accessToken = newToken.accessToken,
-                                        refreshToken = refreshToken,
-                                        expiresIn = newToken.expiresIn
-                                    )
-                                } else {
-                                    tokenManager.clearTokens()
-                                    _loginResult.value = LoginResult.Failure(
-                                        status = 500,
-                                        message = "Access token 재발급 실패: 응답 데이터 오류"
-                                    )
-                                }
-                            } else if (response.code() == 500) {
-                                // 500 에러: 로그인 실패 메시지 처리
-                                val errorBody = response.errorBody()?.string()
-                                tokenManager.clearTokens()
-                                _loginResult.value = LoginResult.Failure(
-                                    status = 500,
-                                    message = errorBody ?: "로그인 실패"
-                                )
-                            } else {
-                                tokenManager.clearTokens()
-                                _loginResult.value = LoginResult.Failure(
-                                    status = response.code(),
-                                    message = response.message()
-                                )
-                            }
+                    val response = runCatching { apiInterface.ReToken(refreshToken) }
+                        .onFailure { e -> Log.e("LoginViewModel", "ReToken 호출 실패", e) }
+                        .getOrNull()
+
+                    if (response == null) {
+                        _loginResult.value = LoginResult.Failure(
+                            status = 500,
+                            message = "통신 오류로 토큰 재발급 실패"
+                        )
+                        return@launch
+                    }
+
+                    if (response.isSuccessful) {
+                        val newToken = response.body()
+                        if (newToken != null) {
+                            tokenManager.accessToken = newToken.accessToken
+                            tokenManager.accessTokenExpiresAt = System.currentTimeMillis() + newToken.expiresIn * 1000L
+                            _loginResult.value = LoginResult.Success(
+                                accessToken = newToken.accessToken,
+                                refreshToken = refreshToken,
+                                expiresIn = newToken.expiresIn
+                            )
                         } else {
+                            tokenManager.clearTokens()
                             _loginResult.value = LoginResult.Failure(
                                 status = 500,
-                                message = "통신 오류로 토큰 재발급 실패"
+                                message = "Access token 재발급 실패: 응답 데이터 오류"
                             )
                         }
                     } else {
+                        val errorBody = response.errorBody()?.string()
+                        tokenManager.clearTokens()
                         _loginResult.value = LoginResult.Failure(
-                            status = 500,
-                            message = "Refresh token이 존재하지 않음"
+                            status = response.code(),
+                            message = errorBody ?: response.message()
                         )
                     }
                 }
-                // case 3: accessToken 유효, refreshToken 만료 → 재로그인 처리 (refresh token 재발급 API 없으면 재로그인)
                 isRefreshTokenExpired -> {
                     tokenManager.clearTokens()
                     _loginResult.value = LoginResult.Failure(
@@ -109,7 +103,6 @@ class LoginViewModel(
                         message = "Refresh token 만료, 재로그인이 필요합니다."
                     )
                 }
-                // case 4: accessToken, refreshToken 모두 유효 → 로그인 성공 상태 유지
                 else -> {
                     val accessToken = tokenManager.accessToken
                     val refreshToken = tokenManager.refreshToken
@@ -126,6 +119,7 @@ class LoginViewModel(
             }
         }
     }
+
 
     // 카카오 로그인 URL 오픈
     fun openKakaoLogin(context: Context) {
