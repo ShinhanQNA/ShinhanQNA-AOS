@@ -33,7 +33,9 @@ android {
 
         buildConfigField("String","LOCAL_URL","\"${localProperties["LOCAL_URL"]}\"")
         manifestPlaceholders["LOCAL_URL"] = "${localProperties["LOCAL_URL"]}"
+
         buildConfigField("String","BASE_URL","\"${localProperties["BASE_URL"]}\"")
+
         buildConfigField("String","MY_SCHEME","\"${localProperties["MY_SCHEME"]}\"")
         manifestPlaceholders["MY_SCHEME"] = "${localProperties["MY_SCHEME"]}"
     }
@@ -92,7 +94,6 @@ dependencies {
     // Kakao SDK (implementation 버전 확인 필수)
     implementation("com.kakao.sdk:v2-user:2.21.5")  // 사용자 정보, 로그인
     implementation("com.kakao.sdk:v2-auth:2.21.5")  // 로그인
-
     // Kotlin Coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     //API

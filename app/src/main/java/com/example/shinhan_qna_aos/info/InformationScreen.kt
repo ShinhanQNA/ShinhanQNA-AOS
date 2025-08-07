@@ -1,5 +1,11 @@
 package com.example.shinhan_qna_aos.info
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,6 +32,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -55,13 +64,20 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.shinhan_qna_aos.API.APIRetrofit
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.login.TokenManager
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 
 @Composable
 fun InformationScreen(
-    viewModel: InfoViewModel
+    viewModel: InfoViewModel,
+    tokenManager: TokenManager
 ) {
     val state = viewModel.state
     var expandedGrade by remember { mutableStateOf(false) }
@@ -157,10 +173,10 @@ fun InformationScreen(
                     onExpandedChange = { expandedMajor = it },
                     fontSize = 14.sp
                 )
-                ImageInsert(fontSize = 14.sp)
+                ImageInsert(viewModel = viewModel, fontSize = 14.sp)
             }
             Spacer(modifier = Modifier.height(36.dp))
-            Request(fontSize = 14.sp)
+            Request(fontSize = 14.sp,viewModel,tokenManager)
         }
     }
 }
@@ -329,56 +345,87 @@ fun MajorDropdown(
 
 // 이미지 첨부 영역
 @Composable
-fun ImageInsert(fontSize: TextUnit){
-    Column(Modifier.fillMaxWidth()) {
+fun ImageInsert(viewModel: InfoViewModel, fontSize: TextUnit) {
+    val context = LocalContext.current
+    val imageUri = viewModel.state.imageUri
+
+    // 사진첩에서 이미지 고르기 위한 ActivityResultLauncher 준비
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        viewModel.onImageChange(context, uri)
+    }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            "재학 확인서 첨부(학생증, 재학증명서)",
-            style = TextStyle(fontFamily = pretendard, fontWeight = FontWeight.Normal, fontSize = fontSize)
+            text = "재학 확인서 첨부(학생증, 재학증명서)",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = fontSize
+            )
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Row(
-            Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .defaultMinSize(minHeight = 36.dp)
-                    .background(color = Color.Black, shape = RoundedCornerShape(12.dp))
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                contentAlignment = Alignment.Center
+            Button(
+                onClick = { launcher.launch("image/*") }, // 클릭 시 사진첩 열기
+                colors = ButtonDefaults.buttonColors(Color.Black),
+                modifier = Modifier.defaultMinSize(minHeight = 36.dp)
             ) {
                 Text(
-                    "사진 첨부", color = Color.White,
-                    style = TextStyle(fontFamily = pretendard, fontWeight = FontWeight.Normal, fontSize = fontSize)
+                    text = "사진 첨부",
+                    color = Color.White,
+                    style = TextStyle(
+                        fontFamily = pretendard,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = fontSize
+                    )
                 )
             }
-            Spacer(Modifier.width(10.dp))
-            Text("url")
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = imageUri?.lastPathSegment ?: "첨부된 사진이 없습니다.",
+                maxLines = 1,
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
 
 // 가입 요청 버튼
 @Composable
-fun Request(fontSize: TextUnit) {
+fun Request(fontSize: TextUnit, viewModel: InfoViewModel,tokenManager: TokenManager) {
+    val context = LocalContext.current
+    val api = APIRetrofit.apiService
+    val accessToken = tokenManager.accessToken
+
     Box(
         modifier = Modifier
             .background(color = Color.Black, shape = RoundedCornerShape(6.dp))
             .padding(horizontal = 18.dp, vertical = 12.dp)
+            .clickable {
+                viewModel.submitStudentInfo(api, accessToken!!, context)
+            }
     ) {
         Text(
             text = "가입요청",
             color = Color.White,
-            modifier = Modifier.clickable { /* 가입 요청 로직 */ },
-            style = TextStyle(fontFamily = pretendard, fontWeight = FontWeight.Normal, fontSize = fontSize)
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = fontSize
+            )
         )
     }
 }
+
 
 
 @Composable
 @Preview(showBackground = true)
 fun Informationpreview(){
     val viewModel : InfoViewModel = viewModel()
-    InformationScreen(viewModel)
+    lateinit var tokenManager: TokenManager
+    InformationScreen(viewModel,tokenManager)
 }

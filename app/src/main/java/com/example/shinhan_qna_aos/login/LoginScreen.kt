@@ -1,6 +1,5 @@
 package com.example.shinhan_qna_aos.login
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,9 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,38 +17,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel,navController:NavController) {
+fun LoginScreen(viewModel: LoginViewModel) {
     val context = LocalContext.current
-    val loginResult by viewModel.loginResult.collectAsState()
-    // 로그인 결과 표시 (토큰 수신 성공/실패)
-
-    LaunchedEffect(loginResult) {
-        Log.d("LoginScreen", "==== loginResult 변경됨: $loginResult ====")
-        when (loginResult) {
-            is LoginResult.Success -> {
-                Log.d(
-                    "LoginScreen", "로그인 성공! 액세스 토큰: ${(loginResult as LoginResult.Success).accessToken} " +
-                            "리프레시 토큰: ${(loginResult as LoginResult.Success).refreshToken} " +
-                            "만료 시간: ${(loginResult as LoginResult.Success).expiresIn} 초"
-                )
-                navController.navigate("info") {
-                    // 로그인 화면을 백스택에서 제거하여 뒤로가기 시 다시 로그인 화면으로 안 돌아가게 처리
-                    popUpTo("login") { inclusive = true }
-                }
-            }
-            is LoginResult.Failure -> {
-                Log.e("LoginScreen", "로그인 실패: ${(loginResult as LoginResult.Failure).errorMsg}")
-            }
-            else -> {
-                Log.d("LoginScreen", "Idle 또는 기타 상태")
-            }
-        }
-    }
 
     BoxWithConstraints(
         modifier = Modifier

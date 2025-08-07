@@ -8,31 +8,56 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.shinhan_qna_aos.API.APIInterface
+import com.example.shinhan_qna_aos.API.APIRetrofit
 import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.login.LoginRepository
 import com.example.shinhan_qna_aos.login.LoginViewModel
+import com.example.shinhan_qna_aos.login.TokenManager
+import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
 
 class MainActivity : ComponentActivity() {
 
-    val loginRepository = LoginRepository()
+    private val loginRepository = LoginRepository()
+    private val apiInterface: APIInterface = APIRetrofit.apiService
+    private lateinit var tokenManager: TokenManager
+    private lateinit var onboardingRepository: OnboardingRepository
 
     private val loginViewModel: LoginViewModel by viewModels {
-        SimpleViewModelFactory { LoginViewModel(loginRepository) }
-    }
-    private val infoViewModel: InfoViewModel by viewModels {
-        SimpleViewModelFactory { InfoViewModel() }
-    }
-    private val onboardingViewModel: OnboardingViewModel by viewModels {
-        SimpleViewModelFactory { OnboardingViewModel() }
+        SimpleViewModelFactory {
+            LoginViewModel(loginRepository, apiInterface, tokenManager)
+        }
     }
 
+    private val onboardingViewModel: OnboardingViewModel by viewModels {
+        SimpleViewModelFactory {
+            OnboardingViewModel(onboardingRepository)
+        }
+    }
+
+    private val infoViewModel: InfoViewModel by viewModels {
+        SimpleViewModelFactory {
+            InfoViewModel()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 토큰 매니저 초기화 (applicationContext 꼭 사용)
+        tokenManager = TokenManager(applicationContext)
+
+        // 온보딩 Repository 초기화
+        onboardingRepository = OnboardingRepository(applicationContext)
+
+        // 앱 시작 시 토큰 만료 여부 체크(있으면 재발급 시도)
+        loginViewModel.tryRefreshTokenIfNeeded()
+
         setContent {
-            AppNavigation(loginViewModel,infoViewModel,onboardingViewModel)
+            AppNavigation(loginViewModel, infoViewModel, onboardingViewModel,tokenManager)
         }
+
         // 최초 진입 시 딥링크 체크
         handleDeepLink(intent)
     }
@@ -57,9 +82,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// 공통적으로 쓸 수 있는 공용 Factory 패턴
+// 공통 ViewModelFactory 구현
 class SimpleViewModelFactory<T: ViewModel>(
     private val creator: () -> T
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T = creator() as T
+): ViewModelProvider.Factory {
+    override fun <VM : ViewModel> create(modelClass: Class<VM>): VM = creator() as VM
 }
