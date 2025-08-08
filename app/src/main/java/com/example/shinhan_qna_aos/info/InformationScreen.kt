@@ -67,7 +67,7 @@ fun InformationScreen(
 
     val isFormValid = remember(state) {
         state.name.isNotBlank()
-                && state.studentId != 0
+                && state.students != 0
                 && state.year != 0
                 && state.department.isNotBlank()
                 && state.imageUri != Uri.EMPTY
@@ -117,7 +117,7 @@ fun InformationScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     StudentIdField(
-                        value = state.studentId,
+                        value = state.students,
                         onValueChange = viewModel::onStudentIdChange,
                         fontSize = 14.sp,
                         modifier = Modifier.weight(0.55f)
@@ -390,9 +390,6 @@ fun Request(
     enabled: Boolean
 ) {
 
-    val api = APIRetrofit.apiService
-    val accessToken = tokenManager.accessToken
-
     Box(
         modifier = Modifier
             .background(
@@ -401,7 +398,7 @@ fun Request(
             )
             .padding(horizontal = 18.dp, vertical = 12.dp)
             .clickable(enabled = enabled) {
-                viewModel.submitStudentInfo(api, accessToken!!)
+                viewModel.submitStudentInfo()
 
             }
     ) {

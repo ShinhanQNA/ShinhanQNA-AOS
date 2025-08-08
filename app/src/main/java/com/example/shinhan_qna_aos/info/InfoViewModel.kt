@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.StateSet.TAG
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.API.APIInterface
+import com.example.shinhan_qna_aos.login.TokenManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -24,7 +25,10 @@ import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
 
-class InfoViewModel : ViewModel() {
+class InfoViewModel(
+    private val api: APIInterface,
+    private val tokenManager: TokenManager
+) : ViewModel() {
 
     val gradeOptions = listOf("1학년", "2학년", "3학년", "4학년")
     val majorOptions = listOf("소프트웨어융합학과")
@@ -35,7 +39,6 @@ class InfoViewModel : ViewModel() {
 
     var compressedImageFile: File? by mutableStateOf(null)
 
-    var apiResponseMessage by mutableStateOf<String?>(null)
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf<String?>(null)
 
@@ -49,7 +52,7 @@ class InfoViewModel : ViewModel() {
 
     fun onStudentIdChange(newId: String) {
         val idInt = newId.toIntOrNull() ?: 0
-        state = state.copy(studentId = idInt)
+        state = state.copy(students= idInt)
     }
 
     fun onGradeChange(newGrade: String) {
@@ -110,11 +113,16 @@ class InfoViewModel : ViewModel() {
         }
     }
 
-    fun submitStudentInfo(api: APIInterface, accessToken: String) {
+    fun submitStudentInfo() {
+        val accessToken = tokenManager.accessToken
+        if (accessToken.isNullOrEmpty()) {
+            errorMessage = "로그인 정보가 없습니다. 다시 로그인 해주세요."
+            return
+        }
+
         viewModelScope.launch {
             isLoading = true
             errorMessage = null
-            apiResponseMessage = null
 
             Log.d(TAG, "submitStudentInfo started with state: $state")
 
@@ -128,16 +136,12 @@ class InfoViewModel : ViewModel() {
             try {
                 Log.d(TAG, "Preparing multipart request body")
 
-                // studentId, year (숫자지만 MultipartBody.Part로는 문자열 RequestBody로 지정)
-                val studentIdPart = state.studentId.toString().toRequestBody("text/plain".toMediaType())
+                val studentIdPart = state.students.toString().toRequestBody("text/plain".toMediaType())
                 val yearPart = state.year.toString().toRequestBody("text/plain".toMediaType())
-
-                // string 타입 필드들
                 val namePart = state.name.toRequestBody("text/plain".toMediaType())
                 val departmentPart = state.department.toRequestBody("text/plain".toMediaType())
                 val rolePart = state.role.toRequestBody("text/plain".toMediaType())
 
-                // 이미지 파일 MultipartBody.Part
                 val imagePart = compressedImageFile?.let { file ->
                     Log.d(TAG, "Image file for upload: ${file.absolutePath}, size=${file.length() / 1024}KB")
                     val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
@@ -151,7 +155,6 @@ class InfoViewModel : ViewModel() {
                     return@launch
                 }
 
-                // API 호출
                 val response = api.InfoStudent(
                     accessToken = "Bearer $accessToken",
                     students = studentIdPart,
@@ -163,8 +166,7 @@ class InfoViewModel : ViewModel() {
                 )
 
                 if (response.isSuccessful) {
-                    apiResponseMessage = response.body()?.message ?: "성공"
-                    Log.d(TAG, "API call successful: $apiResponseMessage")
+                    Log.d(TAG, "API call successful: ${response.code()}")
                 } else {
                     val errBody = response.errorBody()?.string()
                     when (response.code()) {

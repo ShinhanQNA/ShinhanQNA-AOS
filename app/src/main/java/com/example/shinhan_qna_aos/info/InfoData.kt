@@ -7,7 +7,7 @@ data class InfoData(
 )
 
 data class LoginData(
-    val studentId: Int = 0,        // 학번
+    val students: Int = 0,        // 학번
     val name: String = "",         // 이름
     val department: String = "",   // 학과
     val year: Int = 0,             // 학년

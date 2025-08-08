@@ -6,6 +6,7 @@ import com.example.shinhan_qna_aos.login.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.ReToken
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Header
@@ -47,6 +48,6 @@ interface APIInterface {
         @Part("year") year: RequestBody,
         @Part("role") role: RequestBody,
         @Part image: MultipartBody.Part
-    ): Response<InfoData>
+    ): Response<ResponseBody>
 }
 

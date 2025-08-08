@@ -2,7 +2,6 @@ package com.example.shinhan_qna_aos.login
 
 import android.content.Context
 
-
 class TokenManager(private val context: Context) {
     private val prefs = context.getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
 
@@ -22,12 +21,19 @@ class TokenManager(private val context: Context) {
         get() = prefs.getLong("REFRESH_TOKEN_EXP", 0L)
         set(value) = prefs.edit().putLong("REFRESH_TOKEN_EXP", value).apply()
 
-    fun saveTokens(accessToken: String, refreshToken: String, expiresIn: Int) {
+    // expiresIn은 access token 유효기간(초)
+    // refreshTokenExpiresIn: Long? = null 은 refresh token 유효기간(초) (optional)
+    fun saveTokens(accessToken: String, refreshToken: String, expiresIn: Int, refreshTokenExpiresIn: Long? = null) {
+        val now = System.currentTimeMillis()
         this.accessToken = accessToken
         this.refreshToken = refreshToken
-        this.accessTokenExpiresAt = System.currentTimeMillis() + expiresIn * 1000L
-        // 예: 리프레시 토큰 만료기간은 30일 후로 가정
-        this.refreshTokenExpiresAt = System.currentTimeMillis() + 30L * 24 * 60 * 60 * 1000
+        this.accessTokenExpiresAt = now + expiresIn * 1000L
+        this.refreshTokenExpiresAt = if (refreshTokenExpiresIn != null) {
+            now + refreshTokenExpiresIn * 1000L
+        } else {
+            // 기본 7일 만료 예시
+            now + 7L * 24 * 60 * 60 * 1000
+        }
     }
 
     fun isAccessTokenExpired(): Boolean = System.currentTimeMillis() >= accessTokenExpiresAt
@@ -37,5 +43,4 @@ class TokenManager(private val context: Context) {
         prefs.edit().clear().apply()
     }
 }
-
 

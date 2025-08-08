@@ -36,6 +36,7 @@ class LoginViewModel(
                         if (response.isSuccessful) {
                             val body = response.body()
                             if (body != null) {
+                                tokenManager.saveTokens(body.accessToken, body.refreshToken, body.expiresIn)
                                 _loginResult.value = LoginResult.Success(
                                     accessToken = body.accessToken,
                                     refreshToken = body.refreshToken,
@@ -90,11 +91,22 @@ class LoginViewModel(
     // 리프레시 토큰으로 액세스 토큰 재발급
     fun tryRefreshTokenIfNeeded() {
         viewModelScope.launch {
-            val refreshToken = tokenManager.refreshToken
-            if (refreshToken.isNullOrBlank()) {
-                _loginResult.value = LoginResult.Failure(-1, "Refresh token 없음")
+            if (!tokenManager.isAccessTokenExpired()) {
+                // 액세스 토큰이 아직 유효하면 별도 처리 없이 성공 상태 유지 가능
+                _loginResult.value = LoginResult.Success(
+                    tokenManager.accessToken.orEmpty(),
+                    tokenManager.refreshToken.orEmpty(),
+                    ((tokenManager.accessTokenExpiresAt - System.currentTimeMillis()) / 1000).toInt()
+                )
                 return@launch
             }
+
+            val refreshToken = tokenManager.refreshToken
+            if (refreshToken.isNullOrBlank() || tokenManager.isRefreshTokenExpired()) {
+                _loginResult.value = LoginResult.Failure(-1, "유효한 리프레시 토큰이 없습니다.")
+                return@launch
+            }
+
             try {
                 val response = apiInterface.ReToken("Bearer $refreshToken")
                 if (response.isSuccessful) {
