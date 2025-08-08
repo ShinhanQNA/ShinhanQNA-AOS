@@ -7,6 +7,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.API.APIInterface
+import com.example.shinhan_qna_aos.BuildConfig
+import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -120,7 +122,6 @@ class LoginViewModel(
         }
     }
 
-
     // 카카오 로그인 URL 오픈
     fun openKakaoLogin(context: Context) {
         val url = repository.getKakaoLoginUrl()
@@ -137,3 +138,128 @@ class LoginViewModel(
         context.startActivity(intent)
     }
 }
+
+//class LoginViewModel(
+//    private val apiInterface: APIInterface,
+//    private val tokenManager: TokenManager
+//) : ViewModel() {
+//
+//    private val _loginResult = MutableStateFlow<LoginResult>(LoginResult.Idle)
+//    val loginResult: StateFlow<LoginResult> = _loginResult
+//
+//    // 카카오 SDK 로그인
+//    fun loginWithKakao(context: Context) {
+//        val client = UserApiClient.instance
+//        if (client.isKakaoTalkLoginAvailable(context)) {
+//            client.loginWithKakaoTalk(context) { token, error ->
+//                if (error != null) {
+//                    _loginResult.value = LoginResult.Failure(-1, "카카오톡 로그인 실패: ${error.message}")
+//                } else if (token != null) {
+//                    sendKakaoAccessTokenToServer(token.accessToken)
+//                }
+//            }
+//        } else {
+//            client.loginWithKakaoAccount(context) { token, error ->
+//                if (error != null) {
+//                    _loginResult.value = LoginResult.Failure(-1, "카카오 계정 로그인 실패: ${error.message}")
+//                } else if (token != null) {
+//                    sendKakaoAccessTokenToServer(token.accessToken)
+//                }
+//            }
+//        }
+//    }
+//
+//    // 서버로 카카오 액세스 토큰 전달
+//    private fun sendKakaoAccessTokenToServer(accessToken: String) {
+//        viewModelScope.launch {
+//            try {
+//                val response = apiInterface.KakaoAuthCode("Bearer $accessToken")
+//                if (response.isSuccessful) {
+//                    val result = response.body()
+//                    when (result) {
+//                        is LoginResult.Success -> {
+//                            tokenManager.saveTokens(result.accessToken, result.refreshToken, result.expiresIn)
+//                            _loginResult.value = result
+//                        }
+//                        is LoginResult.Failure -> _loginResult.value = result
+//                        else -> _loginResult.value = LoginResult.Failure(-1, "서버 응답 데이터 오류")
+//                    }
+//                } else {
+//                    _loginResult.value = LoginResult.Failure(response.code(), response.errorBody()?.string() ?: response.message())
+//                }
+//            } catch (e: Exception) {
+//                _loginResult.value = LoginResult.Failure(-1, "서버 통신 실패: ${e.message}")
+//            }
+//        }
+//    }
+//
+//    // 구글 인가코드 받아 서버에 POST 요청
+//    fun sendGoogleAuthCodeToServer(authCode: String) {
+//        viewModelScope.launch {
+//            try {
+//                val response = apiInterface.GoogleAuthCode("Bearer $authCode")
+//                if (response.isSuccessful) {
+//                    val result = response.body()
+//                    when (result) {
+//                        is LoginResult.Success -> {
+//                            tokenManager.saveTokens(result.accessToken, result.refreshToken, result.expiresIn)
+//                            _loginResult.value = result
+//                            Log.d("LoginVM", "구글 서버 로그인 성공")
+//                        }
+//                        is LoginResult.Failure -> _loginResult.value = result
+//                        else -> _loginResult.value = LoginResult.Failure(-1, "알 수 없는 서버 응답")
+//                    }
+//                } else {
+//                    val errorMsg = response.errorBody()?.string() ?: response.message()
+//                    _loginResult.value = LoginResult.Failure(response.code(), errorMsg)
+//                }
+//            } catch (e: Exception) {
+//                Log.e("LoginVM", "구글 서버 로그인 중 오류", e)
+//                _loginResult.value = LoginResult.Failure(-1, "서버 통신 실패")
+//            }
+//        }
+//    }
+//
+//    // 토큰 재발급 처리
+//    fun tryRefreshTokenIfNeeded() {
+//        viewModelScope.launch {
+//            val refreshToken = tokenManager.refreshToken
+//            if (refreshToken.isNullOrBlank()) {
+//                _loginResult.value = LoginResult.Failure(-1, "Refresh token 없음")
+//                return@launch
+//            }
+//
+//            try {
+//                val response = apiInterface.ReToken("Bearer $refreshToken")
+//                if (response.isSuccessful) {
+//                    val body = response.body()
+//                    if (body != null) {
+//                        tokenManager.saveTokens(body.accessToken, refreshToken, body.expiresIn)
+//                        _loginResult.value = LoginResult.Success(body.accessToken, refreshToken, body.expiresIn)
+//                        Log.d("LoginVM", "토큰 재발급 성공")
+//                    } else {
+//                        _loginResult.value = LoginResult.Failure(-1, "토큰 재발급 응답 없음")
+//                    }
+//                } else {
+//                    val errorMsg = response.errorBody()?.string() ?: response.message()
+//                    _loginResult.value = LoginResult.Failure(response.code(), errorMsg)
+//                }
+//            } catch (e: Exception) {
+//                Log.e("LoginVM", "토큰 재발급 중 오류", e)
+//                _loginResult.value = LoginResult.Failure(-1, "서버 통신 실패")
+//            }
+//        }
+//    }
+//}
+//
+//fun getGoogleLoginUrl(): String {
+//    val clientId = BuildConfig.GOOGLE_WEB_CLIENT_ID
+//    val redirectUri = "${BuildConfig.BASE_URL}/oauth/callback/google"
+//    val scope = "email profile"
+//    return "https://accounts.google.com/o/oauth2/v2/auth" +
+//            "?client_id=$clientId" +
+//            "&redirect_uri=$redirectUri" +
+//            "&response_type=code" +  // 인가코드 방식
+//            "&scope=$scope" +
+//            "&access_type=offline"   // 리프레시 토큰 받으려면 필요
+//}

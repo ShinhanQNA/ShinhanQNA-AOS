@@ -127,12 +127,17 @@ class InfoViewModel : ViewModel() {
 
             try {
                 Log.d(TAG, "Preparing multipart request body")
+
+                // studentId, year (숫자지만 MultipartBody.Part로는 문자열 RequestBody로 지정)
                 val studentIdPart = state.studentId.toString().toRequestBody("text/plain".toMediaType())
+                val yearPart = state.year.toString().toRequestBody("text/plain".toMediaType())
+
+                // string 타입 필드들
                 val namePart = state.name.toRequestBody("text/plain".toMediaType())
                 val departmentPart = state.department.toRequestBody("text/plain".toMediaType())
-                val yearPart = state.year.toString().toRequestBody("text/plain".toMediaType())
                 val rolePart = state.role.toRequestBody("text/plain".toMediaType())
 
+                // 이미지 파일 MultipartBody.Part
                 val imagePart = compressedImageFile?.let { file ->
                     Log.d(TAG, "Image file for upload: ${file.absolutePath}, size=${file.length() / 1024}KB")
                     val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
@@ -146,6 +151,7 @@ class InfoViewModel : ViewModel() {
                     return@launch
                 }
 
+                // API 호출
                 val response = api.InfoStudent(
                     accessToken = "Bearer $accessToken",
                     studentId = studentIdPart,
@@ -162,8 +168,8 @@ class InfoViewModel : ViewModel() {
                 } else {
                     val errBody = response.errorBody()?.string()
                     when (response.code()) {
-                        401 -> Log.e(TAG, "Unauthorized (401): $errBody")
-                        500 -> Log.e(TAG, "Server error (500): $errBody")
+                        401 -> Log.e(TAG, "사진 없음 (401): $errBody")
+                        500 -> Log.e(TAG, "서버 에러 (500): $errBody")
                         else -> Log.e(TAG, "Unknown error ${response.code()}: $errBody")
                     }
                     errorMessage = errBody ?: "알 수 없는 오류: ${response.code()}"

@@ -83,6 +83,74 @@ fun LoginScreen(viewModel: LoginViewModel) {
     }
 }
 
+//@Composable
+//fun LoginScreen(viewModel: LoginViewModel) {
+//    val context = LocalContext.current
+//
+//    BoxWithConstraints(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .systemBarsPadding()
+//            .background(Color.White)
+//            .padding(top = 64.dp, start = 40.dp, end = 40.dp, bottom = 48.dp),
+//        contentAlignment = Alignment.Center
+//    ) {
+//        val maxw= maxWidth
+//        Column(
+//            modifier = Modifier.fillMaxSize(),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.SpaceBetween
+//        ) {
+//            Image(
+//                painter = painterResource(R.drawable.biglogo),
+//                contentDescription = null,
+//                modifier = Modifier.size(128.dp)
+//            )
+//
+//            Column(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//                // 카카오 로그인 버튼
+//                Image(
+//                    painter = painterResource(R.drawable.kakao_login),
+//                    contentDescription = "카카오 로그인",
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .clickable {
+//                            viewModel.loginWithKakao(context)
+//                        }
+//                )
+//                Spacer(modifier = Modifier.height(12.dp))
+//
+//                // 구글 로그인 버튼
+//                Image(
+//                    painter = painterResource(R.drawable.google_login),
+//                    contentDescription = "구글 로그인",
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .clickable {
+//                            // 구글 로그인 URL 오픈
+//                            val url = getGoogleLoginUrl()
+//                            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
+//                            context.startActivity(intent)
+//                        }
+//                )
+//                Spacer(modifier = Modifier.height(12.dp))
+//
+//                Text(
+//                    text = "관리자 전용 페이지",
+//                    color = Color(0xffDFDFDF),
+//                    style = TextStyle(
+//                        fontWeight = FontWeight.Normal,
+//                        fontSize = 12.sp
+//                    ),
+//                    modifier = Modifier.clickable { /* 관리자 로그인 처리 구현 */ }
+//                )
+//            }
+//        }
+//    }
+//}
 @Composable
 @Preview(showBackground = true)
 fun loginpreview(){

@@ -11,7 +11,6 @@ data class ManagerLoginData(
 data class ReToken(
     @SerializedName("access_token")
     val accessToken: String,
-
     @SerializedName("expires_in")
     val expiresIn: Int
 )
@@ -20,9 +19,9 @@ data class ReToken(
 sealed class LoginResult {
     object Idle : LoginResult() // 로그인 대기중
     data class Success(
-        val accessToken: String,
-        val refreshToken: String,
-        val expiresIn: Int
+        @SerializedName("access_token") val accessToken: String,
+        @SerializedName("refresh_token") val refreshToken: String,
+        @SerializedName("expires_in") val expiresIn: Int
     ) : LoginResult()
     data class Failure(
         val status: Int,
