@@ -110,7 +110,7 @@ class InfoViewModel : ViewModel() {
         }
     }
 
-    fun submitStudentInfo(api: APIInterface, accessToken: String, context: Context) {
+    fun submitStudentInfo(api: APIInterface, accessToken: String) {
         viewModelScope.launch {
             isLoading = true
             errorMessage = null
@@ -154,7 +154,7 @@ class InfoViewModel : ViewModel() {
                 // API 호출
                 val response = api.InfoStudent(
                     accessToken = "Bearer $accessToken",
-                    studentId = studentIdPart,
+                    students = studentIdPart,
                     name = namePart,
                     department = departmentPart,
                     year = yearPart,

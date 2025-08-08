@@ -15,13 +15,19 @@ data class ReToken(
     val expiresIn: Int
 )
 
+data class LoginTokensResponse(
+    @SerializedName("access_token") val accessToken: String,
+    @SerializedName("refresh_token") val refreshToken: String,
+    @SerializedName("expires_in") val expiresIn: Int
+)
 
+// ViewModel 내부 상태 표현용 sealed class
 sealed class LoginResult {
-    object Idle : LoginResult() // 로그인 대기중
+    object Idle : LoginResult()
     data class Success(
-        @SerializedName("access_token") val accessToken: String,
-        @SerializedName("refresh_token") val refreshToken: String,
-        @SerializedName("expires_in") val expiresIn: Int
+        val accessToken: String,
+        val refreshToken: String,
+        val expiresIn: Int
     ) : LoginResult()
     data class Failure(
         val status: Int,

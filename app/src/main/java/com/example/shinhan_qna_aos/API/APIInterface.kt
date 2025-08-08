@@ -2,6 +2,7 @@ package com.example.shinhan_qna_aos.API
 
 import com.example.shinhan_qna_aos.info.InfoData
 import com.example.shinhan_qna_aos.login.LoginResult
+import com.example.shinhan_qna_aos.login.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.ReToken
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -19,13 +20,15 @@ interface APIInterface {
     @POST("/oauth/callback/kakao")
     suspend fun KakaoAuthCode(
         @Header("Authorization") accessToken: String
-    ): Response<LoginResult>
+    ): Response<LoginTokensResponse>
+
     //구글
     @Headers("Content-Type: application/json")
     @POST("/oauth/callback/google")
     suspend fun GoogleAuthCode(
         @Header("Authorization") code : String
-    ): Response<LoginResult>
+    ): Response<LoginTokensResponse>
+
     // 토큰 재발급
     @Headers("Content-Type: application/json")
     @POST("/token/reissue")
@@ -34,12 +37,11 @@ interface APIInterface {
     ): Response<ReToken>
 
     // 학생 정보
-    @Headers("Content-Type: multipart/form-data")
     @Multipart
     @POST("/users/certify")
     suspend fun InfoStudent(
         @Header("Authorization") accessToken: String,
-        @Part("studentId") studentId: RequestBody,
+        @Part("students") students: RequestBody,
         @Part("name") name: RequestBody,
         @Part("department") department: RequestBody,
         @Part("year") year: RequestBody,

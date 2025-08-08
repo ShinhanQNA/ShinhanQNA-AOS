@@ -389,7 +389,7 @@ fun Request(
     tokenManager: TokenManager,
     enabled: Boolean
 ) {
-    val context = LocalContext.current
+
     val api = APIRetrofit.apiService
     val accessToken = tokenManager.accessToken
 
@@ -401,7 +401,8 @@ fun Request(
             )
             .padding(horizontal = 18.dp, vertical = 12.dp)
             .clickable(enabled = enabled) {
-                viewModel.submitStudentInfo(api, accessToken!!, context)
+                viewModel.submitStudentInfo(api, accessToken!!)
+
             }
     ) {
         Text(
