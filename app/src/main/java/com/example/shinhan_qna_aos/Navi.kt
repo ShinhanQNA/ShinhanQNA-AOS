@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.info.InformationScreen
+import com.example.shinhan_qna_aos.info.WaitScreen
 import com.example.shinhan_qna_aos.login.LoginResult
 import com.example.shinhan_qna_aos.login.LoginScreen
 import com.example.shinhan_qna_aos.login.LoginViewModel
@@ -33,12 +34,20 @@ fun AppNavigation(
     val navController = rememberNavController()
     val loginResult by loginViewModel.loginResult.collectAsState()
     val showOnboarding by onboardingViewModel.showOnboarding.collectAsState()
+    // 가입 대기 상태 관찰 (Flow 또는 StateFlow 로 관리하면 더 좋음)
+    val isWaitingApproval = remember { mutableStateOf(tokenManager.isUserWaitingForApproval) }
 
     // 온보딩 상태 체크
-    LaunchedEffect(showOnboarding, loginResult) {
+    LaunchedEffect(showOnboarding, loginResult, isWaitingApproval.value) {
         if (showOnboarding == false) {
-            when (loginResult) {
-                is LoginResult.Success -> {
+            when {
+                // 로그인 성공 & 대기중 상태면 wait 화면으로
+                loginResult is LoginResult.Success && isWaitingApproval.value -> {
+                    navController.navigate("wait/${infoViewModel.state.name}") {
+                        popUpTo(0)
+                    }
+                }
+                loginResult is LoginResult.Success -> {
                     navController.navigate("info") {
                         popUpTo("login") { inclusive = true }
                     }
@@ -67,7 +76,12 @@ fun AppNavigation(
             )
         }
         composable("login") { LoginScreen(viewModel = loginViewModel) }
-        composable("info") { InformationScreen(viewModel = infoViewModel,tokenManager) }
+        composable("info") { InformationScreen(viewModel = infoViewModel,navController) }
+        // 네비게이션 그래프에 WaitScreen 경로 정의 (예시)
+        composable("wait/{userName}") { backStackEntry ->
+            val userName = backStackEntry.arguments?.getString("userName") ?: "사용자"
+            WaitScreen(userName = userName)
+        }
         composable("main") { MainScreen() }
     }
 }

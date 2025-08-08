@@ -21,6 +21,11 @@ class TokenManager(private val context: Context) {
         get() = prefs.getLong("REFRESH_TOKEN_EXP", 0L)
         set(value) = prefs.edit().putLong("REFRESH_TOKEN_EXP", value).apply()
 
+    //wait 화면 유지
+    var isUserWaitingForApproval: Boolean
+        get() = prefs.getBoolean("IS_WAITING_APPROVAL", false)
+        set(value) = prefs.edit().putBoolean("IS_WAITING_APPROVAL", value).apply()
+
     // expiresIn은 access token 유효기간(초)
     // refreshTokenExpiresIn: Long? = null 은 refresh token 유효기간(초) (optional)
     fun saveTokens(accessToken: String, refreshToken: String, expiresIn: Int, refreshTokenExpiresIn: Long? = null) {

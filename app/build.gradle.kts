@@ -31,13 +31,11 @@ android {
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProperties["GOOGLE_WEB_CLIENT_ID"]}\"")
         buildConfigField("String", "GOOGLE_APP_CLIENT_ID", "\"${localProperties["GOOGLE_APP_CLIENT_ID"]}\"")
 
-        buildConfigField("String","LOCAL_URL","\"${localProperties["LOCAL_URL"]}\"")
-        manifestPlaceholders["LOCAL_URL"] = "${localProperties["LOCAL_URL"]}"
-
+//        buildConfigField("String","LOCAL_URL","\"${localProperties["LOCAL_URL"]}\"")
+//        manifestPlaceholders["LOCAL_URL"] = "${localProperties["LOCAL_URL"]}"
+        // 우리서버
         buildConfigField("String","BASE_URL","\"${localProperties["BASE_URL"]}\"")
 
-        buildConfigField("String","MY_SCHEME","\"${localProperties["MY_SCHEME"]}\"")
-        manifestPlaceholders["MY_SCHEME"] = "${localProperties["MY_SCHEME"]}"
     }
     buildTypes {
         release {

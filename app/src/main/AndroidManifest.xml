@@ -30,18 +30,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <!-- 여기에 앱에서 사용할 커스텀 스킴과 호스트 지정 -->
-                <data
-                    android:scheme="${MY_SCHEME}"
-                    android:host="login"
-                    android:path="/success"
-                    />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"

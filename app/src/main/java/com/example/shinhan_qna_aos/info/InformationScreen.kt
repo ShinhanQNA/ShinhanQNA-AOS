@@ -33,6 +33,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +52,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.API.APIRetrofit
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.login.TokenManager
@@ -59,18 +62,29 @@ import com.jihan.lucide_icons.lucide
 @Composable
 fun InformationScreen(
     viewModel: InfoViewModel,
-    tokenManager: TokenManager
+    navController : NavController? = null
 ) {
     val state = viewModel.state
     var expandedGrade by remember { mutableStateOf(false) }
     var expandedMajor by remember { mutableStateOf(false) }
-
+    val navigateNext by viewModel.navigateNext.collectAsState()
     val isFormValid = remember(state) {
         state.name.isNotBlank()
                 && state.students != 0
                 && state.year != 0
                 && state.department.isNotBlank()
                 && state.imageUri != Uri.EMPTY
+    }
+
+    LaunchedEffect(navigateNext) {
+        if (navigateNext) {
+            // 네비게이션 수행
+            navController?.navigate("wait/${viewModel.state.name}"){
+                popUpTo("login") { inclusive = true } // 필요한 경우
+            }
+            // 네비게이션 후 상태 초기화
+            viewModel.resetNavigateNext()
+        }
     }
 
     BoxWithConstraints(
@@ -144,7 +158,7 @@ fun InformationScreen(
                 ImageInsert(viewModel = viewModel, fontSize = 14.sp)
             }
             Spacer(modifier = Modifier.height(36.dp))
-            Request(fontSize = 14.sp, viewModel = viewModel, tokenManager = tokenManager, enabled = isFormValid)
+            Request(fontSize = 14.sp, viewModel = viewModel, enabled = isFormValid)
         }
     }
 }
@@ -386,7 +400,6 @@ fun ImageInsert(viewModel: InfoViewModel, fontSize: TextUnit) {
 fun Request(
     fontSize: TextUnit,
     viewModel: InfoViewModel,
-    tokenManager: TokenManager,
     enabled: Boolean
 ) {
 
@@ -399,7 +412,6 @@ fun Request(
             .padding(horizontal = 18.dp, vertical = 12.dp)
             .clickable(enabled = enabled) {
                 viewModel.submitStudentInfo()
-
             }
     ) {
         Text(
@@ -419,6 +431,5 @@ fun Request(
 @Preview(showBackground = true)
 fun Informationpreview(){
     val viewModel : InfoViewModel = viewModel()
-    lateinit var tokenManager: TokenManager
-    InformationScreen(viewModel,tokenManager)
+    InformationScreen(viewModel)
 }

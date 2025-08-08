@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.API.APIRetrofit
 import com.example.shinhan_qna_aos.info.InfoViewModel
-import com.example.shinhan_qna_aos.login.LoginRepository
 import com.example.shinhan_qna_aos.login.LoginViewModel
 import com.example.shinhan_qna_aos.login.TokenManager
 import com.example.shinhan_qna_aos.onboarding.OnboardingRepository

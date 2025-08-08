@@ -108,7 +108,7 @@ class LoginViewModel(
             }
 
             try {
-                val response = apiInterface.ReToken("Bearer $refreshToken")
+                val response = apiInterface.ReToken(RefreshTokenRequest(refreshToken))
                 if (response.isSuccessful) {
                     val body = response.body()
                     if (body != null) {

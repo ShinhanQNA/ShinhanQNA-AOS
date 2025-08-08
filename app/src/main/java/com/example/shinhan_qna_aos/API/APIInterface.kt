@@ -4,6 +4,7 @@ import com.example.shinhan_qna_aos.info.InfoData
 import com.example.shinhan_qna_aos.login.LoginResult
 import com.example.shinhan_qna_aos.login.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.ReToken
+import com.example.shinhan_qna_aos.login.RefreshTokenRequest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -31,10 +32,9 @@ interface APIInterface {
     ): Response<LoginTokensResponse>
 
     // 토큰 재발급
-    @Headers("Content-Type: application/json")
     @POST("/token/reissue")
     suspend fun ReToken(
-        @Header("Refresh-Token") refreshToken: String
+        @Body refreshTokenRequest: RefreshTokenRequest
     ): Response<ReToken>
 
     // 학생 정보
