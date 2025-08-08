@@ -2,6 +2,10 @@ package com.example.shinhan_qna_aos.info
 
 import android.net.Uri
 
+data class InfoData(
+    val message:String
+)
+
 data class LoginData(
     val students: Int = 0,        // 학번
     val name: String = "",         // 이름

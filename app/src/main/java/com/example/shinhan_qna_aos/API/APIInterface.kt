@@ -5,16 +5,19 @@ import com.example.shinhan_qna_aos.login.LoginResult
 import com.example.shinhan_qna_aos.login.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.ReToken
 import com.example.shinhan_qna_aos.login.RefreshTokenRequest
+import com.example.shinhan_qna_aos.main.PostListResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Query
 
 interface APIInterface {
     //kakao
@@ -48,6 +51,15 @@ interface APIInterface {
         @Part("year") year: RequestBody,
         @Part("role") role: RequestBody,
         @Part image: MultipartBody.Part
-    ): Response<ResponseBody>
+    ): Response<InfoData>
+
+    //게시글 조회
+    @Headers("Content-Type: application/json")
+    @GET("/boards/search")
+    suspend fun getPosts(
+        @Header("Authorization") code : String,
+        @Query("size") size: Int,                        // 아이템 요청 개수
+        @Query("sort") sort: String
+    ):Response<PostListResponse>
 }
 

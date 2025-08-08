@@ -208,7 +208,6 @@ class InfoViewModel(
 
                 if (response.isSuccessful) {
                     Log.d(TAG, "API call successful: ${response.code()}")
-                    tokenManager.isUserWaitingForApproval = true // 가입 대기 상태 저장
                     _navigateNext.value = true  // 네비게이션 진행 신호 방출
                 } else {
                     // 에러 바디를 문자열로 읽어서 로그 및 상태 업데이트

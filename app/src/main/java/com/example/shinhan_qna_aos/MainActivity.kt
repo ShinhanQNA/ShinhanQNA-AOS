@@ -13,6 +13,7 @@ import com.example.shinhan_qna_aos.API.APIRetrofit
 import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.login.LoginViewModel
 import com.example.shinhan_qna_aos.login.TokenManager
+import com.example.shinhan_qna_aos.main.SaySomtingViewModel
 import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
 
@@ -50,7 +51,7 @@ class MainActivity : ComponentActivity() {
         loginViewModel.tryRefreshTokenIfNeeded()
 
         setContent {
-            AppNavigation(loginViewModel = loginViewModel, onboardingViewModel = onboardingViewModel, infoViewModel = infoViewModel, tokenManager = tokenManager)
+            AppNavigation(loginViewModel = loginViewModel, onboardingViewModel = onboardingViewModel, infoViewModel = infoViewModel,tokenManager = tokenManager)
         }
 
 //        // 최초 진입 인텐트에서 구글 인가코드 처리 (필요시)

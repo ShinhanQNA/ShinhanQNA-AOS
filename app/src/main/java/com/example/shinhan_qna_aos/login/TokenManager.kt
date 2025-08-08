@@ -21,24 +21,13 @@ class TokenManager(private val context: Context) {
         get() = prefs.getLong("REFRESH_TOKEN_EXP", 0L)
         set(value) = prefs.edit().putLong("REFRESH_TOKEN_EXP", value).apply()
 
-    //wait 화면 유지
-    var isUserWaitingForApproval: Boolean
-        get() = prefs.getBoolean("IS_WAITING_APPROVAL", false)
-        set(value) = prefs.edit().putBoolean("IS_WAITING_APPROVAL", value).apply()
-
     // expiresIn은 access token 유효기간(초)
-    // refreshTokenExpiresIn: Long? = null 은 refresh token 유효기간(초) (optional)
     fun saveTokens(accessToken: String, refreshToken: String, expiresIn: Int, refreshTokenExpiresIn: Long? = null) {
         val now = System.currentTimeMillis()
         this.accessToken = accessToken
         this.refreshToken = refreshToken
         this.accessTokenExpiresAt = now + expiresIn * 1000L
-        this.refreshTokenExpiresAt = if (refreshTokenExpiresIn != null) {
-            now + refreshTokenExpiresIn * 1000L
-        } else {
-            // 기본 7일 만료 예시
-            now + 7L * 24 * 60 * 60 * 1000
-        }
+        this.refreshTokenExpiresAt = now + 7L * 24 * 60 * 60 * 1000
     }
 
     fun isAccessTokenExpired(): Boolean = System.currentTimeMillis() >= accessTokenExpiresAt

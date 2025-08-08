@@ -8,8 +8,7 @@ data class ManagerLoginData(
     val managerPassword: String = ""
 )
 data class RefreshTokenRequest(
-    @SerializedName("refreshToken")
-    val refreshToken: String
+    @SerializedName("refreshToken") val refreshToken: String
 )
 
 data class ReToken(

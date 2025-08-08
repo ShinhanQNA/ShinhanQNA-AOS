@@ -20,6 +20,7 @@ import com.example.shinhan_qna_aos.login.LoginScreen
 import com.example.shinhan_qna_aos.login.LoginViewModel
 import com.example.shinhan_qna_aos.login.TokenManager
 import com.example.shinhan_qna_aos.main.MainScreen
+import com.example.shinhan_qna_aos.main.SaySomtingViewModel
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
 
@@ -34,20 +35,12 @@ fun AppNavigation(
     val navController = rememberNavController()
     val loginResult by loginViewModel.loginResult.collectAsState()
     val showOnboarding by onboardingViewModel.showOnboarding.collectAsState()
-    // 가입 대기 상태 관찰 (Flow 또는 StateFlow 로 관리하면 더 좋음)
-    val isWaitingApproval = remember { mutableStateOf(tokenManager.isUserWaitingForApproval) }
 
     // 온보딩 상태 체크
-    LaunchedEffect(showOnboarding, loginResult, isWaitingApproval.value) {
+    LaunchedEffect(showOnboarding, loginResult) {
         if (showOnboarding == false) {
-            when {
-                // 로그인 성공 & 대기중 상태면 wait 화면으로
-                loginResult is LoginResult.Success && isWaitingApproval.value -> {
-                    navController.navigate("wait/${infoViewModel.state.name}") {
-                        popUpTo(0)
-                    }
-                }
-                loginResult is LoginResult.Success -> {
+            when (loginResult) {
+                is LoginResult.Success -> {
                     navController.navigate("info") {
                         popUpTo("login") { inclusive = true }
                     }
@@ -62,7 +55,7 @@ fun AppNavigation(
     }
     NavHost(
         navController = navController,
-        startDestination = if (showOnboarding == true) "onboarding" else "login"
+        startDestination =  if (showOnboarding == true) "onboarding" else "login"
     ) {
         composable("onboarding") {
             OnboardingScreen(
