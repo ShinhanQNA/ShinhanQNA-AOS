@@ -67,24 +67,13 @@ fun InformationScreen(
     val state = viewModel.state
     var expandedGrade by remember { mutableStateOf(false) }
     var expandedMajor by remember { mutableStateOf(false) }
-    val navigateNext by viewModel.navigateNext.collectAsState()
+
     val isFormValid = remember(state) {
         state.name.isNotBlank()
                 && state.students != 0
                 && state.year != 0
                 && state.department.isNotBlank()
                 && state.imageUri != Uri.EMPTY
-    }
-
-    LaunchedEffect(navigateNext) {
-        if (navigateNext) {
-            // 네비게이션 수행
-            navController?.navigate("wait/${viewModel.state.name}"){
-                popUpTo("login") { inclusive = true } // 필요한 경우
-            }
-            // 네비게이션 후 상태 초기화
-            viewModel.resetNavigateNext()
-        }
     }
 
     BoxWithConstraints(
@@ -412,6 +401,7 @@ fun Request(
             .padding(horizontal = 18.dp, vertical = 12.dp)
             .clickable(enabled = enabled) {
                 viewModel.submitStudentInfo()
+                viewModel.checkUserStatusAndNavigate()
             }
     ) {
         Text(

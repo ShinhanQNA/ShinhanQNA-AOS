@@ -1,6 +1,7 @@
 package com.example.shinhan_qna_aos.API
 
 import com.example.shinhan_qna_aos.info.InfoData
+import com.example.shinhan_qna_aos.info.UserCheckResponse
 import com.example.shinhan_qna_aos.login.LoginResult
 import com.example.shinhan_qna_aos.login.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.ReToken
@@ -52,6 +53,13 @@ interface APIInterface {
         @Part("role") role: RequestBody,
         @Part image: MultipartBody.Part
     ): Response<InfoData>
+
+    //유저 정보 조회
+    @Headers("Content-Type: application/json")
+    @GET("/users/me")
+    suspend fun UserCheck(
+        @Header("Authorization") accessToken: String
+    ): Response<UserCheckResponse>
 
     //게시글 조회
     @Headers("Content-Type: application/json")

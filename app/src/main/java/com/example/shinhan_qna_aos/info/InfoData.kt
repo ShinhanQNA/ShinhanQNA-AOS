@@ -11,6 +11,18 @@ data class LoginData(
     val name: String = "",         // 이름
     val department: String = "",   // 학과
     val year: Int = 0,             // 학년
-    val role: String = "사용자",     // 역할
+    val role: String = "학생",     // 역할
     val imageUri: Uri = Uri.EMPTY  // 이미지 Uri
+)
+
+data class UserCheckResponse(
+    val email : String?="",
+    val name : String,
+    val token : String?="",
+    val role : String,
+    val year : Int,
+    val department : String,
+    val studentCardImagePath : String?="",
+    val students : Int,
+    val status : String,
 )

@@ -1,5 +1,6 @@
 package com.example.shinhan_qna_aos
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,7 +36,7 @@ fun AppNavigation(
     val navController = rememberNavController()
     val loginResult by loginViewModel.loginResult.collectAsState()
     val showOnboarding by onboardingViewModel.showOnboarding.collectAsState()
-
+    val navigateTo by infoViewModel.navigateTo.collectAsState()
     // 온보딩 상태 체크
     LaunchedEffect(showOnboarding, loginResult) {
         if (showOnboarding == false) {
@@ -53,6 +54,18 @@ fun AppNavigation(
             }
         }
     }
+    // InfoViewModel에서 상태 바뀌면 네비게이션
+    LaunchedEffect(navigateTo) {
+        Log.d("AppNavigation", "navigateTo 상태 변경 감지: $navigateTo")
+        if (!navigateTo.isNullOrEmpty()) {
+            navController.navigate(navigateTo!!) {
+                popUpTo("login") { inclusive = true }
+            }
+            infoViewModel.resetNavigateTo()
+        }
+    }
+
+
     NavHost(
         navController = navController,
         startDestination =  if (showOnboarding == true) "onboarding" else "login"
@@ -72,7 +85,7 @@ fun AppNavigation(
         composable("info") { InformationScreen(viewModel = infoViewModel,navController) }
         // 네비게이션 그래프에 WaitScreen 경로 정의 (예시)
         composable("wait/{userName}") { backStackEntry ->
-            val userName = backStackEntry.arguments?.getString("userName") ?: "사용자"
+            val userName = backStackEntry.arguments?.getString("userName") ?: "학생"
             WaitScreen(userName = userName)
         }
         composable("main") { MainScreen() }
