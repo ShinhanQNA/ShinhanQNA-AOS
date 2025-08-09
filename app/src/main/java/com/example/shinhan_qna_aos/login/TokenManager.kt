@@ -27,7 +27,9 @@ class TokenManager(private val context: Context) {
         this.accessToken = accessToken
         this.refreshToken = refreshToken
         this.accessTokenExpiresAt = now + expiresIn * 1000L
-        this.refreshTokenExpiresAt = now + 7L * 24 * 60 * 60 * 1000
+        this.refreshTokenExpiresAt = refreshTokenExpiresIn?.let {
+            now + it * 1000L
+        } ?: this.refreshTokenExpiresAt
     }
 
     fun isAccessTokenExpired(): Boolean = System.currentTimeMillis() >= accessTokenExpiresAt
