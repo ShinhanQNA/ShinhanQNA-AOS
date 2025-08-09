@@ -26,7 +26,7 @@ import java.io.File
 import java.io.FileOutputStream
 
 class InfoViewModel(
-    private val api: APIInterface,
+    val api: APIInterface,
     private val tokenManager: TokenManager
 ) : ViewModel() {
 

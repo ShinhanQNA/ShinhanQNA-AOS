@@ -5,6 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -18,6 +21,8 @@ import com.example.shinhan_qna_aos.login.TokenManager
 import com.example.shinhan_qna_aos.main.MainScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun AppNavigation(
@@ -26,43 +31,63 @@ fun AppNavigation(
     onboardingViewModel: OnboardingViewModel,
     tokenManager: TokenManager
 ) {
-
     val navController = rememberNavController()
+
     val loginResult by loginViewModel.loginResult.collectAsState()
     val showOnboarding by onboardingViewModel.showOnboarding.collectAsState()
-    val navigateTo by infoViewModel.navigateTo.collectAsState()
-    // 온보딩 상태 체크
+
+    // 처음 진입 시 결정될 시작 경로
+    var initialRoute by remember { mutableStateOf<String?>(null) }
+
+    // 앱 첫 진입 시 라우팅 목적지 미리 결정
     LaunchedEffect(showOnboarding, loginResult) {
-        if (showOnboarding == false) {
-            when (loginResult) {
-                is LoginResult.Success -> {
-                    navController.navigate("info") {
-                        popUpTo("login") { inclusive = true }
+        when {
+            // 온보딩 필요
+            showOnboarding == true -> {
+                initialRoute = "onboarding"
+            }
+            // 로그인 성공 → 가입 상태 먼저 체크
+            loginResult is LoginResult.Success -> {
+                val route = withContext(Dispatchers.IO) {
+                    // 가입 상태 바로 조회 (서버 호출, UI 출력 전 경로 결정)
+                    val accessToken = tokenManager.accessToken
+                    if (accessToken.isNullOrEmpty()) { "login" }
+                    else {
+                        try {
+                            val response = infoViewModel.api.UserCheck("Bearer $accessToken")
+                            if (response.isSuccessful) {
+                                val user = response.body()
+                                when (user?.status) {
+                                    "가입 대기 중" -> "wait/${user.name}"
+                                    "가입 완료" -> "main"
+                                    else -> "info"
+                                }
+                            } else {
+                                "info"
+                            }
+                        } catch (e: Exception) {
+                            "info"
+                        }
                     }
                 }
-                else -> {
-                    navController.navigate("login") {
-                        popUpTo("onboarding") { inclusive = true }
-                    }
-                }
+                initialRoute = route
+            }
+            // 로그인 안 됨
+            else -> {
+                initialRoute = "login"
             }
         }
     }
-    // InfoViewModel에서 상태 바뀌면 네비게이션
-    LaunchedEffect(navigateTo) {
-        Log.d("AppNavigation", "navigateTo 상태 변경 감지: $navigateTo")
-        if (!navigateTo.isNullOrEmpty()) {
-            navController.navigate(navigateTo!!) {
-                popUpTo("login") { inclusive = true }
-            }
-            infoViewModel.resetNavigateTo()
-        }
+    if (initialRoute == null) {
+        // 빈 화면 또는 로딩 화면
+        return
     }
 
 
+    // NavHost 시작
     NavHost(
         navController = navController,
-        startDestination =  if (showOnboarding == true) "onboarding" else "login"
+        startDestination = initialRoute!!
     ) {
         composable("onboarding") {
             OnboardingScreen(
@@ -76,19 +101,11 @@ fun AppNavigation(
             )
         }
         composable("login") { LoginScreen(viewModel = loginViewModel) }
-        composable("info") {
-            // info 화면 진입시 자동 상태 확인!
-            LaunchedEffect(Unit) {
-                infoViewModel.checkUserStatusAndNavigate()
-            }
-            InformationScreen(viewModel = infoViewModel, navController)
-        }
-        // 네비게이션 그래프에 WaitScreen 경로 정의 (예시)
-        composable("wait/{userName}") { backStackEntry ->
-            val userName = backStackEntry.arguments?.getString("userName") ?: "학생"
+        composable("info") { InformationScreen(viewModel = infoViewModel, navController) }
+        composable("wait/{userName}") {
+            val userName = it.arguments?.getString("userName") ?: "학생"
             WaitScreen(userName = userName)
         }
         composable("main") { MainScreen() }
     }
 }
-
