@@ -17,6 +17,8 @@ import com.example.shinhan_qna_aos.info.WaitScreen
 import com.example.shinhan_qna_aos.login.LoginResult
 import com.example.shinhan_qna_aos.login.LoginScreen
 import com.example.shinhan_qna_aos.login.LoginViewModel
+import com.example.shinhan_qna_aos.login.ManagerLogin
+import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
 import com.example.shinhan_qna_aos.login.TokenManager
 import com.example.shinhan_qna_aos.main.MainScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
@@ -29,6 +31,7 @@ fun AppNavigation(
     loginViewModel: LoginViewModel,
     infoViewModel: InfoViewModel,
     onboardingViewModel: OnboardingViewModel,
+    managerLoginViewModel:ManagerLoginViewModel,
     tokenManager: TokenManager
 ) {
     val navController = rememberNavController()
@@ -100,7 +103,17 @@ fun AppNavigation(
                 }
             )
         }
-        composable("login") { LoginScreen(viewModel = loginViewModel) }
+        composable("login") { LoginScreen(viewModel = loginViewModel,navController)}
+        composable("manager login") {
+            ManagerLogin(
+                viewModel = managerLoginViewModel,
+                onLoginSuccess = {
+                    navController.navigate("main") {
+                        popUpTo("managerLogin") { inclusive = true }
+                    }
+                }
+            )
+        }
         composable("info") { InformationScreen(viewModel = infoViewModel) }
         composable("wait/{userName}") {
             val userName = it.arguments?.getString("userName") ?: "학생"

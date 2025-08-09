@@ -32,7 +32,7 @@ class LoginViewModel(
                 // 서버에 토큰 전송하여 인증 처리
                 viewModelScope.launch {
                     try {
-                        val response = apiService.KakaoAuthCode(" ${token.accessToken}")
+                        val response = apiService.KakaoAuthCode(token.accessToken.trim())
                         if (response.isSuccessful) {
                             val body = response.body()
                             if (body != null) {
@@ -91,8 +91,16 @@ class LoginViewModel(
     // 리프레시 토큰으로 액세스 토큰 재발급
     fun tryRefreshTokenIfNeeded() {
         viewModelScope.launch {
-            // 액세스 토큰이 아직 유효하면 바로 성공 상태로 반환
+            Log.d("LoginViewModel", "토큰 재발급 검사 시작")
+
+            // accessToken이 아직 유효하면 바로 반환
             if (!tokenManager.isAccessTokenExpired()) {
+                Log.d(
+                    "LoginViewModel",
+                    "Access Token 아직 유효, 남은시간=${
+                        (tokenManager.accessTokenExpiresAt - System.currentTimeMillis()) / 1000
+                    }초"
+                )
                 _loginResult.value = LoginResult.Success(
                     tokenManager.accessToken.orEmpty(),
                     tokenManager.refreshToken.orEmpty(),
@@ -101,40 +109,51 @@ class LoginViewModel(
                 return@launch
             }
 
-            val refreshToken = tokenManager.refreshToken
+            val refreshToken = tokenManager.refreshToken?.trim()
             if (refreshToken.isNullOrBlank() || tokenManager.isRefreshTokenExpired()) {
-                _loginResult.value = LoginResult.Failure(-1, "유효한 리프레시 토큰이 없습니다.")
+                Log.w("LoginViewModel", "Refresh Token 만료 또는 없음")
+                tokenManager.clearTokens()
+                _loginResult.value = LoginResult.Failure(-1, "유효한 리프레시 토큰이 없습니다. 재로그인이 필요합니다.")
                 return@launch
             }
 
             try {
-                // 공백 제거
+                Log.d("LoginViewModel", "토큰 재발급 요청 시작")
                 val requestBody = RefreshTokenRequest(refreshToken)
-
                 val response = apiInterface.ReToken(requestBody)
+
+                Log.d("LoginViewModel", "서버 응답 코드: ${response.code()}")
 
                 if (response.isSuccessful) {
                     val body = response.body()
+                    Log.d("LoginViewModel", "서버 응답 Body: $body")
                     if (body != null) {
-                        // 기존 refreshToken 유지, accessToken과 expiresIn만 갱신
+                        // accessToken만 갱신, refreshToken 그대로 유지
                         tokenManager.saveTokens(
                             body.accessToken,
                             refreshToken,
                             body.expiresIn
                         )
+                        Log.d("LoginViewModel", "Access Token 재발급 완료: ${body.accessToken}")
                         _loginResult.value = LoginResult.Success(
-                            body.accessToken,
-                            refreshToken,
+                            body.accessToken.trim(),
+                            refreshToken.trim(),
                             body.expiresIn
                         )
                     } else {
-                        _loginResult.value = LoginResult.Failure(-1, "토큰 재발급 응답 없음")
+                        Log.e("LoginViewModel", "토큰 재발급 응답 데이터 없음")
+                        tokenManager.clearTokens()
+                        _loginResult.value = LoginResult.Failure(-1, "토큰 재발급 응답 데이터 없음")
                     }
                 } else {
+                    tokenManager.clearTokens()
                     val errorMsg = response.errorBody()?.string() ?: response.message()
+                    Log.e("LoginViewModel", "토큰 재발급 실패: $errorMsg")
                     _loginResult.value = LoginResult.Failure(response.code(), errorMsg)
                 }
             } catch (e: Exception) {
+                Log.e("LoginViewModel", "토큰 재발급 중 예외 발생", e)
+                tokenManager.clearTokens()
                 _loginResult.value = LoginResult.Failure(-1, "서버 통신 실패: ${e.localizedMessage}")
             }
         }

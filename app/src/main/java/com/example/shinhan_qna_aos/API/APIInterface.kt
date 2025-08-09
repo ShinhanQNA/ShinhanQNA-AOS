@@ -2,8 +2,10 @@ package com.example.shinhan_qna_aos.API
 
 import com.example.shinhan_qna_aos.info.InfoData
 import com.example.shinhan_qna_aos.info.UserCheckResponse
+import com.example.shinhan_qna_aos.login.AdminRequest
 import com.example.shinhan_qna_aos.login.LoginResult
 import com.example.shinhan_qna_aos.login.LoginTokensResponse
+import com.example.shinhan_qna_aos.login.ManagerLoginData
 import com.example.shinhan_qna_aos.login.ReToken
 import com.example.shinhan_qna_aos.login.RefreshTokenRequest
 import com.example.shinhan_qna_aos.main.PostListResponse
@@ -40,6 +42,12 @@ interface APIInterface {
     suspend fun ReToken(
         @Body refreshTokenRequest: RefreshTokenRequest
     ): Response<ReToken>
+
+    // 관리자 로그인
+    @POST("/admin/login")
+    suspend fun AdminLoginData(
+        @Body adminRequest : AdminRequest
+    ):Response<LoginTokensResponse>
 
     // 학생 정보
     @Multipart

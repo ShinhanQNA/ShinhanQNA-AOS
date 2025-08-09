@@ -12,6 +12,7 @@ import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.API.APIRetrofit
 import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.login.LoginViewModel
+import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
 import com.example.shinhan_qna_aos.login.TokenManager
 import com.example.shinhan_qna_aos.main.SaySomtingViewModel
 import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
@@ -41,6 +42,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private val managerLoginViewModel : ManagerLoginViewModel by viewModels {
+        SimpleViewModelFactory{
+            ManagerLoginViewModel(apiInterface,tokenManager)
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // 토큰 저장 초기화
@@ -51,7 +57,7 @@ class MainActivity : ComponentActivity() {
         loginViewModel.tryRefreshTokenIfNeeded()
 
         setContent {
-            AppNavigation(loginViewModel = loginViewModel, onboardingViewModel = onboardingViewModel, infoViewModel = infoViewModel,tokenManager = tokenManager)
+            AppNavigation(loginViewModel = loginViewModel, onboardingViewModel = onboardingViewModel, infoViewModel = infoViewModel, managerLoginViewModel = managerLoginViewModel,tokenManager = tokenManager)
         }
 
 //        // 최초 진입 인텐트에서 구글 인가코드 처리 (필요시)

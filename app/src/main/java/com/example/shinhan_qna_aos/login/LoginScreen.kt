@@ -17,11 +17,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel) {
+fun LoginScreen(viewModel: LoginViewModel,navController: NavController) {
     val context = LocalContext.current
 
     BoxWithConstraints(
@@ -82,7 +83,7 @@ fun LoginScreen(viewModel: LoginViewModel) {
                         fontWeight = FontWeight.Normal,
                         fontSize = 12.sp
                     ),
-                    modifier = Modifier.clickable { /* 관리자 로그인 처리 구현 */ }
+                    modifier = Modifier.clickable { navController.navigate("manager login"){ popUpTo("login") { inclusive = true }} }
                 )
             }
         }

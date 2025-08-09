@@ -21,22 +21,35 @@ class TokenManager(private val context: Context) {
         get() = prefs.getLong("REFRESH_TOKEN_EXP", 0L)
         set(value) = prefs.edit().putLong("REFRESH_TOKEN_EXP", value).apply()
 
-    // expiresIn은 access token 유효기간(초)
-    fun saveTokens(accessToken: String, refreshToken: String, expiresIn: Int, refreshTokenExpiresIn: Long? = null) {
+    /**
+     * @param expiresIn  access token 유효기간(초)
+     * @param refreshTokenExpiresIn refresh token 유효기간(초) - 서버에서 안 주면 기본 7일로 세팅
+     */
+    fun saveTokens(
+        accessToken: String,
+        refreshToken: String,
+        expiresIn: Int,
+        refreshTokenExpiresIn: Long? = null
+    ) {
         val now = System.currentTimeMillis()
-        this.accessToken = accessToken
-        this.refreshToken = refreshToken
+        this.accessToken = accessToken.trim()
+        this.refreshToken = refreshToken.trim()
         this.accessTokenExpiresAt = now + expiresIn * 1000L
+
         this.refreshTokenExpiresAt = refreshTokenExpiresIn?.let {
             now + it * 1000L
-        } ?: this.refreshTokenExpiresAt
+        } ?: (now + 7L * 24 * 60 * 60 * 1000) // 기본 7일
     }
 
-    fun isAccessTokenExpired(): Boolean = System.currentTimeMillis() >= accessTokenExpiresAt
-    fun isRefreshTokenExpired(): Boolean = System.currentTimeMillis() >= refreshTokenExpiresAt
+    fun isAccessTokenExpired(): Boolean =
+        System.currentTimeMillis() >= accessTokenExpiresAt
+
+    fun isRefreshTokenExpired(): Boolean =
+        System.currentTimeMillis() >= refreshTokenExpiresAt
 
     fun clearTokens() {
         prefs.edit().clear().apply()
     }
 }
+
 

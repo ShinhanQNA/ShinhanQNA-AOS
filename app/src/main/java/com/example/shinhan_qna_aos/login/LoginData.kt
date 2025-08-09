@@ -7,6 +7,12 @@ data class ManagerLoginData(
     val managerId: String = "",
     val managerPassword: String = ""
 )
+
+data class AdminRequest(
+    val id : String,
+    val password : String
+)
+
 data class RefreshTokenRequest(
     @SerializedName("refreshToken") val refreshToken: String
 )
