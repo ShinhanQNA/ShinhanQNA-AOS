@@ -83,7 +83,7 @@ fun LoginScreen(viewModel: LoginViewModel,navController: NavController) {
                         fontWeight = FontWeight.Normal,
                         fontSize = 12.sp
                     ),
-                    modifier = Modifier.clickable { navController.navigate("manager login"){ popUpTo("login") { inclusive = true }} }
+                    modifier = Modifier.clickable { navController.navigate("manager login") }
                 )
             }
         }
