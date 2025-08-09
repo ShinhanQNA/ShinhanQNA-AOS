@@ -8,7 +8,6 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.constraintlayout.widget.StateSet.TAG
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.API.APIInterface
@@ -23,7 +22,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.Response
 import java.io.File
 import java.io.FileOutputStream
 
@@ -102,6 +100,39 @@ class InfoViewModel(
             }
         }
     }
+    // 사용자 정보/상태 조회 후 목적 화면으로 이동
+    fun checkUserStatusAndNavigate() {
+        val accessToken = tokenManager.accessToken
+        if (accessToken.isNullOrEmpty()) {
+            errorMessage = "로그인 정보가 없습니다. 다시 로그인해 주세요."
+            return
+        }
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null
+            try {
+                val response = api.UserCheck(accessToken = "Bearer $accessToken")
+                if (response.isSuccessful) {
+                    val userCheck = response.body()
+                    if (userCheck != null) {
+                        when (userCheck.status) {
+                            "가입 대기 중" -> _navigateTo.value = "wait/${userCheck.name}"
+                            "가입 완료" -> _navigateTo.value = "main"
+                            else -> {/* stay in info */}
+                        }
+                    } else {
+                        errorMessage = "사용자 정보 조회 실패"
+                    }
+                } else {
+                    errorMessage = response.errorBody()?.string() ?: "상태 조회 실패"
+                }
+            } catch (e: Exception) {
+                errorMessage = "통신 오류 발생: ${e.localizedMessage}"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
 
     fun submitStudentInfo() {
         val accessToken = tokenManager.accessToken
@@ -161,60 +192,6 @@ class InfoViewModel(
             }
         }
     }
-
-    // UserCheck API를 호출해서 상태확인 및 네비게이션 route 결정
-    fun checkUserStatusAndNavigate() {
-        val accessToken = tokenManager.accessToken
-        if (accessToken.isNullOrEmpty()) {
-            Log.d(TAG, "토큰 없음. 로그인 필요.")  // 추가 로그
-            errorMessage = "로그인 정보가 없습니다. 다시 로그인해 주세요."
-            return
-        }
-        viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
-            try {
-                Log.d(TAG, "UserCheck API 호출 전")  // 추가 로그
-                val response = api.UserCheck(accessToken = "Bearer $accessToken")
-                Log.d(TAG, "UserCheck API 호출 완료. response.isSuccessful=${response.isSuccessful}")
-                if (response.isSuccessful) {
-                    val userCheck = response.body()
-                    Log.d(TAG, "응답 userCheck: $userCheck")
-                    Log.d(TAG, "userCheck.status: [${userCheck?.status}]")
-                    Log.d(TAG, "userCheck.name: [${userCheck?.name}]")
-                    if (userCheck != null) {
-                        when (userCheck.status) {
-                            "가입 대기 중" -> {
-                                Log.d(TAG, "상태가 '가입 대기 중'이라서 대기화면으로 이동합니다.")
-                                _navigateTo.value = "wait/${userCheck.name}"
-                            }
-                            "가입 완료" -> {
-                                Log.d(TAG, "상태가 '가입 완료'라서 메인화면으로 이동합니다.")
-                                _navigateTo.value = "main"
-                            }
-                            else -> {
-                                Log.d(TAG, "알 수 없는 사용자 상태: ${userCheck.status}")
-                                errorMessage = "알 수 없는 사용자 상태입니다."
-                            }
-                        }
-                    } else {
-                        Log.d(TAG, "userCheck가 null임.")
-                        errorMessage = "사용자 정보 조회 실패"
-                    }
-                } else {
-                    Log.d(TAG, "UserCheck 응답 실패: ${response.errorBody()?.string()}")
-                    errorMessage = response.errorBody()?.string() ?: "상태 조회 실패"
-                }
-            } catch (e: Exception) {
-                Log.d(TAG, "통신 에러: ${e.localizedMessage}")
-                errorMessage = "통신 오류 발생: ${e.localizedMessage}"
-            } finally {
-                isLoading = false
-                Log.d(TAG, "checkUserStatusAndNavigate 완료 (isLoading=false)")
-            }
-        }
-    }
-
 
     fun resetNavigateTo() {
         _navigateTo.value = null

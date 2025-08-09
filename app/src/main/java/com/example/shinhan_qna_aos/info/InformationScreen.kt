@@ -401,7 +401,6 @@ fun Request(
             .padding(horizontal = 18.dp, vertical = 12.dp)
             .clickable(enabled = enabled) {
                 viewModel.submitStudentInfo()
-                viewModel.checkUserStatusAndNavigate()
             }
     ) {
         Text(

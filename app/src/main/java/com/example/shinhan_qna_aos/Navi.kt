@@ -5,11 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -21,7 +16,6 @@ import com.example.shinhan_qna_aos.login.LoginScreen
 import com.example.shinhan_qna_aos.login.LoginViewModel
 import com.example.shinhan_qna_aos.login.TokenManager
 import com.example.shinhan_qna_aos.main.MainScreen
-import com.example.shinhan_qna_aos.main.SaySomtingViewModel
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
 
@@ -82,7 +76,13 @@ fun AppNavigation(
             )
         }
         composable("login") { LoginScreen(viewModel = loginViewModel) }
-        composable("info") { InformationScreen(viewModel = infoViewModel,navController) }
+        composable("info") {
+            // info 화면 진입시 자동 상태 확인!
+            LaunchedEffect(Unit) {
+                infoViewModel.checkUserStatusAndNavigate()
+            }
+            InformationScreen(viewModel = infoViewModel, navController)
+        }
         // 네비게이션 그래프에 WaitScreen 경로 정의 (예시)
         composable("wait/{userName}") { backStackEntry ->
             val userName = backStackEntry.arguments?.getString("userName") ?: "학생"
