@@ -42,7 +42,6 @@ class InfoViewModel(
 
     // 상태 체크 후 경로 이동용
     private val _navigateTo = MutableStateFlow<String?>(null)
-    val navigateTo: StateFlow<String?> get() = _navigateTo
 
     fun onNameChange(newName: String) {
         state = state.copy(name = newName)
@@ -191,9 +190,5 @@ class InfoViewModel(
                 isLoading = false
             }
         }
-    }
-
-    fun resetNavigateTo() {
-        _navigateTo.value = null
     }
 }

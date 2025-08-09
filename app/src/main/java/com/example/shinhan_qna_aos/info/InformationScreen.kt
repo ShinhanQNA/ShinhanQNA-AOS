@@ -62,7 +62,6 @@ import com.jihan.lucide_icons.lucide
 @Composable
 fun InformationScreen(
     viewModel: InfoViewModel,
-    navController : NavController? = null
 ) {
     val state = viewModel.state
     var expandedGrade by remember { mutableStateOf(false) }

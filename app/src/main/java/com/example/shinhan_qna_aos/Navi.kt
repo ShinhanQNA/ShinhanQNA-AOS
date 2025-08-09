@@ -101,7 +101,7 @@ fun AppNavigation(
             )
         }
         composable("login") { LoginScreen(viewModel = loginViewModel) }
-        composable("info") { InformationScreen(viewModel = infoViewModel, navController) }
+        composable("info") { InformationScreen(viewModel = infoViewModel) }
         composable("wait/{userName}") {
             val userName = it.arguments?.getString("userName") ?: "학생"
             WaitScreen(userName = userName)
