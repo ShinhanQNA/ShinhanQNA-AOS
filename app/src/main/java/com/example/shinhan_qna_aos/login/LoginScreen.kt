@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -18,11 +19,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.shinhan_qna_aos.R
-import com.example.shinhan_qna_aos.ui.theme.pretendard
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel,navController: NavController) {
+fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
     val context = LocalContext.current
 
     BoxWithConstraints(
@@ -53,6 +54,7 @@ fun LoginScreen(viewModel: LoginViewModel,navController: NavController) {
                 Image(
                     painter = painterResource(R.drawable.kakao_login),
                     contentDescription = "카카오 로그인",
+                    contentScale = ContentScale.FillWidth,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
@@ -92,5 +94,6 @@ fun LoginScreen(viewModel: LoginViewModel,navController: NavController) {
 @Composable
 @Preview(showBackground = true)
 fun loginpreview(){
-
+//    val navController = rememberNavController()
+//    LoginScreen(navController = navController)
 }

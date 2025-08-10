@@ -103,7 +103,7 @@ fun AppNavigation(
                 }
             )
         }
-        composable("login") { LoginScreen(viewModel = loginViewModel,navController)}
+        composable("login") { LoginScreen(viewModel = loginViewModel, navController)}
         composable("manager login") {
             ManagerLogin(
                 viewModel = managerLoginViewModel,
