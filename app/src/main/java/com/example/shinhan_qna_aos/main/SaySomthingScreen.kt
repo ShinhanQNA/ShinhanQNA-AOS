@@ -13,28 +13,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TitleContentLike
 import com.example.shinhan_qna_aos.TitleContentLikeButton
+import com.example.shinhan_qna_aos.login.TokenManager
 
 @Composable
 fun SaySomthingScreen() {
-    val dataList = listOf(
-        TitleContentLike("제목1", "본문내용1", 2, flagsCount = 1, banCount = 0),
-        TitleContentLike("제목2", "본문내용2", 5, flagsCount = 0, banCount = 2),
-        TitleContentLike("제목3", "본문내용3", 1, flagsCount = 2, banCount = 1),
-        TitleContentLike("제목4", "본문내용4", 1, flagsCount = 3, banCount = 4),
-        TitleContentLike("제목5", "본문내용5", 3, flagsCount = 0, banCount = 1),
-        TitleContentLike("제목6", "본문내용6", 8, flagsCount = 2, banCount = 2),
-        TitleContentLike("제목7", "본문내용7", 56, flagsCount = 6, banCount = 8),
-        TitleContentLike("제목8", "본문내용8", 185, flagsCount = 10, banCount = 15),
-    )
-    val isAdmin = true // ViewModel 등 실제 로그인 상태에 따라 분기!
+    val context = LocalContext.current
+    val viewModel = remember {
+        SaySomtingViewModel(
+            tokenManager = TokenManager(context) // 또는 다른 방식으로 TokenManager 생성
+        )
+    }
 
-    LazyColumn(modifier = Modifier.fillMaxSize().background(Color.White).padding(bottom = 50.dp)) {
-        items(dataList) { data ->
-            // 리스트 각각의 응답상태를 기억(로컬 컴포즈 state)
+    val dataList = viewModel.postList
+    val isAdmin = viewModel.isAdmin
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(bottom = 50.dp)
+    ) {
+        items(dataList, key = { it.postID }) { data ->
+            // 리스트 각각의 응답 상태를 로컬 상태로 관리
             var responseState by remember { mutableStateOf(data.responseState) }
             TitleContentLikeButton(
                 title = data.title,
@@ -43,7 +51,11 @@ fun SaySomthingScreen() {
                 isAdmin = isAdmin,
                 flagsCount = data.flagsCount,
                 banCount = data.banCount,
-                onResponseStateChange = { responseState = it }
+                responseState = responseState,
+                onResponseStateChange = { newState ->
+                    responseState = newState
+                    // 관리자인 경우 필요하면 API 호출 연동 등 추가 가능
+                }
             )
             Divider()
         }

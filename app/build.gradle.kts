@@ -31,8 +31,9 @@ android {
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProperties["GOOGLE_WEB_CLIENT_ID"]}\"")
         buildConfigField("String", "GOOGLE_APP_CLIENT_ID", "\"${localProperties["GOOGLE_APP_CLIENT_ID"]}\"")
 
-        buildConfigField("String","LOCAL_URL","\"${localProperties["LOCAL_URL"]}\"")
-        manifestPlaceholders["LOCAL_URL"] = "${localProperties["LOCAL_URL"]}"
+//        buildConfigField("String","LOCAL_URL","\"${localProperties["LOCAL_URL"]}\"")
+//        manifestPlaceholders["LOCAL_URL"] = "${localProperties["LOCAL_URL"]}"
+        // 우리서버
         buildConfigField("String","BASE_URL","\"${localProperties["BASE_URL"]}\"")
 
     }
@@ -68,6 +69,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.navigation.compose.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -89,7 +92,6 @@ dependencies {
     // Kakao SDK (implementation 버전 확인 필수)
     implementation("com.kakao.sdk:v2-user:2.21.5")  // 사용자 정보, 로그인
     implementation("com.kakao.sdk:v2-auth:2.21.5")  // 로그인
-
     // Kotlin Coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     //API

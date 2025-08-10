@@ -18,6 +18,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,14 +30,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.shinhan_qna_aos.info.LabeledField
 import com.example.shinhan_qna_aos.info.PlainInputField
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 
 @Composable
 fun ManagerLogin(
-    viewModel: ManagerLoginViewModel
+    viewModel: ManagerLoginViewModel,
+    onLoginSuccess: () -> Unit = {}
 ) {
+    val isLoginSuccess = viewModel.isLoginSuccess
+
+    // 로그인 성공 시 후처리
+    LaunchedEffect(isLoginSuccess) {
+        if (isLoginSuccess) {
+            onLoginSuccess()
+        }
+    }
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -62,7 +75,7 @@ fun ManagerLogin(
                 fontSize = 14.sp
             )
             Spacer(modifier = Modifier.height(36.dp))
-            ManagerLogin(modifier = Modifier)
+            ManagerLogin(modifier = Modifier, onClick = { viewModel.login() })
         }
     }
 }
@@ -84,14 +97,16 @@ fun ManagerPassword(value: String, onValueChange: (String) -> Unit, fontSize: Te
 
 // 로그인 버튼
 @Composable
-fun ManagerLogin(modifier: Modifier = Modifier){
+fun ManagerLogin(modifier: Modifier = Modifier, onClick:() -> Unit){
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.CenterEnd
     ){
         Box (modifier = Modifier
             .background(color = Color.Black, shape = RoundedCornerShape(6.dp))
-            .padding(horizontal = 18.dp, vertical = 12.dp)){
+            .padding(horizontal = 18.dp, vertical = 12.dp)
+            .clickable { onClick() } // ✅ 클릭 이벤트 연결
+         ){
             Text(
                 text = "로그인",
                 color = Color.White,
@@ -99,8 +114,7 @@ fun ManagerLogin(modifier: Modifier = Modifier){
                     fontFamily = pretendard,
                     fontWeight = FontWeight.Normal,
                     fontSize = 14.sp
-                ),
-                modifier = Modifier.clickable { /** 로그인 요청 **/ }
+                )
             )
         }
     }
@@ -109,6 +123,6 @@ fun ManagerLogin(modifier: Modifier = Modifier){
 @Composable
 @Preview(showBackground = true)
 fun Managerpreview(){
-    val viewModel=ManagerLoginViewModel()
+    val viewModel : ManagerLoginViewModel = viewModel()
     ManagerLogin(viewModel)
 }

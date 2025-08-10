@@ -31,7 +31,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- 카카오 SDK를 위한 AuthCodeHandlerActivity -->
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
@@ -39,7 +38,8 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- 카카오 SDK 딥링크 처리 -->
+
+
                 <data android:host="oauth"
                     android:scheme="kakao${KAKAO_APP_KEY}" />
             </intent-filter>

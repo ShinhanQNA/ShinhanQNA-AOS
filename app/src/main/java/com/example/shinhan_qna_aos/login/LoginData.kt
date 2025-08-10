@@ -2,27 +2,42 @@ package com.example.shinhan_qna_aos.login
 
 import com.google.gson.annotations.SerializedName
 
-data class LoginData(
-    val name: String = "",
-    val studentId: String = "",
-    val grade: String? = "",
-    val major: String? = ""
-)
 
 data class ManagerLoginData(
     val managerId: String = "",
     val managerPassword: String = ""
 )
 
-// 서버 로그인 성공 시 응답 데이터 (access_token, refresh_token, expires_in)
-data class LoginBackendResponse(
-    val accessToken: String,
-    val refreshToken: String,
-    val expiresIn: Int
+data class AdminRequest(
+    val id : String,
+    val password : String
 )
 
-// 서버에서 로그인 실패 시 반환하는 에러 데이터
-data class ApiErrorResponse(
-    val status: Int,
-    val message: String
+data class RefreshTokenRequest(
+    @SerializedName("refreshToken") val refreshToken: String
 )
+
+data class ReToken(
+    @SerializedName("access_token") val accessToken: String,
+    @SerializedName("expires_in") val expiresIn: Int
+)
+
+data class LoginTokensResponse(
+    @SerializedName("access_token") val accessToken: String,
+    @SerializedName("refresh_token") val refreshToken: String,
+    @SerializedName("expires_in") val expiresIn: Int
+)
+
+// ViewModel 내부 상태 표현용 sealed class
+sealed class LoginResult {
+    object Idle : LoginResult()
+    data class Success(
+        val accessToken: String,
+        val refreshToken: String,
+        val expiresIn: Int
+    ) : LoginResult()
+    data class Failure(
+        val status: Int,
+        val message: String
+    ) : LoginResult()
+}

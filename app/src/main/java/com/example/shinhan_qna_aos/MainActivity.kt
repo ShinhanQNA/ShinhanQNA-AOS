@@ -2,54 +2,88 @@ package com.example.shinhan_qna_aos
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import com.example.shinhan_qna_aos.login.LoginScreen
-import com.example.shinhan_qna_aos.onboarding.OnboardingPrefs
-import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
+import androidx.activity.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.shinhan_qna_aos.API.APIInterface
+import com.example.shinhan_qna_aos.API.APIRetrofit
+import com.example.shinhan_qna_aos.info.InfoViewModel
+import com.example.shinhan_qna_aos.login.LoginViewModel
+import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
+import com.example.shinhan_qna_aos.login.TokenManager
+import com.example.shinhan_qna_aos.main.SaySomtingViewModel
+import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
-
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
+    private val apiInterface: APIInterface = APIRetrofit.apiService
+    private lateinit var tokenManager: TokenManager
+    private lateinit var onboardingRepository: OnboardingRepository
+
+    private val loginViewModel: LoginViewModel by viewModels {
+        SimpleViewModelFactory {
+            LoginViewModel(apiInterface, tokenManager)
+        }
+    }
+
+    private val onboardingViewModel: OnboardingViewModel by viewModels {
+        SimpleViewModelFactory {
+            OnboardingViewModel(onboardingRepository)
+        }
+    }
+
+    private val infoViewModel: InfoViewModel by viewModels {
+        SimpleViewModelFactory {
+            InfoViewModel(apiInterface,tokenManager)
+        }
+    }
+
+    private val managerLoginViewModel : ManagerLoginViewModel by viewModels {
+        SimpleViewModelFactory{
+            ManagerLoginViewModel(apiInterface,tokenManager)
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { MainEntry() }
+        // 토큰 저장 초기화
+        tokenManager = TokenManager(applicationContext)
+        // 온보딩 Repository 초기화
+        onboardingRepository = OnboardingRepository(applicationContext)
+        // 토큰 자동 갱신 시도 등 초기 작업
+        loginViewModel.tryRefreshTokenIfNeeded()
+
+        setContent {
+            AppNavigation(loginViewModel = loginViewModel, onboardingViewModel = onboardingViewModel, infoViewModel = infoViewModel, managerLoginViewModel = managerLoginViewModel,tokenManager = tokenManager)
+        }
+
+//        // 최초 진입 인텐트에서 구글 인가코드 처리 (필요시)
+//        handleGoogleAuthCode(intent)
     }
+//
+//    override fun onNewIntent(intent: Intent) {
+//        super.onNewIntent(intent)
+//        // 구글 OAuth 인가코드가 포함된 URI 처리
+//        handleGoogleAuthCode(intent)
+//    }
+
+//    private fun handleGoogleAuthCode(intent: Intent?) {
+//        val data = intent?.data ?: return
+//
+//        if (data.toString().startsWith("${BuildConfig.BASE_URL}/oauth/callback/google")) {
+//            val authCode = data.getQueryParameter("code")
+//            if (!authCode.isNullOrBlank()) {
+//                loginViewModel.sendGoogleAuthCodeToServer(authCode)
+//            }
+//        }
+//    }
 }
-
-@Composable
-fun MainEntry(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    var showOnboarding by remember { mutableStateOf(true) }
-    val scope = rememberCoroutineScope()
-    val onboardingviewmodel= OnboardingViewModel()
-    // 첫 진입시 온보딩 완료 여부 체크
-    LaunchedEffect(Unit) {
-        showOnboarding = !OnboardingPrefs.isOnboarded(context)
-    }
-
-    if (showOnboarding) {
-        OnboardingScreen(
-            viewModel = onboardingviewmodel,
-            onFinish = {
-                scope.launch {
-                    OnboardingPrefs.setOnboarded(context, true)
-                    showOnboarding = false // 로그인으로 전환
-                }
-            }
-        )
-    } else {
-        LoginScreen()
-    }
+// 공통 ViewModelFactory 구현
+class SimpleViewModelFactory<T: ViewModel>(
+    private val creator: () -> T
+): ViewModelProvider.Factory {
+    override fun <VM : ViewModel> create(modelClass: Class<VM>): VM = creator() as VM
 }
