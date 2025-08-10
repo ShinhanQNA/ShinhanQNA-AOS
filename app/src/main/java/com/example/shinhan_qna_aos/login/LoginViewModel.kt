@@ -132,6 +132,11 @@ class LoginViewModel(
                             refreshToken, // 재발급 시엔 원래 refreshToken 그대로 유지
                             body.expiresIn
                         )
+                        _loginResult.value = LoginResult.Success(
+                            accessToken = body.accessToken,
+                            refreshToken = refreshToken,
+                            expiresIn = body.expiresIn
+                        )
                     }
                 } else {
                     Log.e("LoginViewModel", "재발급 실패 코드=${response.code()} 메세지=${response.message()}")
