@@ -1,6 +1,5 @@
 package com.example.shinhan_qna_aos
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -19,7 +18,7 @@ import com.example.shinhan_qna_aos.login.LoginScreen
 import com.example.shinhan_qna_aos.login.LoginViewModel
 import com.example.shinhan_qna_aos.login.ManagerLogin
 import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
-import com.example.shinhan_qna_aos.login.TokenManager
+import com.example.shinhan_qna_aos.login.LoginManager
 import com.example.shinhan_qna_aos.main.MainScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
@@ -32,7 +31,7 @@ fun AppNavigation(
     infoViewModel: InfoViewModel,
     onboardingViewModel: OnboardingViewModel,
     managerLoginViewModel:ManagerLoginViewModel,
-    tokenManager: TokenManager
+    loginmanager: LoginManager
 ) {
     val navController = rememberNavController()
 
@@ -53,7 +52,7 @@ fun AppNavigation(
             loginResult is LoginResult.Success -> {
                 val route = withContext(Dispatchers.IO) {
                     // 가입 상태 바로 조회 (서버 호출, UI 출력 전 경로 결정)
-                    val accessToken = tokenManager.accessToken
+                    val accessToken = loginmanager.accessToken
                     if (accessToken.isNullOrEmpty()) { "login" }
                     else {
                         try {

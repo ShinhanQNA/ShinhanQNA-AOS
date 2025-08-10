@@ -11,10 +11,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.API.APIInterface
-import com.example.shinhan_qna_aos.login.TokenManager
+import com.example.shinhan_qna_aos.login.LoginManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -27,7 +26,7 @@ import java.io.FileOutputStream
 
 class InfoViewModel(
     val api: APIInterface,
-    private val tokenManager: TokenManager
+    private val loginmanager: LoginManager
 ) : ViewModel() {
 
     private val TAG = "InfoViewModel"
@@ -101,7 +100,7 @@ class InfoViewModel(
     }
     // 사용자 정보/상태 조회 후 목적 화면으로 이동
     fun checkUserStatusAndNavigate() {
-        val accessToken = tokenManager.accessToken
+        val accessToken = loginmanager.accessToken
         if (accessToken.isNullOrEmpty()) {
             errorMessage = "로그인 정보가 없습니다. 다시 로그인해 주세요."
             return
@@ -134,7 +133,7 @@ class InfoViewModel(
     }
 
     fun submitStudentInfo() {
-        val accessToken = tokenManager.accessToken
+        val accessToken = loginmanager.accessToken
         if (accessToken.isNullOrEmpty()) {
             errorMessage = "로그인 정보가 없습니다. 다시 로그인 해주세요."
             return
