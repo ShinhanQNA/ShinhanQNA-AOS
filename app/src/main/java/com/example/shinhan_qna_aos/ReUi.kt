@@ -81,13 +81,15 @@ fun TitleContentLikeButton(
     banCount: Int = 0,
     isAdmin: Boolean = false,
     responseState: String = "응답 상태",
-    onResponseStateChange: (String) -> Unit = {}
+    onResponseStateChange: (String) -> Unit = {},
+    onClick:()->Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .clickable { onClick() },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -109,7 +111,6 @@ fun TitleContentLikeButton(
                 }
             }
         }
-
         if (isAdmin) {
             ManagerDropDown(responseState, onResponseStateChange = onResponseStateChange)
         }
@@ -266,27 +267,12 @@ fun TopBar(
 
 // 상세보기 [제목 + 내용]
 @Composable
-fun DetailContent(){
-    val datas = listOf( StringData(" Text(\n" +
-            "            title,\n" +
-            "            color = Color.Black,style = TextStyle(fontFamily = pretendard,\n" +
-            "                fontWeight = FontWeight.Bold,\n" +
-            "                fontSize = 20.sp\n" +
-            "            ),\n" +
-            "        )\n" +
-            "        Spacer(modifier = Modifier.height(8.dp))\n" +
-            "        Text(\n" +
-            "            content,\n" +
-            "            color = Color(0xffA5A5A5),\n" +
-            "            style = TextStyle(\n"
-    )
-    )
-    Column (
-        modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 16.dp)
-    ){
+fun DetailContent(title: String, content: String) {
+    Column(
+        modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
+    ) {
         Text(
-            "title",
+            title,
             color = Color.Black,
             style = TextStyle(
                 fontFamily = pretendard,
@@ -296,22 +282,19 @@ fun DetailContent(){
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
-        LazyColumn ( modifier = Modifier.fillMaxWidth()){
-            items(datas) {data ->
-                Text(
-                    data.content,
-                    color = Color.Black,
-                    style = TextStyle(
-                        fontFamily = pretendard,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 16.sp
-                    ),
-                    lineHeight = 28.sp
-                )
-            }
-        }
+        Text(
+            content,
+            color = Color.Black,
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp
+            ),
+            lineHeight = 28.sp
+        )
     }
 }
+
 
 // 개인정보처리방침, 이용약관, 법적고지 텍스트 영역 컴포저블
 @Composable

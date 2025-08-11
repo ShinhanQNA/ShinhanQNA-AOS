@@ -17,17 +17,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.TitleContentLikeButton
 import com.example.shinhan_qna_aos.login.LoginManager
 
 @Composable
-fun SaySomthingScreen() {
+fun SaySomthingScreen(saySomtingViewModel: SaySomtingViewModel,navController:NavController) {
     val context = LocalContext.current
-    val saySomtingViewModel = remember {
-        SaySomtingViewModel(
-            loginmanager = LoginManager(context) // 또는 다른 방식으로 TokenManager 생성
-        )
-    }
 
     val dataList = saySomtingViewModel.postList
     val isAdmin = saySomtingViewModel.isAdmin
@@ -45,7 +41,8 @@ fun SaySomthingScreen() {
                 responseState = responseState,
                 onResponseStateChange = { newState ->
                     responseState = newState
-                }
+                },
+                onClick = { navController.navigate("postDetail/${data.postID}") }
             )
             Divider()
         }
@@ -55,5 +52,5 @@ fun SaySomthingScreen() {
 @Composable
 @Preview(showBackground = true)
 fun SayScreenPreview(){
-    SaySomthingScreen()
+//    SaySomthingScreen()
 }

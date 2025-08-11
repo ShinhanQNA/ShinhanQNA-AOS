@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,36 +26,55 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.DetailContent
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.TopBar
+import com.example.shinhan_qna_aos.login.LoginManager
+import com.example.shinhan_qna_aos.main.SaySomtingViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun WriteOpenScreen () {
-    Box() {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-                .padding(bottom = 50.dp)
-        ) {
-            TopBar(null, {})
-            DetailContent()
-            Spacer(modifier = Modifier.height(16.dp))
-            Like(45)
-            Spacer(modifier = Modifier.height(36.dp))
-            FunctionButton(true)
+fun WriteOpenScreen (
+    navController: NavController,
+    postId: Int,
+    saySomtingViewModel: SaySomtingViewModel,
+    loginManager: LoginManager
+) {
+    val postDetail = saySomtingViewModel.selectedPost
+
+    // 처음 진입 시 데이터 로드
+    LaunchedEffect(postId) {
+        saySomtingViewModel.loadPostDetail(postId)
+    }
+
+    postDetail?.let { post ->
+        val currentEmail = loginManager.getUserEmail()
+        val isOwner = currentEmail == post.email
+        Box {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White)
+                    .padding(bottom = 50.dp)
+            ) {
+                TopBar(null) { navController.popBackStack() }
+                DetailContent(post.title, post.content)
+                Spacer(modifier = Modifier.height(16.dp))
+                Like(post.likes)
+                Spacer(modifier = Modifier.height(36.dp))
+                FunctionButton(isOwner)
+            }
+            Text(
+                "배너광고",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(Color.Red)
+                    .align(Alignment.BottomCenter)
+            )
         }
-        Text(
-            "배너광고",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .background(Color.Red)
-                .align(Alignment.BottomCenter)
-        )
     }
 }
 
@@ -160,6 +180,6 @@ fun FunctionButton(
 @Preview(showBackground = true)
 @Composable
 fun WriteOpenScreenPreview(){
-    WriteOpenScreen()
+//    WriteOpenScreen()
 //    FunctionButton()
 }

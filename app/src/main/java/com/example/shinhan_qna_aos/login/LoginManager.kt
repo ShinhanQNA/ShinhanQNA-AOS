@@ -74,5 +74,14 @@ class LoginManager(private val context: Context) {
     fun isAdmin(): Boolean {
         return prefs.getBoolean("is_admin", false)
     }
+
+    // 이메일 저장
+    fun setUserEmail(email: String) {
+        prefs.edit().putString("user_email", email).apply()
+    }
+
+    fun getUserEmail(): String? {
+        return prefs.getString("user_email", null)
+    }
 }
 

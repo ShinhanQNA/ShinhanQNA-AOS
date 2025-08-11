@@ -7,9 +7,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.shinhan_qna_aos.etc.WriteOpenScreen
 import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.info.InformationScreen
 import com.example.shinhan_qna_aos.info.WaitScreen
@@ -20,6 +23,7 @@ import com.example.shinhan_qna_aos.login.ManagerLogin
 import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
 import com.example.shinhan_qna_aos.login.LoginManager
 import com.example.shinhan_qna_aos.main.MainScreen
+import com.example.shinhan_qna_aos.main.SaySomtingViewModel
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +35,7 @@ fun AppNavigation(
     infoViewModel: InfoViewModel,
     onboardingViewModel: OnboardingViewModel,
     managerLoginViewModel:ManagerLoginViewModel,
+    saysomtingviewmodel : SaySomtingViewModel,
     loginmanager: LoginManager
 ) {
     val navController = rememberNavController()
@@ -60,7 +65,9 @@ fun AppNavigation(
                             if (response.isSuccessful) {
                                 val user = response.body()
                                 when (user?.status) {
-                                    "가입 대기 중" -> "wait/${user.name}"
+//                                    "가입 대기 중" -> "wait/${user.name}"
+//                                    "가입 완료" -> "main"
+                                    "가입 대기 중" -> "main" // API 연결로 인한 로직 변경
                                     "가입 완료" -> "main"
                                     else -> "info"
                                 }
@@ -102,7 +109,7 @@ fun AppNavigation(
                 }
             )
         }
-        composable("login") { LoginScreen(viewModel = loginViewModel, navController)}
+        composable("login") { LoginScreen(viewModel = loginViewModel, navController) }
         composable("manager login") {
             ManagerLogin(
                 viewModel = managerLoginViewModel,
@@ -118,6 +125,19 @@ fun AppNavigation(
             val userName = it.arguments?.getString("userName") ?: "학생"
             WaitScreen(userName = userName)
         }
-        composable("main") { MainScreen() }
+        composable("main") { MainScreen(saysomtingviewmodel, navController)}
+
+        composable(
+           "postDetail/{postId}",
+            arguments = listOf(navArgument("postId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getInt("postId") ?: 0
+            WriteOpenScreen(
+                navController = navController,
+                postId = postId,
+                saySomtingViewModel = saysomtingviewmodel,
+                loginManager = loginmanager // getUserEmail 사용 가능
+            )
+        }
     }
 }

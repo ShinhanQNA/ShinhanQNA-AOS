@@ -60,7 +60,8 @@ fun DeclarationScreen(){
                         isAdmin = isAdmin,
                         flagsCount = data.flagsCount,
                         banCount = data.banCount,
-                        onResponseStateChange = { responseState = it }
+                        onResponseStateChange = { responseState = it },
+                        onClick = {}
                     )
                     Divider()
                 }

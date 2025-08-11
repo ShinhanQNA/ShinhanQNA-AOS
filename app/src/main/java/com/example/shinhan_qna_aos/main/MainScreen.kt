@@ -36,16 +36,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun MainScreen(){
+fun MainScreen(saySomtingViewModel: SaySomtingViewModel,navController: NavController){
     Box(modifier = Modifier.fillMaxSize()){
         Column{
             MainTopbar()
-            Selectboard()
+            Selectboard(saySomtingViewModel,navController)
         }
         Text(
             "배너광고",
@@ -134,7 +136,8 @@ fun TopIcon(){
 
 //게시판 선택
 @Composable
-fun Selectboard() {
+fun Selectboard(saySomtingViewModel: SaySomtingViewModel, navController: NavController) {
+
     val tabData = listOf(
         Pair("말해봐요", R.drawable.trumpet),
         Pair("선정된 의견", R.drawable.star),
@@ -204,7 +207,7 @@ fun Selectboard() {
 
         // 페이지별 본문 표시
         when (selectedIndex) {
-            0 -> SaySomthingScreen()
+            0 -> SaySomthingScreen(saySomtingViewModel = saySomtingViewModel , navController =  navController)
             1 -> SelectedOpinionsScreen()
             2 -> AnsweredScreen()
         }
@@ -243,6 +246,6 @@ fun TabWithAppleEmoji(
 @Composable
 @Preview(showBackground = true)
 fun MainScreenPreview(){
-    MainScreen()
+//    MainScreen()
 //    MainTopbar()
 }
