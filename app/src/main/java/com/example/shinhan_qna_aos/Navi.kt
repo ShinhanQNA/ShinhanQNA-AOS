@@ -55,6 +55,12 @@ fun AppNavigation(
             }
             // 로그인 성공 → 가입 상태 먼저 체크
             loginResult is LoginResult.Success -> {
+                // 관리자인 경우 바로 메인으로
+                if (loginmanager.isAdmin()) {
+                    initialRoute = "main"
+                    return@LaunchedEffect
+                }
+
                 val route = withContext(Dispatchers.IO) {
                     // 가입 상태 바로 조회 (서버 호출, UI 출력 전 경로 결정)
                     val accessToken = loginmanager.accessToken
