@@ -3,16 +3,15 @@ package com.example.shinhan_qna_aos
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.API.APIRetrofit
 import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.login.LoginViewModel
 import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
 import com.example.shinhan_qna_aos.login.LoginManager
-import com.example.shinhan_qna_aos.main.SaySomtingViewModel
+import com.example.shinhan_qna_aos.main.PostRepository
+import com.example.shinhan_qna_aos.main.PostViewModel
 import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
 
@@ -24,7 +23,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var onboardingViewModel: OnboardingViewModel
     private lateinit var infoViewModel: InfoViewModel
     private lateinit var managerLoginViewModel: ManagerLoginViewModel
-    private lateinit var saySometingViewModel: SaySomtingViewModel
+    private lateinit var postViewModel: PostViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -32,7 +31,7 @@ class MainActivity : ComponentActivity() {
         loginmanager = LoginManager(applicationContext)
         onboardingRepository = OnboardingRepository(applicationContext)
         val apiInterface = APIRetrofit.apiService
-
+        val postRepository = PostRepository(apiInterface,loginmanager)
         // 2. ViewModel 생성
         loginViewModel = ViewModelProvider(
             this,
@@ -54,10 +53,10 @@ class MainActivity : ComponentActivity() {
             SimpleViewModelFactory { ManagerLoginViewModel(apiInterface, loginmanager) }
         )[ManagerLoginViewModel::class.java]
 
-        saySometingViewModel = ViewModelProvider(
+        postViewModel = ViewModelProvider(
             this,
-            SimpleViewModelFactory { SaySomtingViewModel(loginmanager) }
-        )[SaySomtingViewModel::class.java]
+            SimpleViewModelFactory { PostViewModel(postRepository,loginmanager) }
+        )[PostViewModel::class.java]
 
         // 3. 토큰 유효성 검사 및 자동 갱신 시도
         loginViewModel.tryRefreshTokenIfNeeded()
@@ -69,7 +68,7 @@ class MainActivity : ComponentActivity() {
                 onboardingViewModel = onboardingViewModel,
                 infoViewModel = infoViewModel,
                 managerLoginViewModel = managerLoginViewModel,
-                saysomtingviewmodel = saySometingViewModel,
+                postViewModel = postViewModel,
                 loginmanager = loginmanager,
             )
         }

@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.shinhan_qna_aos.etc.WriteOpenScreen
+import com.example.shinhan_qna_aos.etc.manager.ManagerWriteOpenScreen
 import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.info.InformationScreen
 import com.example.shinhan_qna_aos.info.WaitScreen
@@ -23,7 +24,7 @@ import com.example.shinhan_qna_aos.login.ManagerLogin
 import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
 import com.example.shinhan_qna_aos.login.LoginManager
 import com.example.shinhan_qna_aos.main.MainScreen
-import com.example.shinhan_qna_aos.main.SaySomtingViewModel
+import com.example.shinhan_qna_aos.main.PostViewModel
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +36,7 @@ fun AppNavigation(
     infoViewModel: InfoViewModel,
     onboardingViewModel: OnboardingViewModel,
     managerLoginViewModel:ManagerLoginViewModel,
-    saysomtingviewmodel : SaySomtingViewModel,
+    postViewModel : PostViewModel,
     loginmanager: LoginManager
 ) {
     val navController = rememberNavController()
@@ -131,19 +132,22 @@ fun AppNavigation(
             val userName = it.arguments?.getString("userName") ?: "학생"
             WaitScreen(userName = userName)
         }
-        composable("main") { MainScreen(saysomtingviewmodel, navController)}
-
+        composable("main") { MainScreen(postViewModel, navController) }
+        // 학생용 상세 게시글
         composable(
-           "postDetail/{postId}",
+            "postDetail/{postId}",
             arguments = listOf(navArgument("postId") { type = NavType.IntType })
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-            WriteOpenScreen(
-                navController = navController,
-                postId = postId,
-                saySomtingViewModel = saysomtingviewmodel,
-                loginManager = loginmanager // getUserEmail 사용 가능
-            )
+            WriteOpenScreen(navController, postId, postViewModel, loginmanager)
+        }
+        // 관리자용 상세 게시글
+        composable(
+            "managerPostDetail/{postId}",
+            arguments = listOf(navArgument("postId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getInt("postId") ?: 0
+            ManagerWriteOpenScreen(isNotice = false, viewModel = postViewModel, postId = postId)
         }
     }
 }

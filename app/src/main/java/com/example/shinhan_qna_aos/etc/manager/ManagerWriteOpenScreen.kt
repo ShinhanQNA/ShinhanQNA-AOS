@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,13 +32,23 @@ import com.example.shinhan_qna_aos.DetailContent
 import com.example.shinhan_qna_aos.LikeFlagBan
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.TopBar
+import com.example.shinhan_qna_aos.main.PostViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
 fun ManagerWriteOpenScreen(
-    isNotice: Boolean = true // true면 공지사항, false면 일반글
+    postId: Int,
+    viewModel: PostViewModel,
+    isNotice: Boolean = false // true면 공지사항, false면 일반글
 ) {
+    val postDetail = viewModel.selectedPost
+
+    // 처음 진입 시 API 호출
+    LaunchedEffect(postId) {
+        viewModel.loadPostDetail(postId)
+    }
+
     Box {
         Column(
             modifier = Modifier
@@ -46,15 +57,25 @@ fun ManagerWriteOpenScreen(
                 .padding(bottom = 50.dp)
         ) {
             TopBar(null, {})
-            DetailContent(title = "", content = "")
 
+            // API에서 가져온 데이터로 표시
+            postDetail?.let { DetailContent(title = it.title, content = postDetail.content) }
+
+            // 공지사항이 아닌 경우 좋아요/신고 영역 표시
             if (!isNotice) {
                 Spacer(modifier = Modifier.height(16.dp))
-                LikeFlagBan(likeCount = 45, flagsCount = 10, banCount = 2)
+                if (postDetail != null) {
+                    LikeFlagBan(
+                        likeCount = postDetail.likes,
+                        flagsCount = 0, // 여긴 아직 값이 안 옴
+                        banCount = 34 // 여긴 아직 값이 안 옴
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
             ManagerFunctionButton(isNotice)
+
         }
         // 배너광고는 항상 하단 고정
         Text(
@@ -122,6 +143,6 @@ fun ManagerButton(icon: Int, label: String, background: Color) {
 @Preview(showBackground = true)
 @Composable
 fun WriteOpenScreenPreview(){
-    ManagerWriteOpenScreen()
+//    ManagerWriteOpenScreen()
 //    FunctionButton()
 }
