@@ -129,12 +129,12 @@ class LoginViewModel(
                     if (body != null) {
                         loginmanager.saveTokens(
                             body.accessToken,
-                            refreshToken, // 재발급 시엔 원래 refreshToken 그대로 유지
+                            body.refreshToken,
                             body.expiresIn
                         )
                         _loginResult.value = LoginResult.Success(
                             accessToken = body.accessToken,
-                            refreshToken = refreshToken,
+                            refreshToken = body.refreshToken,
                             expiresIn = body.expiresIn
                         )
                     }
