@@ -1,8 +1,6 @@
 package com.example.shinhan_qna_aos
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -13,51 +11,67 @@ import com.example.shinhan_qna_aos.API.APIRetrofit
 import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.login.LoginViewModel
 import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
-import com.example.shinhan_qna_aos.login.TokenManager
+import com.example.shinhan_qna_aos.login.LoginManager
 import com.example.shinhan_qna_aos.main.SaySomtingViewModel
 import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
 
 class MainActivity : ComponentActivity() {
 
-    private val apiInterface: APIInterface = APIRetrofit.apiService
-    private lateinit var tokenManager: TokenManager
+    private lateinit var loginmanager: LoginManager
     private lateinit var onboardingRepository: OnboardingRepository
-
-    private val loginViewModel: LoginViewModel by viewModels {
-        SimpleViewModelFactory {
-            LoginViewModel(apiInterface, tokenManager)
-        }
-    }
-
-    private val onboardingViewModel: OnboardingViewModel by viewModels {
-        SimpleViewModelFactory {
-            OnboardingViewModel(onboardingRepository)
-        }
-    }
-
-    private val infoViewModel: InfoViewModel by viewModels {
-        SimpleViewModelFactory {
-            InfoViewModel(apiInterface,tokenManager)
-        }
-    }
-
-    private val managerLoginViewModel : ManagerLoginViewModel by viewModels {
-        SimpleViewModelFactory{
-            ManagerLoginViewModel(apiInterface,tokenManager)
-        }
-    }
+    private lateinit var loginViewModel: LoginViewModel
+    private lateinit var onboardingViewModel: OnboardingViewModel
+    private lateinit var infoViewModel: InfoViewModel
+    private lateinit var managerLoginViewModel: ManagerLoginViewModel
+    private lateinit var saySometingViewModel: SaySomtingViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 토큰 저장 초기화
-        tokenManager = TokenManager(applicationContext)
-        // 온보딩 Repository 초기화
+
+        // 1. 의존성 먼저 생성
+        loginmanager = LoginManager(applicationContext)
         onboardingRepository = OnboardingRepository(applicationContext)
-        // 토큰 자동 갱신 시도 등 초기 작업
+        val apiInterface = APIRetrofit.apiService
+
+        // 2. ViewModel 생성
+        loginViewModel = ViewModelProvider(
+            this,
+            SimpleViewModelFactory { LoginViewModel(apiInterface, loginmanager) }
+        )[LoginViewModel::class.java]
+
+        onboardingViewModel = ViewModelProvider(
+            this,
+            SimpleViewModelFactory { OnboardingViewModel(onboardingRepository) }
+        )[OnboardingViewModel::class.java]
+
+        infoViewModel = ViewModelProvider(
+            this,
+            SimpleViewModelFactory { InfoViewModel(apiInterface, loginmanager) }
+        )[InfoViewModel::class.java]
+
+        managerLoginViewModel = ViewModelProvider(
+            this,
+            SimpleViewModelFactory { ManagerLoginViewModel(apiInterface, loginmanager) }
+        )[ManagerLoginViewModel::class.java]
+
+        saySometingViewModel = ViewModelProvider(
+            this,
+            SimpleViewModelFactory { SaySomtingViewModel(loginmanager) }
+        )[SaySomtingViewModel::class.java]
+
+        // 3. 토큰 유효성 검사 및 자동 갱신 시도
         loginViewModel.tryRefreshTokenIfNeeded()
 
+        // 4. Compose 시작
         setContent {
-            AppNavigation(loginViewModel = loginViewModel, onboardingViewModel = onboardingViewModel, infoViewModel = infoViewModel, managerLoginViewModel = managerLoginViewModel,tokenManager = tokenManager)
+            AppNavigation(
+                loginViewModel = loginViewModel,
+                onboardingViewModel = onboardingViewModel,
+                infoViewModel = infoViewModel,
+                managerLoginViewModel = managerLoginViewModel,
+                saysomtingviewmodel = saySometingViewModel,
+                loginmanager = loginmanager,
+            )
         }
 
 //        // 최초 진입 인텐트에서 구글 인가코드 처리 (필요시)

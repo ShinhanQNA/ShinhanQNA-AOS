@@ -8,7 +8,9 @@ import com.example.shinhan_qna_aos.login.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.ManagerLoginData
 import com.example.shinhan_qna_aos.login.ReToken
 import com.example.shinhan_qna_aos.login.RefreshTokenRequest
-import com.example.shinhan_qna_aos.main.PostListResponse
+import com.example.shinhan_qna_aos.main.Post
+import com.example.shinhan_qna_aos.main.PostDetail
+import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -20,6 +22,7 @@ import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface APIInterface {
@@ -76,6 +79,14 @@ interface APIInterface {
         @Header("Authorization") code : String,
         @Query("size") size: Int,                        // 아이템 요청 개수
         @Query("sort") sort: String
-    ):Response<PostListResponse>
+    ):Response<List<Post>>
+
+    //게시글 상세조회
+    @Headers("Content-Type: application/json")
+    @GET("/boards/{postId}")
+    suspend fun getPostsDetail(
+        @Header("Authorization") code : String,
+        @Path("postId") postId: Int
+    ):Response<PostDetail>
 }
 

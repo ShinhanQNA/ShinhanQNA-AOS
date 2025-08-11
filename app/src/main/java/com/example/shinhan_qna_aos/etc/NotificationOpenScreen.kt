@@ -26,7 +26,7 @@ fun NotificationOpenScreen(){
                 .padding(bottom = 50.dp)
         ) {
             TopBar(null, {})
-            DetailContent()
+            DetailContent(title = "ㅇ", content = "ㄴㄴ")
         }
         Text(
             "배너광고",

@@ -10,13 +10,13 @@ import kotlinx.coroutines.launch
 
 class ManagerLoginViewModel(
     private val apiInterface: APIInterface,
-    private val tokenManager: TokenManager
+    private val loginmanager: LoginManager
 ) : ViewModel() {
 
     var state by mutableStateOf(ManagerLoginData())
     var loginResult by mutableStateOf<String?>(null) // 성공/실패 메시지
     var isLoginSuccess by mutableStateOf(false)
-    var admin by mutableStateOf(false)
+
     fun onAdminIdChange(newId: String) {
         state = state.copy(managerId = newId)
     }
@@ -39,13 +39,13 @@ class ManagerLoginViewModel(
                     val body = response.body()
                     if (body != null) {
                         // 토큰 저장 (액세스+리프레시)
-                        tokenManager.saveTokens(
+                        loginmanager.saveTokens(
                             body.accessToken,
                             body.refreshToken,
                             body.expiresIn
                         )
+                        loginmanager.saveIsAdmin(true)
                         loginResult = "관리자 로그인 성공"
-                        admin = true // 학생과 관리자 구별 유아이 작동을 위한 변수
                         isLoginSuccess = true //  성공 상태 true
                     } else {
                         loginResult = "로그인 응답이 비어있습니다."

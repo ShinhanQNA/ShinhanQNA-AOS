@@ -3,10 +3,7 @@ package com.example.shinhan_qna_aos.onboarding
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.R
-import com.example.shinhan_qna_aos.login.LoginViewModel
-import com.example.shinhan_qna_aos.login.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

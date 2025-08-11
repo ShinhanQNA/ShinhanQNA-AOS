@@ -16,33 +16,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.shinhan_qna_aos.SimpleViewModelFactory
-import com.example.shinhan_qna_aos.TitleContentLike
+import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.TitleContentLikeButton
-import com.example.shinhan_qna_aos.login.TokenManager
+import com.example.shinhan_qna_aos.login.LoginManager
 
 @Composable
-fun SaySomthingScreen() {
+fun SaySomthingScreen(saySomtingViewModel: SaySomtingViewModel,navController:NavController) {
     val context = LocalContext.current
-    val viewModel = remember {
-        SaySomtingViewModel(
-            tokenManager = TokenManager(context) // 또는 다른 방식으로 TokenManager 생성
-        )
-    }
 
-    val dataList = viewModel.postList
-    val isAdmin = viewModel.isAdmin
+    val dataList = saySomtingViewModel.postList
+    val isAdmin = saySomtingViewModel.isAdmin
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(bottom = 50.dp)
-    ) {
+    LazyColumn {
         items(dataList, key = { it.postID }) { data ->
-            // 리스트 각각의 응답 상태를 로컬 상태로 관리
             var responseState by remember { mutableStateOf(data.responseState) }
             TitleContentLikeButton(
                 title = data.title,
@@ -54,8 +41,8 @@ fun SaySomthingScreen() {
                 responseState = responseState,
                 onResponseStateChange = { newState ->
                     responseState = newState
-                    // 관리자인 경우 필요하면 API 호출 연동 등 추가 가능
-                }
+                },
+                onClick = { navController.navigate("postDetail/${data.postID}") }
             )
             Divider()
         }
@@ -65,5 +52,5 @@ fun SaySomthingScreen() {
 @Composable
 @Preview(showBackground = true)
 fun SayScreenPreview(){
-    SaySomthingScreen()
+//    SaySomthingScreen()
 }

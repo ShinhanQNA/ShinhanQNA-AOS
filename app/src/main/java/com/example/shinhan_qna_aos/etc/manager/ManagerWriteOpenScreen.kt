@@ -46,7 +46,7 @@ fun ManagerWriteOpenScreen(
                 .padding(bottom = 50.dp)
         ) {
             TopBar(null, {})
-            DetailContent()
+            DetailContent(title = "", content = "")
 
             if (!isNotice) {
                 Spacer(modifier = Modifier.height(16.dp))

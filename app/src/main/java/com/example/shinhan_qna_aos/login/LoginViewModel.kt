@@ -1,8 +1,6 @@
 package com.example.shinhan_qna_aos.login
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,11 +15,24 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(
     private val apiInterface: APIInterface,
-    private val tokenManager: TokenManager
+    private val loginmanager: LoginManager
 ): ViewModel() {
 
     private val _loginResult = MutableStateFlow<LoginResult>(LoginResult.Idle)
     val loginResult: StateFlow<LoginResult> get() = _loginResult
+
+    init {
+        // 앱 시작 시 저장된 토큰이 아직 유효하면 곧바로 Success로 설정
+        val access = loginmanager.accessToken
+        val refresh = loginmanager.refreshToken
+        if (!access.isNullOrBlank() && !loginmanager.isAccessTokenExpired()) {
+            _loginResult.value = LoginResult.Success(
+                accessToken = access,
+                refreshToken = refresh.orEmpty(),
+                expiresIn = ((loginmanager.accessTokenExpiresAt - System.currentTimeMillis()) / 1000).toInt()
+            )
+        }
+    }
 
     // 카카오 로그인 처리
     fun loginWithKakao(context: Context) {
@@ -36,7 +47,7 @@ class LoginViewModel(
                         if (response.isSuccessful) {
                             val body = response.body()
                             if (body != null) {
-                                tokenManager.saveTokens(body.accessToken, body.refreshToken, body.expiresIn)
+                                loginmanager.saveTokens(body.accessToken, body.refreshToken, body.expiresIn)
                                 _loginResult.value = LoginResult.Success(
                                     accessToken = body.accessToken,
                                     refreshToken = body.refreshToken,
@@ -93,68 +104,45 @@ class LoginViewModel(
         viewModelScope.launch {
             Log.d("LoginViewModel", "토큰 재발급 검사 시작")
 
-            // accessToken이 아직 유효하면 바로 반환
-            if (!tokenManager.isAccessTokenExpired()) {
-                Log.d(
-                    "LoginViewModel",
-                    "Access Token 아직 유효, 남은시간=${
-                        (tokenManager.accessTokenExpiresAt - System.currentTimeMillis()) / 1000
-                    }초"
-                )
-                _loginResult.value = LoginResult.Success(
-                    tokenManager.accessToken.orEmpty(),
-                    tokenManager.refreshToken.orEmpty(),
-                    ((tokenManager.accessTokenExpiresAt - System.currentTimeMillis()) / 1000).toInt()
-                )
+            val currentAccess = loginmanager.accessToken
+            val currentRefresh = loginmanager.refreshToken
+            Log.d("LoginViewModel", "현재 저장된 access=$currentAccess refresh=$currentRefresh")
+
+            if (!loginmanager.isAccessTokenExpired()) {
+                Log.d("LoginViewModel", "Access Token 아직 유효 → 재발급 안 함")
                 return@launch
             }
 
-            val refreshToken = tokenManager.refreshToken?.trim()
-            if (refreshToken.isNullOrBlank() || tokenManager.isRefreshTokenExpired()) {
-                Log.w("LoginViewModel", "Refresh Token 만료 또는 없음")
-                tokenManager.clearTokens()
-                _loginResult.value = LoginResult.Failure(-1, "유효한 리프레시 토큰이 없습니다. 재로그인이 필요합니다.")
+            val refreshToken = currentRefresh?.trim()
+            if (refreshToken.isNullOrBlank() || loginmanager.isRefreshTokenExpired()) {
+                Log.w("LoginViewModel", "Refresh Token 만료 혹은 없음 → 재로그인 필요")
                 return@launch
             }
 
             try {
-                Log.d("LoginViewModel", "토큰 재발급 요청 시작")
-                val requestBody = RefreshTokenRequest(refreshToken)
-                val response = apiInterface.ReToken(requestBody)
-
-                Log.d("LoginViewModel", "서버 응답 코드: ${response.code()}")
-
+                Log.d("LoginViewModel", "재발급 요청 시작, 사용중인 Refresh Token=$refreshToken")
+                val response = apiInterface.ReToken(RefreshTokenRequest(refreshToken))
                 if (response.isSuccessful) {
                     val body = response.body()
-                    Log.d("LoginViewModel", "서버 응답 Body: $body")
+                    Log.d("LoginViewModel", "재발급 응답 body=$body")
+
                     if (body != null) {
-                        // accessToken만 갱신, refreshToken 그대로 유지
-                        tokenManager.saveTokens(
+                        loginmanager.saveTokens(
                             body.accessToken,
-                            refreshToken,
+                            refreshToken, // 재발급 시엔 원래 refreshToken 그대로 유지
                             body.expiresIn
                         )
-                        Log.d("LoginViewModel", "Access Token 재발급 완료: ${body.accessToken}")
                         _loginResult.value = LoginResult.Success(
-                            body.accessToken.trim(),
-                            refreshToken.trim(),
-                            body.expiresIn
+                            accessToken = body.accessToken,
+                            refreshToken = refreshToken,
+                            expiresIn = body.expiresIn
                         )
-                    } else {
-                        Log.e("LoginViewModel", "토큰 재발급 응답 데이터 없음")
-                        tokenManager.clearTokens()
-                        _loginResult.value = LoginResult.Failure(-1, "토큰 재발급 응답 데이터 없음")
                     }
                 } else {
-                    tokenManager.clearTokens()
-                    val errorMsg = response.errorBody()?.string() ?: response.message()
-                    Log.e("LoginViewModel", "토큰 재발급 실패: $errorMsg")
-                    _loginResult.value = LoginResult.Failure(response.code(), errorMsg)
+                    Log.e("LoginViewModel", "재발급 실패 코드=${response.code()} 메세지=${response.message()}")
                 }
             } catch (e: Exception) {
-                Log.e("LoginViewModel", "토큰 재발급 중 예외 발생", e)
-                tokenManager.clearTokens()
-                _loginResult.value = LoginResult.Failure(-1, "서버 통신 실패: ${e.localizedMessage}")
+                Log.e("LoginViewModel", "재발급 중 예외 발생", e)
             }
         }
     }
