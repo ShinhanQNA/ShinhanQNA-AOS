@@ -81,27 +81,7 @@ class MainActivity : ComponentActivity() {
                 loginmanager = loginmanager,
             )
         }
-
-//        // 최초 진입 인텐트에서 구글 인가코드 처리 (필요시)
-//        handleGoogleAuthCode(intent)
     }
-//
-//    override fun onNewIntent(intent: Intent) {
-//        super.onNewIntent(intent)
-//        // 구글 OAuth 인가코드가 포함된 URI 처리
-//        handleGoogleAuthCode(intent)
-//    }
-
-//    private fun handleGoogleAuthCode(intent: Intent?) {
-//        val data = intent?.data ?: return
-//
-//        if (data.toString().startsWith("${BuildConfig.BASE_URL}/oauth/callback/google")) {
-//            val authCode = data.getQueryParameter("code")
-//            if (!authCode.isNullOrBlank()) {
-//                loginViewModel.sendGoogleAuthCodeToServer(authCode)
-//            }
-//        }
-//    }
 }
 // 공통 ViewModelFactory 구현
 class SimpleViewModelFactory<T: ViewModel>(
