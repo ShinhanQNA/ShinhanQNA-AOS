@@ -31,7 +31,7 @@ import com.example.shinhan_qna_aos.DetailContent
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.login.LoginManager
-import com.example.shinhan_qna_aos.main.SaySomtingViewModel
+import com.example.shinhan_qna_aos.main.PostViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
@@ -39,7 +39,7 @@ import com.jihan.lucide_icons.lucide
 fun WriteOpenScreen (
     navController: NavController,
     postId: Int,
-    saySomtingViewModel: SaySomtingViewModel,
+    saySomtingViewModel: PostViewModel,
     loginManager: LoginManager
 ) {
     val postDetail = saySomtingViewModel.selectedPost

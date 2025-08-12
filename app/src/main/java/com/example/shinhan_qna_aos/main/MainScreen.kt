@@ -35,18 +35,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun MainScreen(saySomtingViewModel: SaySomtingViewModel,navController: NavController){
+fun MainScreen(saySomtingViewModel: PostViewModel, navController: NavController){
     Box(modifier = Modifier.fillMaxSize()){
         Column{
-            MainTopbar()
+            MainTopbar(navController)
             Selectboard(saySomtingViewModel,navController)
         }
         Text(
@@ -62,7 +60,7 @@ fun MainScreen(saySomtingViewModel: SaySomtingViewModel,navController: NavContro
 
 // 서브 선택
 @Composable
-fun MainTopbar(){
+fun MainTopbar(navController: NavController){
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
@@ -75,18 +73,19 @@ fun MainTopbar(){
             modifier = Modifier.size(28.dp),
             contentDescription = null
         )
-        TopIcon()
+        TopIcon(navController)
     }
 }
 
 // 서브 선택
 @Composable
-fun TopIcon(){
+fun TopIcon(navController: NavController){
     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)){
         Box(
             modifier = Modifier
                 .border(1.dp, color = Color(0xffDFDFDF), RoundedCornerShape(10.dp))
                 .padding(6.dp)
+                .clickable { navController.navigate("writeboard")}
         ) {
             Icon(
                 painter = painterResource(lucide.plus),
@@ -136,7 +135,7 @@ fun TopIcon(){
 
 //게시판 선택
 @Composable
-fun Selectboard(saySomtingViewModel: SaySomtingViewModel, navController: NavController) {
+fun Selectboard(saySomtingViewModel: PostViewModel, navController: NavController) {
 
     val tabData = listOf(
         Pair("말해봐요", R.drawable.trumpet),

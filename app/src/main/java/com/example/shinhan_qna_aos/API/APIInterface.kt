@@ -1,5 +1,6 @@
 package com.example.shinhan_qna_aos.API
 
+import com.example.shinhan_qna_aos.etc.Write
 import com.example.shinhan_qna_aos.info.InfoData
 import com.example.shinhan_qna_aos.info.UserCheckResponse
 import com.example.shinhan_qna_aos.login.AdminRequest
@@ -88,5 +89,16 @@ interface APIInterface {
         @Header("Authorization") code : String,
         @Path("postId") postId: Int
     ):Response<PostDetail>
+
+    // 게시글 쓰기
+    @Multipart
+    @POST
+    suspend fun writeBoards(
+        @Header("Authorization") code: String,
+        @Part("title") title: RequestBody,
+        @Part("content") content: RequestBody,
+        @Part("category") category: RequestBody,
+        @Part image: MultipartBody.Part?
+    ):Response<Write>
 }
 

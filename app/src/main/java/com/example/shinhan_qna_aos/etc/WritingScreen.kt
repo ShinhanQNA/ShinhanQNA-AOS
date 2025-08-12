@@ -1,7 +1,11 @@
 package com.example.shinhan_qna_aos.etc
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,20 +38,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.TopBar
-import com.example.shinhan_qna_aos.WritingViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun WritingScreen(viewModel: WritingViewModel) {
+fun WritingScreen(viewModel: WritingViewModel,navController: NavController) {
+    val context = LocalContext.current
     val state = viewModel.state
+
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                viewModel.onImageChange(context, it)
+            }
+        }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        TopBar("게시글 작성", {})
+        TopBar("게시글 작성",  { navController.popBackStack() })
 
         LazyColumn(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
@@ -54,14 +68,14 @@ fun WritingScreen(viewModel: WritingViewModel) {
         ) {
             item {
                 WritingTitleField(
-                    value = state.title,
+                    value = state.title ?: "",
                     onValueChange = viewModel::onTitleChange,
                     fontSize = 14.sp
                 )
             }
             item {
                 WritingContentField(
-                    value = state.content,
+                    value = state.content ?: "",
                     onValueChange = viewModel::onContentChange,
                     fontSize = 14.sp
                 )
@@ -70,27 +84,28 @@ fun WritingScreen(viewModel: WritingViewModel) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier
-                        .background(
-                            Color.Black,
-                            RoundedCornerShape(12.dp)
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier
+                            .background(Color.Black, RoundedCornerShape(12.dp))
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                            .clickable { launcher.launch("image/*") },
+                    ) {
+                        Icon(
+                            painter = painterResource(lucide.images),
+                            contentDescription = "사진 첨부",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.White
                         )
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                ) {
-                    Icon(
-                        painter = painterResource(lucide.images),
-                        contentDescription = "사진 첨부",
-                        modifier = Modifier.size(20.dp),
-                        tint = Color.White
-                    )
+                        Text("사진 첨부", color = Color.White, fontSize = 14.sp)
+                    }
                     Text(
-                        text = "사진 첨부",
-                        color = Color.White,
-                        style = TextStyle(
-                            fontFamily = pretendard,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 14.sp
-                        )
+                        state.imageUri?.lastPathSegment ?: "",
+                        maxLines = 1,
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }
@@ -105,11 +120,17 @@ fun WritingScreen(viewModel: WritingViewModel) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         modifier = Modifier
-                            .background(
-                                Color.Black,
-                                RoundedCornerShape(12.dp)
-                            )
+                            .background(Color.Black, RoundedCornerShape(12.dp))
                             .padding(horizontal = 18.dp, vertical = 12.dp)
+                            .clickable {
+                                viewModel.uploadPost(
+                                    onSuccess = {
+                                        // 뒤로 가기나 화면 이동
+                                    },
+                                    onError = {
+                                    }
+                                )
+                            }
                     ) {
                         Icon(
                             painter = painterResource(lucide.cloud_upload),
@@ -117,15 +138,7 @@ fun WritingScreen(viewModel: WritingViewModel) {
                             modifier = Modifier.size(20.dp),
                             tint = Color.White
                         )
-                        Text(
-                            text = "작성하기",
-                            color = Color.White,
-                            style = TextStyle(
-                                fontFamily = pretendard,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 14.sp
-                            )
-                        )
+                        Text("작성하기", color = Color.White, fontSize = 14.sp)
                     }
                 }
             }
@@ -249,6 +262,6 @@ fun WriteInfo(){
 @Preview(showBackground = true)
 @Composable
 fun WritinScreenPreview(){
-    val viewModel = WritingViewModel()
-    WritingScreen(viewModel)
+//    val writingViewModel = WritingViewModel()
+//    WritingScreen(writingViewModel)
 }

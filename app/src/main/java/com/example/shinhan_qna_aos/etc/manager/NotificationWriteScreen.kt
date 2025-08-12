@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.shinhan_qna_aos.NotificationWritingViewModel
+import com.example.shinhan_qna_aos.etc.NotificationWritingViewModel
 import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.etc.WriteInfo
 import com.example.shinhan_qna_aos.etc.WritingContentField

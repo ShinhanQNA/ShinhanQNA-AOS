@@ -1,8 +1,6 @@
 package com.example.shinhan_qna_aos.info
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -11,18 +9,16 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.API.APIInterface
+import com.example.shinhan_qna_aos.ImageUtils
 import com.example.shinhan_qna_aos.login.LoginManager
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.io.FileOutputStream
 
 class InfoViewModel(
     val api: APIInterface,
@@ -64,40 +60,11 @@ class InfoViewModel(
         Log.d(TAG, "onImageChange called with uri=$uri")
         state = state.copy(imageUri = uri)
         viewModelScope.launch {
-            compressedImageFile = compressImage(context, uri, 10)
+            compressedImageFile = ImageUtils.compressImage(context, uri, 10)
             Log.d(TAG, "onImageChange: compressedImageFile=${compressedImageFile?.absolutePath}")
         }
     }
 
-    private suspend fun compressImage(context: Context, imageUri: Uri, maxFileSizeMB: Int): File? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val inputStream = context.contentResolver.openInputStream(imageUri)
-                if (inputStream == null) return@withContext null
-                val originalBitmap = BitmapFactory.decodeStream(inputStream)
-                inputStream.close()
-                if (originalBitmap == null) return@withContext null
-                val compressedFile = File(context.cacheDir, "compressed_image_${System.currentTimeMillis()}.jpg")
-                var quality = 100
-                var fileSizeKB: Long
-
-                do {
-                    if (compressedFile.exists()) compressedFile.delete()
-                    FileOutputStream(compressedFile).use { outputStream ->
-                        val compressed = originalBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-                        if (!compressed) return@withContext null
-                        outputStream.flush()
-                    }
-                    fileSizeKB = compressedFile.length() / 1024
-                    quality -= 5
-                } while (fileSizeKB > maxFileSizeMB * 1024 && quality > 5)
-
-                compressedFile
-            } catch (e: Exception) {
-                null
-            }
-        }
-    }
     // 사용자 정보/상태 조회 후 목적 화면으로 이동
     fun checkUserStatusAndNavigate() {
         val accessToken = loginmanager.accessToken
