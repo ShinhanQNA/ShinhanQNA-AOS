@@ -75,29 +75,35 @@ class LoginViewModel(
     }
 
     // 구글 인가 코드 서버 전송
-//    fun sendGoogleAuthCodeToServer(authCode: String) {
-//        viewModelScope.launch {
-//            try {
-//                val response = apiInterface.GoogleAuthCode("Bearer $authCode")
-//                if (response.isSuccessful) {
-//                    val result = response.body()
-//                    when (result) {
-//                        is LoginResult.Success -> {
-//                            tokenManager.saveTokens(result.accessToken, result.refreshToken, result.expiresIn)
-//                            _loginResult.value = result
-//                        }
-//                        is LoginResult.Failure -> _loginResult.value = result
-//                        else -> _loginResult.value = LoginResult.Failure(-1, "알 수 없는 서버 응답")
-//                    }
-//                } else {
-//                    val errorMsg = response.errorBody()?.string() ?: response.message()
-//                    _loginResult.value = LoginResult.Failure(response.code(), errorMsg)
-//                }
-//            } catch (e: Exception) {
-//                _loginResult.value = LoginResult.Failure(-1, "서버 통신 실패")
-//            }
-//        }
-//    }
+    fun sendGoogleAuthCodeToServer(authCode: String) {
+        viewModelScope.launch {
+            try {
+                val bearerCode = "$authCode"
+                val response = apiInterface.GoogleAuthCode(bearerCode)
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body != null) {
+                        loginmanager.saveTokens(
+                            body.accessToken,
+                            body.refreshToken,
+                            body.expiresIn
+                        )
+                        _loginResult.value = LoginResult.Success(
+                            accessToken = body.accessToken,
+                            refreshToken = body.refreshToken,
+                            expiresIn = body.expiresIn
+                        )
+                    } else {
+                        _loginResult.value = LoginResult.Failure(response.code(), "응답 데이터 없음")
+                    }
+                } else {
+                    _loginResult.value = LoginResult.Failure(response.code(), response.message())
+                }
+            } catch (e: Exception) {
+                _loginResult.value = LoginResult.Failure(-1, e.localizedMessage ?: "구글 로그인 서버 요청 실패")
+            }
+        }
+    }
 
     // 리프레시 토큰으로 액세스 토큰 재발급
     fun tryRefreshTokenIfNeeded() {
@@ -146,16 +152,4 @@ class LoginViewModel(
             }
         }
     }
-}
-
-fun getGoogleLoginUrl(): String {
-    val clientId = BuildConfig.GOOGLE_WEB_CLIENT_ID
-    val redirectUri = "${BuildConfig.BASE_URL}/oauth/callback/google"
-    val scope = "email profile"
-    return "https://accounts.google.com/o/oauth2/v2/auth" +
-            "?client_id=$clientId" +
-            "&redirect_uri=$redirectUri" +
-            "&response_type=code" +  // 인가코드 방식
-            "&scope=$scope" +
-            "&access_type=offline"   // 리프레시 토큰 받으려면 필요
 }

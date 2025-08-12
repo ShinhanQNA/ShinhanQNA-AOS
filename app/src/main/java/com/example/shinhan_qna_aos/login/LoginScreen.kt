@@ -1,5 +1,10 @@
 package com.example.shinhan_qna_aos.login
 
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,12 +25,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.shinhan_qna_aos.BuildConfig
 import com.example.shinhan_qna_aos.R
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
     val context = LocalContext.current
-
+    val googleSignInLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                val authCode = account?.serverAuthCode
+                if (!authCode.isNullOrEmpty()) {
+                    // ViewModel로 Authorization Code 전달
+                    viewModel.sendGoogleAuthCodeToServer(authCode)
+                }
+            } catch (e: Exception) {
+                Log.e("LoginScreen", "Google login failed: ${e.localizedMessage}", e)
+            }
+        }
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -70,10 +92,13 @@ fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            // 구글 로그인 URL 오픈
-                            val url = getGoogleLoginUrl()
-                            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))
-                            context.startActivity(intent)
+                            val gso =
+                                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                    .requestServerAuthCode(BuildConfig.GOOGLE_WEB_CLIENT_ID) // 웹 클라이언트 ID
+                                    .requestEmail()
+                                    .build()
+                            val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                            googleSignInLauncher.launch(googleSignInClient.signInIntent)
                         }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
