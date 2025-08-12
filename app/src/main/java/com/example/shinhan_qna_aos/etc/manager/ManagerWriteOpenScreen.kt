@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.DetailContent
 import com.example.shinhan_qna_aos.LikeFlagBan
 import com.example.shinhan_qna_aos.R
@@ -40,6 +39,7 @@ import com.jihan.lucide_icons.lucide
 fun ManagerWriteOpenScreen(
     postId: Int,
     viewModel: PostViewModel,
+    navController: NavController,
     isNotice: Boolean = false // true면 공지사항, false면 일반글
 ) {
     val postDetail = viewModel.selectedPost
@@ -56,7 +56,7 @@ fun ManagerWriteOpenScreen(
                 .background(Color.White)
                 .padding(bottom = 50.dp)
         ) {
-            TopBar(null, {})
+            TopBar(null,  { navController.popBackStack() })
 
             // API에서 가져온 데이터로 표시
             postDetail?.let { DetailContent(title = it.title, content = postDetail.content) }

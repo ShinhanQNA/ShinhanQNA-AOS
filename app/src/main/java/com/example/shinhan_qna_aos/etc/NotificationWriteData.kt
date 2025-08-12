@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos
+package com.example.shinhan_qna_aos.etc
 
 data class NotificationWriteData (
     val title: String? ="",

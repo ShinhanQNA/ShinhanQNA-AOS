@@ -13,6 +13,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.shinhan_qna_aos.etc.WriteOpenScreen
+import com.example.shinhan_qna_aos.etc.WritingScreen
+import com.example.shinhan_qna_aos.etc.WritingViewModel
 import com.example.shinhan_qna_aos.etc.manager.ManagerWriteOpenScreen
 import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.info.InformationScreen
@@ -37,6 +39,7 @@ fun AppNavigation(
     onboardingViewModel: OnboardingViewModel,
     managerLoginViewModel:ManagerLoginViewModel,
     postViewModel : PostViewModel,
+    writingViewModel: WritingViewModel,
     loginmanager: LoginManager
 ) {
     val navController = rememberNavController()
@@ -147,7 +150,10 @@ fun AppNavigation(
             arguments = listOf(navArgument("postId") { type = NavType.IntType })
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-            ManagerWriteOpenScreen(isNotice = false, viewModel = postViewModel, postId = postId)
+            ManagerWriteOpenScreen(isNotice = false, viewModel = postViewModel, navController = navController, postId = postId)
+        }
+        composable("writeboard"){
+            WritingScreen(writingViewModel,navController)
         }
     }
 }

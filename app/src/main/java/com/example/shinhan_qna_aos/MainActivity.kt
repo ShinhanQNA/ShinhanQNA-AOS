@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.shinhan_qna_aos.API.APIRetrofit
+import com.example.shinhan_qna_aos.etc.WriteRepository
+import com.example.shinhan_qna_aos.etc.WritingViewModel
 import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.login.LoginViewModel
 import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
@@ -23,6 +25,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var onboardingViewModel: OnboardingViewModel
     private lateinit var infoViewModel: InfoViewModel
     private lateinit var managerLoginViewModel: ManagerLoginViewModel
+    private lateinit var writingViewModel: WritingViewModel
     private lateinit var postViewModel: PostViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +35,7 @@ class MainActivity : ComponentActivity() {
         onboardingRepository = OnboardingRepository(applicationContext)
         val apiInterface = APIRetrofit.apiService
         val postRepository = PostRepository(apiInterface,loginmanager)
+        val writeRepository = WriteRepository(apiInterface,loginmanager)
         // 2. ViewModel 생성
         loginViewModel = ViewModelProvider(
             this,
@@ -58,6 +62,10 @@ class MainActivity : ComponentActivity() {
             SimpleViewModelFactory { PostViewModel(postRepository,loginmanager) }
         )[PostViewModel::class.java]
 
+        writingViewModel = ViewModelProvider(
+            this,
+            SimpleViewModelFactory { WritingViewModel(writeRepository) }
+        )[WritingViewModel::class.java]
         // 3. 토큰 유효성 검사 및 자동 갱신 시도
         loginViewModel.tryRefreshTokenIfNeeded()
 
@@ -69,6 +77,7 @@ class MainActivity : ComponentActivity() {
                 infoViewModel = infoViewModel,
                 managerLoginViewModel = managerLoginViewModel,
                 postViewModel = postViewModel,
+                writingViewModel = writingViewModel,
                 loginmanager = loginmanager,
             )
         }

@@ -44,7 +44,7 @@ import com.jihan.lucide_icons.lucide
 fun MainScreen(saySomtingViewModel: PostViewModel, navController: NavController){
     Box(modifier = Modifier.fillMaxSize()){
         Column{
-            MainTopbar()
+            MainTopbar(navController)
             Selectboard(saySomtingViewModel,navController)
         }
         Text(
@@ -60,7 +60,7 @@ fun MainScreen(saySomtingViewModel: PostViewModel, navController: NavController)
 
 // 서브 선택
 @Composable
-fun MainTopbar(){
+fun MainTopbar(navController: NavController){
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
@@ -73,18 +73,19 @@ fun MainTopbar(){
             modifier = Modifier.size(28.dp),
             contentDescription = null
         )
-        TopIcon()
+        TopIcon(navController)
     }
 }
 
 // 서브 선택
 @Composable
-fun TopIcon(){
+fun TopIcon(navController: NavController){
     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)){
         Box(
             modifier = Modifier
                 .border(1.dp, color = Color(0xffDFDFDF), RoundedCornerShape(10.dp))
                 .padding(6.dp)
+                .clickable { navController.navigate("writeboard")}
         ) {
             Icon(
                 painter = painterResource(lucide.plus),
