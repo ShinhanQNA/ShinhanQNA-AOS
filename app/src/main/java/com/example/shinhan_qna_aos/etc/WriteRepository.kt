@@ -1,8 +1,5 @@
 package com.example.shinhan_qna_aos.etc
 
-import android.content.Context
-import android.net.Uri
-import android.provider.MediaStore.Images
 import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.login.LoginManager
 import okhttp3.MediaType.Companion.toMediaTypeOrNull

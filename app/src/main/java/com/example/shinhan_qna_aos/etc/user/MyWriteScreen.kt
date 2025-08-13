@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.etc
+package com.example.shinhan_qna_aos.etc.user
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -20,8 +20,6 @@ import androidx.compose.ui.unit.dp
 import com.example.shinhan_qna_aos.TitleContent
 import com.example.shinhan_qna_aos.TitleContentButton
 import com.example.shinhan_qna_aos.TopBar
-import com.example.shinhan_qna_aos.main.MainTopbar
-import com.example.shinhan_qna_aos.main.Selectboard
 
 @Composable
 fun MyWriteScreen(){

@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.etc
+package com.example.shinhan_qna_aos.etc.user
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

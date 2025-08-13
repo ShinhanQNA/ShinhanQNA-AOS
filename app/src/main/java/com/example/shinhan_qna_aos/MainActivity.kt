@@ -12,8 +12,8 @@ import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.login.LoginViewModel
 import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
 import com.example.shinhan_qna_aos.login.LoginManager
-import com.example.shinhan_qna_aos.main.PostRepository
-import com.example.shinhan_qna_aos.main.PostViewModel
+import com.example.shinhan_qna_aos.main.api.PostRepository
+import com.example.shinhan_qna_aos.main.api.PostViewModel
 import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
 

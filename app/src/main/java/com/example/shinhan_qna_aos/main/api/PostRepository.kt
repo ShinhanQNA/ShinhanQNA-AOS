@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.main
+package com.example.shinhan_qna_aos.main.api
 
 import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.login.LoginManager

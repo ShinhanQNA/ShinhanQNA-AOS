@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.etc
+package com.example.shinhan_qna_aos.etc.user
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +31,7 @@ import com.example.shinhan_qna_aos.DetailContent
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.login.LoginManager
-import com.example.shinhan_qna_aos.main.PostViewModel
+import com.example.shinhan_qna_aos.main.api.PostViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 

@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.TitleContentLikeButton
+import com.example.shinhan_qna_aos.main.api.PostViewModel
 
 @Composable
 fun SaySomthingScreen(saySomtingViewModel: PostViewModel, navController:NavController) {

@@ -1,11 +1,10 @@
-package com.example.shinhan_qna_aos.main
+package com.example.shinhan_qna_aos.main.api
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shinhan_qna_aos.API.APIRetrofit.apiService
 import com.example.shinhan_qna_aos.login.LoginManager
 import kotlinx.coroutines.launch
 

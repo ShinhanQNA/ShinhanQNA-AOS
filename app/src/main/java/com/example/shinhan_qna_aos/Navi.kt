@@ -12,7 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.shinhan_qna_aos.etc.WriteOpenScreen
+import com.example.shinhan_qna_aos.etc.user.WriteOpenScreen
 import com.example.shinhan_qna_aos.etc.WritingScreen
 import com.example.shinhan_qna_aos.etc.WritingViewModel
 import com.example.shinhan_qna_aos.etc.manager.ManagerWriteOpenScreen
@@ -26,7 +26,7 @@ import com.example.shinhan_qna_aos.login.ManagerLogin
 import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
 import com.example.shinhan_qna_aos.login.LoginManager
 import com.example.shinhan_qna_aos.main.MainScreen
-import com.example.shinhan_qna_aos.main.PostViewModel
+import com.example.shinhan_qna_aos.main.api.PostViewModel
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
 import kotlinx.coroutines.Dispatchers

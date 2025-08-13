@@ -7,3 +7,8 @@ data class WriteData (
     val content: String? ="",
     val imageUri : Uri?
 )
+
+data class NotificationWriteData (
+    val title: String? ="",
+    val content: String? =""
+)

@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.main
+package com.example.shinhan_qna_aos.main.api
 
 import com.google.gson.annotations.SerializedName
 
