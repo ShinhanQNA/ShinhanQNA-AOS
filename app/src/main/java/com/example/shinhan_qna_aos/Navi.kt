@@ -7,6 +7,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -156,4 +158,11 @@ fun AppNavigation(
             WritingScreen(writingViewModel,navController)
         }
     }
+}
+
+// 공통 ViewModelFactory 구현
+class SimpleViewModelFactory<T: ViewModel>(
+    private val creator: () -> T
+): ViewModelProvider.Factory {
+    override fun <VM : ViewModel> create(modelClass: Class<VM>): VM = creator() as VM
 }

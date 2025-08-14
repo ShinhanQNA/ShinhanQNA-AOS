@@ -81,9 +81,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-// 공통 ViewModelFactory 구현
-class SimpleViewModelFactory<T: ViewModel>(
-    private val creator: () -> T
-): ViewModelProvider.Factory {
-    override fun <VM : ViewModel> create(modelClass: Class<VM>): VM = creator() as VM
-}
