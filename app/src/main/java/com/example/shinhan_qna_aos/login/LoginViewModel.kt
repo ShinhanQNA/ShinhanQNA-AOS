@@ -22,6 +22,7 @@ class LoginViewModel(
     val loginResult: StateFlow<LoginResult> get() = _loginResult
 
     init {
+        tryRefreshTokenIfNeeded()
         // 앱 시작 시 저장된 토큰이 아직 유효하면 곧바로 Success로 설정
         val access = loginmanager.accessToken
         val refresh = loginmanager.refreshToken

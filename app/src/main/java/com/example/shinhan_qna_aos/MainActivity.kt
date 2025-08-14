@@ -66,8 +66,6 @@ class MainActivity : ComponentActivity() {
             this,
             SimpleViewModelFactory { WritingViewModel(writeRepository) }
         )[WritingViewModel::class.java]
-        // 3. 토큰 유효성 검사 및 자동 갱신 시도
-        loginViewModel.tryRefreshTokenIfNeeded()
 
         // 4. Compose 시작
         setContent {
