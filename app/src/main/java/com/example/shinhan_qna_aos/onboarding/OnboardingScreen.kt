@@ -48,12 +48,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun OnboardingScreen(
-    onboardingRepository: OnboardingRepository,
     onFinish: () -> Unit
 ) {
-    val viewModel: OnboardingViewModel = viewModel(factory = SimpleViewModelFactory { OnboardingViewModel(onboardingRepository) })
-
-    val pages = viewModel.pages
     val pagerState = rememberPagerState(initialPage = 0)
 
     BoxWithConstraints(
@@ -74,7 +70,7 @@ fun OnboardingScreen(
         Column(modifier = Modifier.fillMaxSize()) {
 
             HorizontalPager(
-                count = pages.size,
+                count = 2,
                 state = pagerState,
                 modifier = Modifier
                     .weight(1f)
@@ -436,18 +432,5 @@ fun OnboardingPage2(
 @Composable
 @Preview(showBackground = true)
 fun preview(){
-//    val viewModel : OnboardingViewModel = viewModel()
-//    OnboardingScreen(onFinish = {}, )
-////    DotIndicator(2,1)
-//    BoxWithConstraints(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(Color.White)
-//            .systemBarsPadding()
-//    ) {
-//        val maxW = maxWidth
-//        val maxH = maxHeight
-////        OnboardingPage1(0,2,maxW)
-//        OnboardingPage2(1,2,maxW,maxH,{})
-//    }
+    OnboardingScreen(onFinish = {}, )
 }

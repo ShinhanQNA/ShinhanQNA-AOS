@@ -77,31 +77,30 @@ fun AppNavigation(
                 return@LaunchedEffect
             }
 
-            val route = withContext(Dispatchers.IO) {
-                try {
-                    val response = apiInterface.UserCheck("Bearer $accessToken")
-                    if (response.isSuccessful) {
-                        val user = response.body()
-                        when (user?.status) {
-                            "가입 완료" -> "main"
-                            "가입 대기 중" -> "wait/${user.name}"
-                            null -> "wait/${user?.name}"
-                            else -> "info"
-                        }
-                    } else {
-                        "info"
-                    }
-                } catch (e: Exception) {
-                    "info"
-                }
-            }
-            initialRoute = route
+//            val route = withContext(Dispatchers.IO) {
+//                try {
+//                    val response = apiInterface.UserCheck("Bearer $accessToken")
+//                    if (response.isSuccessful) {
+//                        val user = response.body()
+//                        when (user?.status) {
+//                            "가입 완료" -> "main"
+//                            "가입 대기 중" -> "wait/${user.name}"
+//                            null -> "wait/${user?.name}"
+//                            else -> "info"
+//                        }
+//                    } else {
+//                        "info"
+//                    }
+//                } catch (e: Exception) {
+//                    "info"
+//                }
+//            }
+//            initialRoute = route
             return@LaunchedEffect
         }
 
         initialRoute = "login"
     }
-
     if (initialRoute == null) {
         return
     }
@@ -112,7 +111,6 @@ fun AppNavigation(
     ) {
         composable("onboarding") {
             OnboardingScreen(
-                onboardingRepository,
                 onFinish = {
                     onboardingViewModel.setOnboarded()
                     navController.navigate("login") {
@@ -126,7 +124,7 @@ fun AppNavigation(
             LoginScreen(authRepository, loginManager, navController)
         }
 
-        composable("manager login") {
+        composable("manager_login") {
             ManagerLoginScreen(authRepository, loginManager, navController)
         }
 

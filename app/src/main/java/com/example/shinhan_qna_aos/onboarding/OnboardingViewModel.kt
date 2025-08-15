@@ -11,25 +11,21 @@ import kotlinx.coroutines.launch
 class OnboardingViewModel(
     private val repository: OnboardingRepository
 ) : ViewModel() {
-
-    val pages = listOf(
-        OnboardingData(R.drawable.android_mockup1),
-        OnboardingData(R.drawable.android_mockup2)
-    )
-
+    // 온보딩 화면 표시 여부 상태 저장용 플로우
     private val _showOnboarding = MutableStateFlow<Boolean?>(null)
     val showOnboarding: StateFlow<Boolean?> = _showOnboarding
 
     init {
+        // 뷰모델 초기화 시 저장소에서 온보딩 완료 여부 확인 후 상태값 설정
         viewModelScope.launch {
             _showOnboarding.value = !repository.isOnboarded()
         }
     }
-
+    // 온보딩 완료 상태 저장 후 화면 숨김 처리 함수
     fun setOnboarded() {
         viewModelScope.launch {
             repository.setOnboarded(true)
-            _showOnboarding.value = false
+            _showOnboarding.value = false // 화면 숨김 표시
         }
     }
 }
