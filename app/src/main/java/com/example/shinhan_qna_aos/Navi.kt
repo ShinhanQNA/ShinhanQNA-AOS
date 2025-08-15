@@ -21,21 +21,18 @@ import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.etc.WriteRepository
 import com.example.shinhan_qna_aos.etc.user.WriteOpenScreen
 import com.example.shinhan_qna_aos.etc.WritingScreen
-import com.example.shinhan_qna_aos.etc.WritingViewModel
 import com.example.shinhan_qna_aos.etc.manager.ManagerWriteOpenScreen
 import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.info.InformationScreen
 import com.example.shinhan_qna_aos.info.WaitScreen
-import com.example.shinhan_qna_aos.login.AuthRepository
-import com.example.shinhan_qna_aos.login.LoginResult
+import com.example.shinhan_qna_aos.login.api.AuthRepository
+import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.LoginScreen
-import com.example.shinhan_qna_aos.login.LoginViewModel
+import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.example.shinhan_qna_aos.login.ManagerLogin
-import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
-import com.example.shinhan_qna_aos.login.LoginManager
+import com.example.shinhan_qna_aos.login.api.LoginManager
 import com.example.shinhan_qna_aos.main.MainScreen
 import com.example.shinhan_qna_aos.main.api.PostRepository
-import com.example.shinhan_qna_aos.main.api.PostViewModel
 import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
@@ -64,7 +61,7 @@ fun AppNavigation(
 
     // 처음 진입 시 결정될 시작 경로
     var initialRoute by remember { mutableStateOf<String?>(null) }
-    
+
     // 앱 첫 진입 시 라우팅 목적지 미리 결정
     LaunchedEffect(showOnboarding, loginResult) {
         when {

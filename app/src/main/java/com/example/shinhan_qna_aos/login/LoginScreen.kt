@@ -26,12 +26,15 @@ import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.BuildConfig
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
+import com.example.shinhan_qna_aos.login.api.AuthRepository
+import com.example.shinhan_qna_aos.login.api.LoginManager
+import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
 @Composable
-fun LoginScreen(repository: AuthRepository,loginManager: LoginManager, navController: NavController) {
+fun LoginScreen(repository: AuthRepository, loginManager: LoginManager, navController: NavController) {
     val context = LocalContext.current
     val viewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(repository,loginManager) })
     val googleSignInLauncher =

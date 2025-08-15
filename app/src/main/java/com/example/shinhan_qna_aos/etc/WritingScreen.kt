@@ -42,7 +42,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
-import com.example.shinhan_qna_aos.login.LoginViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 

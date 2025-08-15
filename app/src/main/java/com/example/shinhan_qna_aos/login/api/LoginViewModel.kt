@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.login
+package com.example.shinhan_qna_aos.login.api
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -38,10 +38,12 @@ class LoginViewModel(
                 viewModelScope.launch {
                     repository.loginWithKakao(token.accessToken.trim())
                         .onSuccess {
-                            _loginResult.value = LoginResult.Success(it.accessToken, it.refreshToken, it.expiresIn)
+                            _loginResult.value =
+                                LoginResult.Success(it.accessToken, it.refreshToken, it.expiresIn)
                         }
                         .onFailure { e ->
-                            _loginResult.value = LoginResult.Failure(-1, e.localizedMessage ?: "서버 통신 실패")
+                            _loginResult.value =
+                                LoginResult.Failure(-1, e.localizedMessage ?: "서버 통신 실패")
                         }
                 }
             }
@@ -58,7 +60,8 @@ class LoginViewModel(
         viewModelScope.launch {
             repository.loginWithGoogle(authCode)
                 .onSuccess {
-                    _loginResult.value = LoginResult.Success(it.accessToken, it.refreshToken, it.expiresIn)
+                    _loginResult.value =
+                        LoginResult.Success(it.accessToken, it.refreshToken, it.expiresIn)
                 }
                 .onFailure { e ->
                     _loginResult.value = LoginResult.Failure(-1, e.localizedMessage ?: "구글 로그인 실패")

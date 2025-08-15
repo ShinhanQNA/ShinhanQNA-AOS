@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.login
+package com.example.shinhan_qna_aos.login.api
 
 import android.app.Application
 import com.example.shinhan_qna_aos.BuildConfig

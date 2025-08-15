@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shinhan_qna_aos.login.LoginManager
+import com.example.shinhan_qna_aos.login.api.LoginManager
 import kotlinx.coroutines.launch
 
 

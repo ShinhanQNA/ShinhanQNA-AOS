@@ -3,9 +3,9 @@ package com.example.shinhan_qna_aos.API
 import com.example.shinhan_qna_aos.etc.Write
 import com.example.shinhan_qna_aos.info.InfoData
 import com.example.shinhan_qna_aos.info.UserCheckResponse
-import com.example.shinhan_qna_aos.login.AdminRequest
-import com.example.shinhan_qna_aos.login.LoginTokensResponse
-import com.example.shinhan_qna_aos.login.RefreshTokenRequest
+import com.example.shinhan_qna_aos.login.api.AdminRequest
+import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
+import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
 import com.example.shinhan_qna_aos.main.api.Post
 import com.example.shinhan_qna_aos.main.api.PostDetail
 import okhttp3.MultipartBody

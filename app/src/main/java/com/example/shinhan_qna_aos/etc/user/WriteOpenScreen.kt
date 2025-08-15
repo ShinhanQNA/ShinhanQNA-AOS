@@ -32,7 +32,7 @@ import com.example.shinhan_qna_aos.DetailContent
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
-import com.example.shinhan_qna_aos.login.LoginManager
+import com.example.shinhan_qna_aos.login.api.LoginManager
 import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.PostViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard

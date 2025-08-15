@@ -1,11 +1,10 @@
-package com.example.shinhan_qna_aos.login
+package com.example.shinhan_qna_aos.login.api
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shinhan_qna_aos.API.APIInterface
 import kotlinx.coroutines.launch
 
 class ManagerLoginViewModel(

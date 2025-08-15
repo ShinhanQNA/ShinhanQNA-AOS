@@ -1,7 +1,6 @@
-package com.example.shinhan_qna_aos.login
+package com.example.shinhan_qna_aos.login.api
 
 import android.content.Context
-import android.util.Log
 
 class LoginManager(private val context: Context) {
     private val prefs = context.getSharedPreferences("token_prefs", Context.MODE_PRIVATE)

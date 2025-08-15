@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.ImageUtils
-import com.example.shinhan_qna_aos.login.LoginManager
+import com.example.shinhan_qna_aos.login.api.LoginManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType

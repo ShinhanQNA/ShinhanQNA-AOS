@@ -14,13 +14,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TitleContentLikeButton
-import com.example.shinhan_qna_aos.login.LoginManager
-import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
+import com.example.shinhan_qna_aos.login.api.LoginManager
 import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.PostViewModel
 
 @Composable
-fun SaySomthingScreen(postRepository: PostRepository,loginManager: LoginManager, navController:NavController) {
+fun SaySomthingScreen(postRepository: PostRepository, loginManager: LoginManager, navController:NavController) {
     val context = LocalContext.current
     val postViewModel: PostViewModel = viewModel(factory = SimpleViewModelFactory { PostViewModel(postRepository,loginManager) })
 

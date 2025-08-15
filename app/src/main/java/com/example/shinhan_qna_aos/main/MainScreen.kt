@@ -35,18 +35,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.R
-import com.example.shinhan_qna_aos.SimpleViewModelFactory
-import com.example.shinhan_qna_aos.login.LoginManager
+import com.example.shinhan_qna_aos.login.api.LoginManager
 import com.example.shinhan_qna_aos.main.api.PostRepository
-import com.example.shinhan_qna_aos.main.api.PostViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun MainScreen(postRepository: PostRepository,loginManager: LoginManager, navController: NavController){
+fun MainScreen(postRepository: PostRepository, loginManager: LoginManager, navController: NavController){
 
     Box(modifier = Modifier.fillMaxSize()){
         Column{
@@ -141,7 +138,7 @@ fun TopIcon(navController: NavController){
 
 //게시판 선택
 @Composable
-fun Selectboard(postRepository: PostRepository,loginManager: LoginManager,navController: NavController) {
+fun Selectboard(postRepository: PostRepository, loginManager: LoginManager, navController: NavController) {
 
     val tabData = listOf(
         Pair("말해봐요", R.drawable.trumpet),
