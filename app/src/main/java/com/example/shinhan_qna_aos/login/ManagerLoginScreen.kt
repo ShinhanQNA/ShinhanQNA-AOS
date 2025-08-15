@@ -32,15 +32,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.info.LabeledField
 import com.example.shinhan_qna_aos.info.PlainInputField
+import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 
 @Composable
 fun ManagerLogin(
-    viewModel: ManagerLoginViewModel,
+    authRepository: AuthRepository,
     onLoginSuccess: () -> Unit = {}
 ) {
+    val viewModel: ManagerLoginViewModel = viewModel(factory = SimpleViewModelFactory { ManagerLoginViewModel(authRepository) })
+
     val isLoginSuccess = viewModel.isLoginSuccess
 
     // 로그인 성공 시 후처리
@@ -123,6 +127,6 @@ fun ManagerLogin(modifier: Modifier = Modifier, onClick:() -> Unit){
 @Composable
 @Preview(showBackground = true)
 fun Managerpreview(){
-    val viewModel : ManagerLoginViewModel = viewModel()
-    ManagerLogin(viewModel)
+//    val viewModel : ManagerLoginViewModel = viewModel()
+//    ManagerLogin(viewModel)
 }

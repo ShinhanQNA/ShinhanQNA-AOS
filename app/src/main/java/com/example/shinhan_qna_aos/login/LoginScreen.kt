@@ -21,16 +21,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.BuildConfig
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
+fun LoginScreen(repository: AuthRepository,loginManager: LoginManager, navController: NavController) {
     val context = LocalContext.current
+    val viewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(repository,loginManager) })
     val googleSignInLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)

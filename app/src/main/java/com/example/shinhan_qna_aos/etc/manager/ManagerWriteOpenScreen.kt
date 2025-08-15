@@ -26,11 +26,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.DetailContent
 import com.example.shinhan_qna_aos.LikeFlagBan
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
+import com.example.shinhan_qna_aos.login.LoginManager
+import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.PostViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
@@ -38,15 +42,17 @@ import com.jihan.lucide_icons.lucide
 @Composable
 fun ManagerWriteOpenScreen(
     postId: Int,
-    viewModel: PostViewModel,
+    postRepository:PostRepository,
+    loginManager: LoginManager,
     navController: NavController,
     isNotice: Boolean = false // true면 공지사항, false면 일반글
 ) {
-    val postDetail = viewModel.selectedPost
+    val postViewModel: PostViewModel = viewModel(factory = SimpleViewModelFactory { PostViewModel(postRepository,loginManager) })
+    val postDetail = postViewModel.selectedPost
 
     // 처음 진입 시 API 호출
     LaunchedEffect(postId) {
-        viewModel.loadPostDetail(postId)
+        postViewModel.loadPostDetail(postId)
     }
 
     Box {

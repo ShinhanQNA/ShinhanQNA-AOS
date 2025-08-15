@@ -17,6 +17,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.shinhan_qna_aos.API.APIInterface
+import com.example.shinhan_qna_aos.etc.WriteRepository
 import com.example.shinhan_qna_aos.etc.user.WriteOpenScreen
 import com.example.shinhan_qna_aos.etc.WritingScreen
 import com.example.shinhan_qna_aos.etc.WritingViewModel
@@ -24,6 +26,7 @@ import com.example.shinhan_qna_aos.etc.manager.ManagerWriteOpenScreen
 import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.info.InformationScreen
 import com.example.shinhan_qna_aos.info.WaitScreen
+import com.example.shinhan_qna_aos.login.AuthRepository
 import com.example.shinhan_qna_aos.login.LoginResult
 import com.example.shinhan_qna_aos.login.LoginScreen
 import com.example.shinhan_qna_aos.login.LoginViewModel
@@ -31,6 +34,7 @@ import com.example.shinhan_qna_aos.login.ManagerLogin
 import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
 import com.example.shinhan_qna_aos.login.LoginManager
 import com.example.shinhan_qna_aos.main.MainScreen
+import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.PostViewModel
 import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
@@ -41,24 +45,26 @@ import kotlinx.coroutines.withContext
 @Composable
 fun AppNavigation(
     navController : NavHostController = rememberNavController(),
-    loginViewModel: LoginViewModel,
-    infoViewModel: InfoViewModel,
-    managerLoginViewModel:ManagerLoginViewModel,
-    postViewModel : PostViewModel,
-    writingViewModel: WritingViewModel,
-    loginmanager: LoginManager
+    apiInterface: APIInterface
 ) {
     val context = LocalContext.current
+
+    val loginManager = LoginManager(context)
     val onboardingRepository = OnboardingRepository(context)
+    val authRepository = AuthRepository(apiInterface,loginManager)
+    val writeRepository = WriteRepository(apiInterface,loginManager)
+    val postRepository = PostRepository(apiInterface,loginManager)
+
     val onboardingViewModel : OnboardingViewModel = viewModel(factory = SimpleViewModelFactory { OnboardingViewModel(onboardingRepository) })
+    val loginViewModel : LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository,loginManager) })
+    val infoViewModel : InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(apiInterface,loginManager) })
 
     val loginResult by loginViewModel.loginResult.collectAsState()
     val showOnboarding by onboardingViewModel.showOnboarding.collectAsState()
 
     // 처음 진입 시 결정될 시작 경로
     var initialRoute by remember { mutableStateOf<String?>(null) }
-
-
+    
     // 앱 첫 진입 시 라우팅 목적지 미리 결정
     LaunchedEffect(showOnboarding, loginResult) {
         when {
@@ -69,14 +75,14 @@ fun AppNavigation(
             // 로그인 성공 → 가입 상태 먼저 체크
             loginResult is LoginResult.Success -> {
                 // 관리자인 경우 바로 메인으로
-                if (loginmanager.isAdmin) {
+                if (loginManager.isAdmin) {
                     initialRoute = "main"
                     return@LaunchedEffect
                 }
 
                 val route = withContext(Dispatchers.IO) {
                     // 가입 상태 바로 조회 (서버 호출, UI 출력 전 경로 결정)
-                    val accessToken = loginmanager.accessToken
+                    val accessToken = loginManager.accessToken
                     if (accessToken.isNullOrEmpty()) { "login" }
                     else {
                         try {
@@ -128,10 +134,10 @@ fun AppNavigation(
                 }
             )
         }
-        composable("login") { LoginScreen(viewModel = loginViewModel, navController) }
+        composable("login") { LoginScreen(authRepository,loginManager, navController) }
         composable("manager login") {
             ManagerLogin(
-                viewModel = managerLoginViewModel,
+                authRepository,
                 onLoginSuccess = {
                     navController.navigate("main") {
                         popUpTo("managerLogin") { inclusive = true }
@@ -144,14 +150,14 @@ fun AppNavigation(
             val userName = it.arguments?.getString("userName") ?: "학생"
             WaitScreen(userName = userName)
         }
-        composable("main") { MainScreen(postViewModel, navController) }
+        composable("main") { MainScreen(postRepository,loginManager, navController) }
         // 학생용 상세 게시글
         composable(
             "postDetail/{postId}",
             arguments = listOf(navArgument("postId") { type = NavType.IntType })
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-            WriteOpenScreen(navController, postId, postViewModel, loginmanager)
+            WriteOpenScreen(navController, postRepository,postId, loginManager)
         }
         // 관리자용 상세 게시글
         composable(
@@ -159,10 +165,10 @@ fun AppNavigation(
             arguments = listOf(navArgument("postId") { type = NavType.IntType })
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-            ManagerWriteOpenScreen(isNotice = false, viewModel = postViewModel, navController = navController, postId = postId)
+            ManagerWriteOpenScreen(isNotice = false, postRepository = postRepository , loginManager =loginManager , navController = navController, postId = postId)
         }
         composable("writeboard"){
-            WritingScreen(writingViewModel,navController)
+            WritingScreen(writeRepository,navController)
         }
     }
 }

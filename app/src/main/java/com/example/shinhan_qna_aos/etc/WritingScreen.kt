@@ -38,14 +38,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
+import com.example.shinhan_qna_aos.login.LoginViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun WritingScreen(viewModel: WritingViewModel,navController: NavController) {
+fun WritingScreen(writeRepository: WriteRepository,navController: NavController) {
     val context = LocalContext.current
+    val viewModel : WritingViewModel = viewModel(factory = SimpleViewModelFactory { WritingViewModel(writeRepository) })
+
     val state = viewModel.state
 
     val launcher =
