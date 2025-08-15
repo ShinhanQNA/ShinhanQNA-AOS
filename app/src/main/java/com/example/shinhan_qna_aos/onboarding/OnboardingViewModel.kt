@@ -31,14 +31,4 @@ class OnboardingViewModel(private val repository: OnboardingRepository) : ViewMo
             _showOnboarding.value = false
         }
     }
-    companion object {
-        fun provideFactory(
-            repository: OnboardingRepository
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return OnboardingViewModel(repository) as T
-            }
-        }
-    }
 }

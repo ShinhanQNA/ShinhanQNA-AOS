@@ -20,7 +20,7 @@ class PostViewModel(
     var selectedPost by mutableStateOf<PostDetail?>(null)
         private set
 
-    var isAdmin by mutableStateOf(loginManager.isAdmin()) // 관리자 여부
+    var isAdmin by mutableStateOf(loginManager.isAdmin) // 관리자 여부
 
     var isLoading by mutableStateOf(false)
         private set

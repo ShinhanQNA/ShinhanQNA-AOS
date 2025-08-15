@@ -9,12 +9,13 @@ import com.example.shinhan_qna_aos.API.APIInterface
 import kotlinx.coroutines.launch
 
 class ManagerLoginViewModel(
-    private val apiInterface: APIInterface,
-    private val loginmanager: LoginManager
+    private val repository: AuthRepository //  Repository 의존
 ) : ViewModel() {
 
     var state by mutableStateOf(ManagerLoginData())
-    var loginResult by mutableStateOf<String?>(null) // 성공/실패 메시지
+    // 로그인 성공 여부
+    var loginResult by mutableStateOf<String?>(null)
+    // 로그인 성공으로 후 처리
     var isLoginSuccess by mutableStateOf(false)
 
     fun onAdminIdChange(newId: String) {
@@ -25,37 +26,17 @@ class ManagerLoginViewModel(
         state = state.copy(managerPassword = newPw)
     }
 
+    // ✅ 관리자 로그인
     fun login() {
         viewModelScope.launch {
-            try {
-                val request = AdminRequest(
-                    id = state.managerId,
-                    password = state.managerPassword
-                )
-
-                val response = apiInterface.AdminLoginData(request)
-
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null) {
-                        // 토큰 저장 (액세스+리프레시)
-                        loginmanager.saveTokens(
-                            body.accessToken,
-                            body.refreshToken,
-                            body.expiresIn
-                        )
-                        loginmanager.saveIsAdmin(true)
-                        loginResult = "관리자 로그인 성공"
-                        isLoginSuccess = true //  성공 상태 true
-                    } else {
-                        loginResult = "로그인 응답이 비어있습니다."
-                    }
-                } else {
-                    loginResult = "로그인 실패: ${response.code()} ${response.message()}"
+            repository.loginAdmin(state.managerId, state.managerPassword)
+                .onSuccess {
+                    loginResult = "관리자 로그인 성공"
+                    isLoginSuccess = true
                 }
-            } catch (e: Exception) {
-                loginResult = "서버 통신 실패: ${e.localizedMessage}"
-            }
+                .onFailure { e ->
+                    loginResult = "로그인 실패: ${e.message}"
+                }
         }
     }
 }

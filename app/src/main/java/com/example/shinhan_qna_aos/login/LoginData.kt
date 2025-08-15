@@ -17,12 +17,6 @@ data class RefreshTokenRequest(
     @SerializedName("refreshToken") val refreshToken: String
 )
 
-data class ReToken(
-    @SerializedName("access_token") val accessToken: String,
-    @SerializedName("refresh_token") val refreshToken: String,
-    @SerializedName("expires_in") val expiresIn: Int
-)
-
 data class LoginTokensResponse(
     @SerializedName("access_token") val accessToken: String,
     @SerializedName("refresh_token") val refreshToken: String,

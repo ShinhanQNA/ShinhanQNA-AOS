@@ -9,6 +9,7 @@ import com.example.shinhan_qna_aos.API.APIRetrofit
 import com.example.shinhan_qna_aos.etc.WriteRepository
 import com.example.shinhan_qna_aos.etc.WritingViewModel
 import com.example.shinhan_qna_aos.info.InfoViewModel
+import com.example.shinhan_qna_aos.login.AuthRepository
 import com.example.shinhan_qna_aos.login.LoginViewModel
 import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
 import com.example.shinhan_qna_aos.login.LoginManager
@@ -20,9 +21,7 @@ import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
 class MainActivity : ComponentActivity() {
 
     private lateinit var loginmanager: LoginManager
-    private lateinit var onboardingRepository: OnboardingRepository
     private lateinit var loginViewModel: LoginViewModel
-    private lateinit var onboardingViewModel: OnboardingViewModel
     private lateinit var infoViewModel: InfoViewModel
     private lateinit var managerLoginViewModel: ManagerLoginViewModel
     private lateinit var writingViewModel: WritingViewModel
@@ -32,20 +31,16 @@ class MainActivity : ComponentActivity() {
 
         // 1. 의존성 먼저 생성
         loginmanager = LoginManager(applicationContext)
-        onboardingRepository = OnboardingRepository(applicationContext)
+        
         val apiInterface = APIRetrofit.apiService
         val postRepository = PostRepository(apiInterface,loginmanager)
+        val authRepository = AuthRepository(apiInterface,loginmanager)
         val writeRepository = WriteRepository(apiInterface,loginmanager)
         // 2. ViewModel 생성
         loginViewModel = ViewModelProvider(
             this,
-            SimpleViewModelFactory { LoginViewModel(apiInterface, loginmanager) }
+            SimpleViewModelFactory { LoginViewModel(authRepository,loginmanager) }
         )[LoginViewModel::class.java]
-
-        onboardingViewModel = ViewModelProvider(
-            this,
-            SimpleViewModelFactory { OnboardingViewModel(onboardingRepository) }
-        )[OnboardingViewModel::class.java]
 
         infoViewModel = ViewModelProvider(
             this,
@@ -54,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
         managerLoginViewModel = ViewModelProvider(
             this,
-            SimpleViewModelFactory { ManagerLoginViewModel(apiInterface, loginmanager) }
+            SimpleViewModelFactory { ManagerLoginViewModel(authRepository) }
         )[ManagerLoginViewModel::class.java]
 
         postViewModel = ViewModelProvider(
@@ -71,7 +66,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppNavigation(
                 loginViewModel = loginViewModel,
-                onboardingViewModel = onboardingViewModel,
                 infoViewModel = infoViewModel,
                 managerLoginViewModel = managerLoginViewModel,
                 postViewModel = postViewModel,

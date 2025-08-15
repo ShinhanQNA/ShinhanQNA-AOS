@@ -5,7 +5,6 @@ import com.example.shinhan_qna_aos.info.InfoData
 import com.example.shinhan_qna_aos.info.UserCheckResponse
 import com.example.shinhan_qna_aos.login.AdminRequest
 import com.example.shinhan_qna_aos.login.LoginTokensResponse
-import com.example.shinhan_qna_aos.login.ReToken
 import com.example.shinhan_qna_aos.login.RefreshTokenRequest
 import com.example.shinhan_qna_aos.main.api.Post
 import com.example.shinhan_qna_aos.main.api.PostDetail
@@ -41,7 +40,7 @@ interface APIInterface {
     @POST("/token/reissue")
     suspend fun ReToken(
         @Body refreshTokenRequest: RefreshTokenRequest
-    ): Response<ReToken>
+    ): Response<LoginTokensResponse>
 
     // 관리자 로그인
     @POST("/admin/login")

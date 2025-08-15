@@ -36,7 +36,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -46,9 +48,11 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun OnboardingScreen(
-    viewModel: OnboardingViewModel,
+    onboardingRepository: OnboardingRepository,
     onFinish: () -> Unit
 ) {
+    val viewModel: OnboardingViewModel = viewModel(factory = SimpleViewModelFactory { OnboardingViewModel(onboardingRepository) })
+
     val pages = viewModel.pages
     val pagerState = rememberPagerState(initialPage = 0)
 
@@ -432,8 +436,8 @@ fun OnboardingPage2(
 @Composable
 @Preview(showBackground = true)
 fun preview(){
-    val viewModel : OnboardingViewModel = viewModel()
-    OnboardingScreen(onFinish = {}, viewModel = viewModel)
+//    val viewModel : OnboardingViewModel = viewModel()
+//    OnboardingScreen(onFinish = {}, )
 ////    DotIndicator(2,1)
 //    BoxWithConstraints(
 //        modifier = Modifier

@@ -7,8 +7,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,6 +32,7 @@ import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
 import com.example.shinhan_qna_aos.login.LoginManager
 import com.example.shinhan_qna_aos.main.MainScreen
 import com.example.shinhan_qna_aos.main.api.PostViewModel
+import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
 import kotlinx.coroutines.Dispatchers
@@ -36,21 +40,24 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun AppNavigation(
+    navController : NavHostController = rememberNavController(),
     loginViewModel: LoginViewModel,
     infoViewModel: InfoViewModel,
-    onboardingViewModel: OnboardingViewModel,
     managerLoginViewModel:ManagerLoginViewModel,
     postViewModel : PostViewModel,
     writingViewModel: WritingViewModel,
     loginmanager: LoginManager
 ) {
-    val navController = rememberNavController()
+    val context = LocalContext.current
+    val onboardingRepository = OnboardingRepository(context)
+    val onboardingViewModel : OnboardingViewModel = viewModel(factory = SimpleViewModelFactory { OnboardingViewModel(onboardingRepository) })
 
     val loginResult by loginViewModel.loginResult.collectAsState()
     val showOnboarding by onboardingViewModel.showOnboarding.collectAsState()
 
     // 처음 진입 시 결정될 시작 경로
     var initialRoute by remember { mutableStateOf<String?>(null) }
+
 
     // 앱 첫 진입 시 라우팅 목적지 미리 결정
     LaunchedEffect(showOnboarding, loginResult) {
@@ -62,7 +69,7 @@ fun AppNavigation(
             // 로그인 성공 → 가입 상태 먼저 체크
             loginResult is LoginResult.Success -> {
                 // 관리자인 경우 바로 메인으로
-                if (loginmanager.isAdmin()) {
+                if (loginmanager.isAdmin) {
                     initialRoute = "main"
                     return@LaunchedEffect
                 }
@@ -112,7 +119,7 @@ fun AppNavigation(
     ) {
         composable("onboarding") {
             OnboardingScreen(
-                viewModel = onboardingViewModel,
+                onboardingRepository,
                 onFinish = {
                     onboardingViewModel.setOnboarded()
                     navController.navigate("login") {

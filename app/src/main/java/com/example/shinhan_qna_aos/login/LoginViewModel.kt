@@ -1,12 +1,8 @@
 package com.example.shinhan_qna_aos.login
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shinhan_qna_aos.API.APIInterface
-import com.example.shinhan_qna_aos.API.APIRetrofit.apiService
-import com.example.shinhan_qna_aos.BuildConfig
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,60 +10,42 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val apiInterface: APIInterface,
-    private val loginmanager: LoginManager
-): ViewModel() {
+    private val repository: AuthRepository,
+    loginManager: LoginManager
+) : ViewModel() {
 
     private val _loginResult = MutableStateFlow<LoginResult>(LoginResult.Idle)
     val loginResult: StateFlow<LoginResult> get() = _loginResult
 
     init {
-        tryRefreshTokenIfNeeded()
-        // 앱 시작 시 저장된 토큰이 아직 유효하면 곧바로 Success로 설정
-        val access = loginmanager.accessToken
-        val refresh = loginmanager.refreshToken
-        if (!access.isNullOrBlank() && !loginmanager.isAccessTokenExpired()) {
+        val access = loginManager.accessToken
+        if (!access.isNullOrBlank() && !loginManager.isAccessTokenExpired()) {
             _loginResult.value = LoginResult.Success(
                 accessToken = access,
-                refreshToken = refresh.orEmpty(),
-                expiresIn = ((loginmanager.accessTokenExpiresAt - System.currentTimeMillis()) / 1000).toInt()
+                refreshToken = loginManager.refreshToken.orEmpty(),
+                expiresIn = ((loginManager.accessTokenExpiresAt - System.currentTimeMillis()) / 1000).toInt()
             )
         }
+        tryRefreshTokenIfNeeded()
     }
 
-    // 카카오 로그인 처리
+    // 카카오 로그인
     fun loginWithKakao(context: Context) {
         val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             if (error != null) {
                 _loginResult.value = LoginResult.Failure(-1, error.localizedMessage ?: "로그인 실패")
             } else if (token != null) {
-                // 서버에 토큰 전송하여 인증 처리
                 viewModelScope.launch {
-                    try {
-                        val response = apiService.KakaoAuthCode(token.accessToken.trim())
-                        if (response.isSuccessful) {
-                            val body = response.body()
-                            if (body != null) {
-                                loginmanager.saveTokens(body.accessToken, body.refreshToken, body.expiresIn)
-                                _loginResult.value = LoginResult.Success(
-                                    accessToken = body.accessToken,
-                                    refreshToken = body.refreshToken,
-                                    expiresIn = body.expiresIn
-                                )
-                                Log.d("LoginViewModel", "${body.accessToken} ${body.refreshToken} ${body.expiresIn}")
-                            } else {
-                                _loginResult.value = LoginResult.Failure(response.code(), "응답 데이터 없음")
-                            }
-                        } else {
-                            _loginResult.value = LoginResult.Failure(response.code(), response.message())
+                    repository.loginWithKakao(token.accessToken.trim())
+                        .onSuccess {
+                            _loginResult.value = LoginResult.Success(it.accessToken, it.refreshToken, it.expiresIn)
                         }
-                    } catch (e: Exception) {
-                        _loginResult.value = LoginResult.Failure(-1, e.localizedMessage ?: "서버 통신 실패")
-                    }
+                        .onFailure { e ->
+                            _loginResult.value = LoginResult.Failure(-1, e.localizedMessage ?: "서버 통신 실패")
+                        }
                 }
             }
         }
-
         if (UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {
             UserApiClient.instance.loginWithKakaoTalk(context, callback = callback)
         } else {
@@ -75,81 +53,25 @@ class LoginViewModel(
         }
     }
 
-    // 구글 인가 코드 서버 전송
+    // 구글 로그인
     fun sendGoogleAuthCodeToServer(authCode: String) {
         viewModelScope.launch {
-            try {
-                val bearerCode = "$authCode"
-                val response = apiInterface.GoogleAuthCode(bearerCode)
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null) {
-                        loginmanager.saveTokens(
-                            body.accessToken,
-                            body.refreshToken,
-                            body.expiresIn
-                        )
-                        _loginResult.value = LoginResult.Success(
-                            accessToken = body.accessToken,
-                            refreshToken = body.refreshToken,
-                            expiresIn = body.expiresIn
-                        )
-                    } else {
-                        _loginResult.value = LoginResult.Failure(response.code(), "응답 데이터 없음")
-                    }
-                } else {
-                    _loginResult.value = LoginResult.Failure(response.code(), response.message())
+            repository.loginWithGoogle(authCode)
+                .onSuccess {
+                    _loginResult.value = LoginResult.Success(it.accessToken, it.refreshToken, it.expiresIn)
                 }
-            } catch (e: Exception) {
-                _loginResult.value = LoginResult.Failure(-1, e.localizedMessage ?: "구글 로그인 서버 요청 실패")
-            }
+                .onFailure { e ->
+                    _loginResult.value = LoginResult.Failure(-1, e.localizedMessage ?: "구글 로그인 실패")
+                }
         }
     }
 
-    // 리프레시 토큰으로 액세스 토큰 재발급
+    // 토큰 재발급 시도
     fun tryRefreshTokenIfNeeded() {
         viewModelScope.launch {
-            Log.d("LoginViewModel", "토큰 재발급 검사 시작")
-
-            val currentAccess = loginmanager.accessToken
-            val currentRefresh = loginmanager.refreshToken
-            Log.d("LoginViewModel", "현재 저장된 access=$currentAccess refresh=$currentRefresh")
-
-            if (!loginmanager.isAccessTokenExpired()) {
-                Log.d("LoginViewModel", "Access Token 아직 유효 → 재발급 안 함")
-                return@launch
-            }
-
-            val refreshToken = currentRefresh?.trim()
-            if (refreshToken.isNullOrBlank() || loginmanager.isRefreshTokenExpired()) {
-                Log.w("LoginViewModel", "Refresh Token 만료 혹은 없음 → 재로그인 필요")
-                return@launch
-            }
-
-            try {
-                Log.d("LoginViewModel", "재발급 요청 시작, 사용중인 Refresh Token=$refreshToken")
-                val response = apiInterface.ReToken(RefreshTokenRequest(refreshToken))
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    Log.d("LoginViewModel", "재발급 응답 body=$body")
-
-                    if (body != null) {
-                        loginmanager.saveTokens(
-                            body.accessToken,
-                            body.refreshToken,
-                            body.expiresIn
-                        )
-                        _loginResult.value = LoginResult.Success(
-                            accessToken = body.accessToken,
-                            refreshToken = body.refreshToken,
-                            expiresIn = body.expiresIn
-                        )
-                    }
-                } else {
-                    Log.e("LoginViewModel", "재발급 실패 코드=${response.code()} 메세지=${response.message()}")
-                }
-            } catch (e: Exception) {
-                Log.e("LoginViewModel", "재발급 중 예외 발생", e)
+            if (!repository.refreshTokenIfNeeded()) {
+                _loginResult.value = LoginResult.Failure(-1, "재로그인 필요")
+                // 필요시 로그아웃 처리로직 추가 가능
             }
         }
     }

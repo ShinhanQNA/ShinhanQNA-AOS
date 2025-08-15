@@ -6,80 +6,66 @@ import android.util.Log
 class LoginManager(private val context: Context) {
     private val prefs = context.getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
 
+    companion object {
+        private const val KEY_ACCESS_TOKEN = "ACCESS_TOKEN"
+        private const val KEY_REFRESH_TOKEN = "REFRESH_TOKEN"
+        private const val KEY_ACCESS_TOKEN_EXP = "ACCESS_TOKEN_EXP"
+        private const val KEY_REFRESH_TOKEN_EXP = "REFRESH_TOKEN_EXP"
+        private const val KEY_IS_ADMIN = "IS_ADMIN"
+    }
+
     var accessToken: String?
-        get() {
-            val value = prefs.getString("ACCESS_TOKEN", null)
-            Log.d("LoginManager", "accessToken GET: $value")
-            return value
-        }
-        set(value) {
-            Log.d("LoginManager", "accessToken SET: $value")
-            prefs.edit().putString("ACCESS_TOKEN", value).apply()
-        }
+        get() = prefs.getString(KEY_ACCESS_TOKEN, null)
+        set(value) = prefs.edit().putString(KEY_ACCESS_TOKEN, value).apply()
 
     var refreshToken: String?
-        get() {
-            val value = prefs.getString("REFRESH_TOKEN", null)
-            Log.d("LoginManager", "refreshToken GET: $value")
-            return value
-        }
-        set(value) {
-            Log.d("LoginManager", "refreshToken SET: $value")
-            prefs.edit().putString("REFRESH_TOKEN", value).apply()
-        }
+        get() = prefs.getString(KEY_REFRESH_TOKEN, null)
+        set(value) = prefs.edit().putString(KEY_REFRESH_TOKEN, value).apply()
 
     var accessTokenExpiresAt: Long
-        get() = prefs.getLong("ACCESS_TOKEN_EXP", 0L)
-        set(value) = prefs.edit().putLong("ACCESS_TOKEN_EXP", value).apply()
+        get() = prefs.getLong(KEY_ACCESS_TOKEN_EXP, 0L)
+        set(value) = prefs.edit().putLong(KEY_ACCESS_TOKEN_EXP, value).apply()
 
     var refreshTokenExpiresAt: Long
-        get() = prefs.getLong("REFRESH_TOKEN_EXP", 0L)
-        set(value) = prefs.edit().putLong("REFRESH_TOKEN_EXP", value).apply()
+        get() = prefs.getLong(KEY_REFRESH_TOKEN_EXP, 0L)
+        set(value) = prefs.edit().putLong(KEY_REFRESH_TOKEN_EXP, value).apply()
 
+    var isAdmin: Boolean
+        get() = prefs.getBoolean(KEY_IS_ADMIN, false)
+        set(value) = prefs.edit().putBoolean(KEY_IS_ADMIN, value).apply()
+
+    /**
+     * 안전하게 토큰 저장: 입력 토큰 trim 처리 후 저장
+     * @param expiresInSeconds - access token 유효시간(초)
+     * @param refreshTokenExpiresInSeconds - refresh token 유효시간(초), 없으면 7일 기본 값
+     */
     fun saveTokens(
         accessToken: String,
         refreshToken: String,
-        expiresIn: Int,
-        refreshTokenExpiresIn: Long? = null
+        expiresInSeconds: Int,
+        refreshTokenExpiresInSeconds: Long? = null
     ) {
         val now = System.currentTimeMillis()
-        Log.d(
-            "LoginManager",
-            "[saveTokens] 저장 직전 access=$accessToken refresh=$refreshToken expiresIn=$expiresIn"
-        )
-        this.accessToken = accessToken.trim()
-        this.refreshToken = refreshToken.trim()
-        this.accessTokenExpiresAt = now + expiresIn * 1000L
 
-        this.refreshTokenExpiresAt = refreshTokenExpiresIn?.let {
+        val trimmedAccessToken = accessToken.trim()
+        val trimmedRefreshToken = refreshToken.trim()
+
+        this.accessToken = trimmedAccessToken
+        this.refreshToken = trimmedRefreshToken
+
+        this.accessTokenExpiresAt = now + expiresInSeconds * 1000L
+        this.refreshTokenExpiresAt = refreshTokenExpiresInSeconds?.let {
             now + it * 1000L
-        } ?: (now + 7L * 24 * 60 * 60 * 1000)
-        Log.d(
-            "LoginManager",
-            "[saveTokens] 저장 완료 accessTokenExpiresAt=$accessTokenExpiresAt refreshTokenExpiresAt=$refreshTokenExpiresAt"
-        )
+        } ?: (now + 7L * 24 * 60 * 60 * 1000) // 기본 7일
     }
 
-    fun isAccessTokenExpired(): Boolean =
-        System.currentTimeMillis() >= accessTokenExpiresAt
+    // 액세스 토큰 만료 여부 체크
+    fun isAccessTokenExpired(): Boolean = System.currentTimeMillis() >= accessTokenExpiresAt
 
-    fun isRefreshTokenExpired(): Boolean =
-        System.currentTimeMillis() >= refreshTokenExpiresAt
-
-    // 관리자 정보 관련
-    fun saveIsAdmin(isAdmin: Boolean) {
-        prefs.edit().putBoolean("is_admin", isAdmin).apply()
-    }
-
-    fun isAdmin(): Boolean {
-        return prefs.getBoolean("is_admin", false)
-    }
+    // 리프레시 토큰 만료 여부 체크
+    fun isRefreshTokenExpired(): Boolean = System.currentTimeMillis() >= refreshTokenExpiresAt
 
     // 이메일 저장
-    fun setUserEmail(email: String) {
-        prefs.edit().putString("user_email", email).apply()
-    }
-
     fun getUserEmail(): String? {
         return prefs.getString("user_email", null)
     }
