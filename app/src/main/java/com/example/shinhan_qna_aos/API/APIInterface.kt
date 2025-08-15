@@ -1,13 +1,13 @@
 package com.example.shinhan_qna_aos.API
 
-import com.example.shinhan_qna_aos.etc.Write
+//import com.example.shinhan_qna_aos.etc.Write
 import com.example.shinhan_qna_aos.info.InfoData
 import com.example.shinhan_qna_aos.info.UserCheckResponse
 import com.example.shinhan_qna_aos.login.api.AdminRequest
 import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
-import com.example.shinhan_qna_aos.main.api.Post
-import com.example.shinhan_qna_aos.main.api.PostDetail
+//import com.example.shinhan_qna_aos.main.api.Post
+//import com.example.shinhan_qna_aos.main.api.PostDetail
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -68,32 +68,32 @@ interface APIInterface {
         @Header("Authorization") accessToken: String
     ): Response<UserCheckResponse>
 
-    //게시글 조회
-    @Headers("Content-Type: application/json")
-    @GET("/boards/search")
-    suspend fun getPosts(
-        @Header("Authorization") code : String,
-        @Query("size") size: Int,                        // 아이템 요청 개수
-        @Query("sort") sort: String
-    ):Response<List<Post>>
-
-    //게시글 상세조회
-    @Headers("Content-Type: application/json")
-    @GET("/boards/{postId}")
-    suspend fun getPostsDetail(
-        @Header("Authorization") code : String,
-        @Path("postId") postId: Int
-    ):Response<PostDetail>
-
-    // 게시글 쓰기
-    @Multipart
-    @POST
-    suspend fun writeBoards(
-        @Header("Authorization") code: String,
-        @Part("title") title: RequestBody,
-        @Part("content") content: RequestBody,
-        @Part("category") category: RequestBody,
-        @Part image: MultipartBody.Part?
-    ):Response<Write>
+//    //게시글 조회
+//    @Headers("Content-Type: application/json")
+//    @GET("/boards/search")
+//    suspend fun getPosts(
+//        @Header("Authorization") code : String,
+//        @Query("size") size: Int,                        // 아이템 요청 개수
+//        @Query("sort") sort: String
+//    ):Response<List<Post>>
+//
+//    //게시글 상세조회
+//    @Headers("Content-Type: application/json")
+//    @GET("/boards/{postId}")
+//    suspend fun getPostsDetail(
+//        @Header("Authorization") code : String,
+//        @Path("postId") postId: Int
+//    ):Response<PostDetail>
+//
+//    // 게시글 쓰기
+//    @Multipart
+//    @POST
+//    suspend fun writeBoards(
+//        @Header("Authorization") code: String,
+//        @Part("title") title: RequestBody,
+//        @Part("content") content: RequestBody,
+//        @Part("category") category: RequestBody,
+//        @Part image: MultipartBody.Part?
+//    ):Response<Write>
 }
 

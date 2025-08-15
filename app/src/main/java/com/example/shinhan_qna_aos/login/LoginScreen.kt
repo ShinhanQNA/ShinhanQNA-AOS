@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,14 +30,15 @@ import com.example.shinhan_qna_aos.BuildConfig
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.login.api.AuthRepository
-import com.example.shinhan_qna_aos.login.api.LoginManager
+import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
 @Composable
-fun LoginScreen(repository: AuthRepository, loginManager: LoginManager, navController: NavController) {
+fun LoginScreen(repository: AuthRepository, loginManager: Data, navController: NavController) {
     val context = LocalContext.current
     val viewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(repository,loginManager) })
     val googleSignInLauncher =
@@ -51,6 +55,9 @@ fun LoginScreen(repository: AuthRepository, loginManager: LoginManager, navContr
                 Log.e("LoginScreen", "Google login failed: ${e.localizedMessage}", e)
             }
         }
+
+    val loginResult by viewModel.loginResult.collectAsState()
+
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()

@@ -1,11 +1,11 @@
-package com.example.shinhan_qna_aos.login.api
+package com.example.shinhan_qna_aos
 
 import android.content.Context
 
-class LoginManager(private val context: Context) {
+class Data(private val context: Context) {
     private val prefs = context.getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
 
-    companion object {
+    companion object Companion {
         private const val KEY_ACCESS_TOKEN = "ACCESS_TOKEN"
         private const val KEY_REFRESH_TOKEN = "REFRESH_TOKEN"
         private const val KEY_ACCESS_TOKEN_EXP = "ACCESS_TOKEN_EXP"

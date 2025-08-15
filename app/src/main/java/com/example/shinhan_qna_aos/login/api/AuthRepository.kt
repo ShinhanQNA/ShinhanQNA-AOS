@@ -1,6 +1,7 @@
 package com.example.shinhan_qna_aos.login.api
 
 import com.example.shinhan_qna_aos.API.APIInterface
+import com.example.shinhan_qna_aos.Data
 
 /**
  * AuthRepository
@@ -9,7 +10,7 @@ import com.example.shinhan_qna_aos.API.APIInterface
  */
 class AuthRepository(
     private val apiInterface: APIInterface,
-    private val loginManager: LoginManager
+    private val loginManager: Data
 ) {
     // 관리자 로그인
     suspend fun loginAdmin(id: String, password: String): Result<LoginTokensResponse> {

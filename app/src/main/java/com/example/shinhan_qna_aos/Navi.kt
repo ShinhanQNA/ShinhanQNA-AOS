@@ -12,28 +12,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.shinhan_qna_aos.API.APIInterface
-import com.example.shinhan_qna_aos.etc.WriteRepository
-import com.example.shinhan_qna_aos.etc.user.WriteOpenScreen
-import com.example.shinhan_qna_aos.etc.WritingScreen
-import com.example.shinhan_qna_aos.etc.manager.ManagerWriteOpenScreen
-import com.example.shinhan_qna_aos.info.InfoRepository
-import com.example.shinhan_qna_aos.info.InfoViewModel
-import com.example.shinhan_qna_aos.info.InformationScreen
-import com.example.shinhan_qna_aos.info.WaitScreen
+//import com.example.shinhan_qna_aos.etc.WriteRepository
+//import com.example.shinhan_qna_aos.info.InfoRepository
+//import com.example.shinhan_qna_aos.info.InformationScreen
+//import com.example.shinhan_qna_aos.info.WaitScreen
 import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.LoginScreen
 import com.example.shinhan_qna_aos.login.api.LoginViewModel
-import com.example.shinhan_qna_aos.login.ManagerLogin
-import com.example.shinhan_qna_aos.login.api.LoginManager
-import com.example.shinhan_qna_aos.main.MainScreen
-import com.example.shinhan_qna_aos.main.api.PostRepository
+import com.example.shinhan_qna_aos.login.ManagerLoginScreen
+//import com.example.shinhan_qna_aos.main.MainScreen
+//import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
@@ -47,76 +40,72 @@ fun AppNavigation(
 ) {
     val context = LocalContext.current
 
-    val loginManager = LoginManager(context)
-    val onboardingRepository = OnboardingRepository(context)
-    val authRepository = AuthRepository(apiInterface,loginManager)
-    val writeRepository = WriteRepository(apiInterface,loginManager)
-    val postRepository = PostRepository(apiInterface,loginManager)
-    val infoRepository = InfoRepository(apiInterface)
+    // 데이터 및 리포지토리 초기화
+    val loginManager = remember { Data(context) }
+    val onboardingRepository = remember { OnboardingRepository(context) }
+    val authRepository = remember { AuthRepository(apiInterface, loginManager) }
+//    val writeRepository = remember { WriteRepository(apiInterface, loginManager) }
+//    val postRepository = remember { PostRepository(apiInterface, loginManager) }
+//    val infoRepository = remember { InfoRepository(apiInterface) }
 
-    val onboardingViewModel : OnboardingViewModel = viewModel(factory = SimpleViewModelFactory { OnboardingViewModel(onboardingRepository) })
-    val loginViewModel : LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository,loginManager) })
+// 뷰모델 초기화
+    val onboardingViewModel: OnboardingViewModel = viewModel(factory = SimpleViewModelFactory { OnboardingViewModel(onboardingRepository) })
+    val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository, loginManager) })
 
     val loginResult by loginViewModel.loginResult.collectAsState()
     val showOnboarding by onboardingViewModel.showOnboarding.collectAsState()
 
-    // 처음 진입 시 결정될 시작 경로
+// 앱 첫 진입 시 라우팅 목적지 결정용 상태
     var initialRoute by remember { mutableStateOf<String?>(null) }
 
-    // 앱 첫 진입 시 라우팅 목적지 미리 결정
+// 앱 시작 또는 상태 변화 시 분기 처리
     LaunchedEffect(showOnboarding, loginResult) {
-        when {
-            // 온보딩 필요
-            showOnboarding == true -> {
-                initialRoute = "onboarding"
-            }
-            // 로그인 성공 → 가입 상태 먼저 체크
-            loginResult is LoginResult.Success -> {
-                // 관리자인 경우 바로 메인으로
-                if (loginManager.isAdmin) {
-                    initialRoute = "main"
-                    return@LaunchedEffect
-                }
-
-                val route = withContext(Dispatchers.IO) {
-                    // 가입 상태 바로 조회 (서버 호출, UI 출력 전 경로 결정)
-                    val accessToken = loginManager.accessToken
-                    if (accessToken.isNullOrEmpty()) { "login" }
-                    else {
-                        try {
-                            val response = apiInterface.UserCheck("Bearer $accessToken")
-                            if (response.isSuccessful) {
-                                val user = response.body()
-                                when (user?.status) {
-//                                    "가입 대기 중" -> "wait/${user.name}"
-//                                    "가입 완료" -> "main"
-                                    "가입 대기 중" -> "main" // API 연결로 인한 로직 변경
-                                    "가입 완료" -> "main"
-                                    else -> "info"
-                                }
-                            } else {
-                                "info"
-                            }
-                        } catch (e: Exception) {
-                            "info"
-                        }
-                    }
-                }
-                initialRoute = route
-            }
-            // 로그인 안 됨
-            else -> {
-                initialRoute = "login"
-            }
+        if (showOnboarding == true) {
+            initialRoute = "onboarding"
+            return@LaunchedEffect
         }
+
+        if (loginResult is LoginResult.Success) {
+            if (loginManager.isAdmin) {
+                initialRoute = "main"
+                return@LaunchedEffect
+            }
+
+            val accessToken = loginManager.accessToken
+            if (accessToken.isNullOrEmpty()) {
+                initialRoute = "login"
+                return@LaunchedEffect
+            }
+
+            val route = withContext(Dispatchers.IO) {
+                try {
+                    val response = apiInterface.UserCheck("Bearer $accessToken")
+                    if (response.isSuccessful) {
+                        val user = response.body()
+                        when (user?.status) {
+                            "가입 완료" -> "main"
+                            "가입 대기 중" -> "wait/${user.name}"
+                            null -> "wait/${user?.name}"
+                            else -> "info"
+                        }
+                    } else {
+                        "info"
+                    }
+                } catch (e: Exception) {
+                    "info"
+                }
+            }
+            initialRoute = route
+            return@LaunchedEffect
+        }
+
+        initialRoute = "login"
     }
+
     if (initialRoute == null) {
-        // 빈 화면 또는 로딩 화면
         return
     }
 
-
-    // NavHost 시작
     NavHost(
         navController = navController,
         startDestination = initialRoute!!
@@ -132,42 +121,46 @@ fun AppNavigation(
                 }
             )
         }
-        composable("login") { LoginScreen(authRepository,loginManager, navController) }
+
+        composable("login") {
+            LoginScreen(authRepository, loginManager, navController)
+        }
+
         composable("manager login") {
-            ManagerLogin(
-                authRepository,
-                onLoginSuccess = {
-                    navController.navigate("main") {
-                        popUpTo("managerLogin") { inclusive = true }
-                    }
-                }
-            )
+            ManagerLoginScreen(authRepository, loginManager, navController)
         }
-        composable("info") { InformationScreen(infoRepository, loginManager) }
-        composable("wait/{userName}") {
-            val userName = it.arguments?.getString("userName") ?: "학생"
-            WaitScreen(userName = userName)
-        }
-        composable("main") { MainScreen(postRepository,loginManager, navController) }
-        // 학생용 상세 게시글
-        composable(
-            "postDetail/{postId}",
-            arguments = listOf(navArgument("postId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-            WriteOpenScreen(navController, postRepository,postId, loginManager)
-        }
-        // 관리자용 상세 게시글
-        composable(
-            "managerPostDetail/{postId}",
-            arguments = listOf(navArgument("postId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-            ManagerWriteOpenScreen(isNotice = false, postRepository = postRepository , loginManager =loginManager , navController = navController, postId = postId)
-        }
-        composable("writeboard"){
-            WritingScreen(writeRepository,navController)
-        }
+
+//        composable("info") {
+//            InformationScreen(infoRepository, loginManager)
+//        }
+//
+//        composable("wait/{userName}") { backStackEntry ->
+//            val userName = backStackEntry.arguments?.getString("userName") ?: "학생"
+//            WaitScreen(userName = userName)
+//        }
+//
+//        composable("main") {
+//            MainScreen(postRepository, loginManager, navController)
+//        }
+//        // 학생용 상세 게시글
+//        composable(
+//            "postDetail/{postId}",
+//            arguments = listOf(navArgument("postId") { type = NavType.IntType })
+//        ) { backStackEntry ->
+//            val postId = backStackEntry.arguments?.getInt("postId") ?: 0
+//            WriteOpenScreen(navController, postRepository,postId, loginManager)
+//        }
+//        // 관리자용 상세 게시글
+//        composable(
+//            "managerPostDetail/{postId}",
+//            arguments = listOf(navArgument("postId") { type = NavType.IntType })
+//        ) { backStackEntry ->
+//            val postId = backStackEntry.arguments?.getInt("postId") ?: 0
+//            ManagerWriteOpenScreen(isNotice = false, postRepository = postRepository , loginManager =loginManager , navController = navController, postId = postId)
+//        }
+//        composable("writeboard"){
+//            WritingScreen(writeRepository,navController)
+//        }
     }
 }
 

@@ -3,6 +3,7 @@ package com.example.shinhan_qna_aos.login.api
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shinhan_qna_aos.Data
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(
     private val repository: AuthRepository,
-    loginManager: LoginManager
+    loginManager: Data
 ) : ViewModel() {
 
     private val _loginResult = MutableStateFlow<LoginResult>(LoginResult.Idle)

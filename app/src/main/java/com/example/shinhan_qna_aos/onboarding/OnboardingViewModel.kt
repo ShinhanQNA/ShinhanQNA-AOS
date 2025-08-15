@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class OnboardingViewModel(private val repository: OnboardingRepository) : ViewModel() {
+class OnboardingViewModel(
+    private val repository: OnboardingRepository
+) : ViewModel() {
 
     val pages = listOf(
         OnboardingData(R.drawable.android_mockup1),
@@ -20,8 +22,7 @@ class OnboardingViewModel(private val repository: OnboardingRepository) : ViewMo
 
     init {
         viewModelScope.launch {
-            val onboarded = repository.isOnboarded()
-            _showOnboarding.value = !onboarded
+            _showOnboarding.value = !repository.isOnboarded()
         }
     }
 

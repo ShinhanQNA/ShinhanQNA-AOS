@@ -16,6 +16,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,28 +29,26 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
-import com.example.shinhan_qna_aos.info.LabeledField
-import com.example.shinhan_qna_aos.info.PlainInputField
 import com.example.shinhan_qna_aos.login.api.AuthRepository
+import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.LabeledField
+import com.example.shinhan_qna_aos.PlainInputField
+import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.api.ManagerLoginViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 
 @Composable
-fun ManagerLogin(
+fun ManagerLoginScreen(
     authRepository: AuthRepository,
-    onLoginSuccess: () -> Unit = {}
+    loginManager: Data,
+    navController: NavController
 ) {
     val viewModel: ManagerLoginViewModel = viewModel(factory = SimpleViewModelFactory { ManagerLoginViewModel(authRepository) })
+    val loginResult by viewModel.loginResult.collectAsState()
+    val isAdmin = loginManager.isAdmin
 
-    val isLoginSuccess = viewModel.isLoginSuccess
-
-    // 로그인 성공 시 후처리
-    LaunchedEffect(isLoginSuccess) {
-        if (isLoginSuccess) {
-            onLoginSuccess()
-        }
-    }
 
     BoxWithConstraints(
         modifier = Modifier
@@ -106,7 +106,7 @@ fun ManagerLogin(modifier: Modifier = Modifier, onClick:() -> Unit){
             .background(color = Color.Black, shape = RoundedCornerShape(6.dp))
             .padding(horizontal = 18.dp, vertical = 12.dp)
             .clickable { onClick() } // ✅ 클릭 이벤트 연결
-         ){
+        ){
             Text(
                 text = "로그인",
                 color = Color.White,

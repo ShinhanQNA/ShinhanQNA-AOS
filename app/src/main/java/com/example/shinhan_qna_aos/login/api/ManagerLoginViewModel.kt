@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ManagerLoginViewModel(
@@ -12,10 +14,9 @@ class ManagerLoginViewModel(
 ) : ViewModel() {
 
     var state by mutableStateOf(ManagerLoginData())
-    // 로그인 성공 여부
-    var loginResult by mutableStateOf<String?>(null)
-    // 로그인 성공으로 후 처리
-    var isLoginSuccess by mutableStateOf(false)
+
+    private val _loginResult = MutableStateFlow<LoginResult>(LoginResult.Idle)
+    val loginResult: StateFlow<LoginResult> get() = _loginResult
 
     fun onAdminIdChange(newId: String) {
         state = state.copy(managerId = newId)
@@ -30,11 +31,11 @@ class ManagerLoginViewModel(
         viewModelScope.launch {
             repository.loginAdmin(state.managerId, state.managerPassword)
                 .onSuccess {
-                    loginResult = "관리자 로그인 성공"
-                    isLoginSuccess = true
+                    _loginResult.value =
+                        LoginResult.Success(it.accessToken, it.refreshToken, it.expiresIn)
                 }
                 .onFailure { e ->
-                    loginResult = "로그인 실패: ${e.message}"
+                    _loginResult.value = LoginResult.Failure(-1, e.localizedMessage ?: "관리자 로그인 실패")
                 }
         }
     }
