@@ -26,3 +26,10 @@ data class UserCheckResponse(
     val students : Int,
     val status : String,
 )
+
+data class InfoUiState(
+    val data: LoginData = LoginData(),
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val navigateTo: String? = null
+)

@@ -22,6 +22,7 @@ import com.example.shinhan_qna_aos.etc.WriteRepository
 import com.example.shinhan_qna_aos.etc.user.WriteOpenScreen
 import com.example.shinhan_qna_aos.etc.WritingScreen
 import com.example.shinhan_qna_aos.etc.manager.ManagerWriteOpenScreen
+import com.example.shinhan_qna_aos.info.InfoRepository
 import com.example.shinhan_qna_aos.info.InfoViewModel
 import com.example.shinhan_qna_aos.info.InformationScreen
 import com.example.shinhan_qna_aos.info.WaitScreen
@@ -51,10 +52,10 @@ fun AppNavigation(
     val authRepository = AuthRepository(apiInterface,loginManager)
     val writeRepository = WriteRepository(apiInterface,loginManager)
     val postRepository = PostRepository(apiInterface,loginManager)
+    val infoRepository = InfoRepository(apiInterface)
 
     val onboardingViewModel : OnboardingViewModel = viewModel(factory = SimpleViewModelFactory { OnboardingViewModel(onboardingRepository) })
     val loginViewModel : LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository,loginManager) })
-    val infoViewModel : InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(apiInterface,loginManager) })
 
     val loginResult by loginViewModel.loginResult.collectAsState()
     val showOnboarding by onboardingViewModel.showOnboarding.collectAsState()
@@ -83,7 +84,7 @@ fun AppNavigation(
                     if (accessToken.isNullOrEmpty()) { "login" }
                     else {
                         try {
-                            val response = infoViewModel.api.UserCheck("Bearer $accessToken")
+                            val response = apiInterface.UserCheck("Bearer $accessToken")
                             if (response.isSuccessful) {
                                 val user = response.body()
                                 when (user?.status) {
@@ -142,7 +143,7 @@ fun AppNavigation(
                 }
             )
         }
-        composable("info") { InformationScreen(viewModel = infoViewModel) }
+        composable("info") { InformationScreen(infoRepository, loginManager) }
         composable("wait/{userName}") {
             val userName = it.arguments?.getString("userName") ?: "학생"
             WaitScreen(userName = userName)

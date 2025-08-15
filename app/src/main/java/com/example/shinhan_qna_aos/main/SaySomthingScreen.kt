@@ -20,7 +20,6 @@ import com.example.shinhan_qna_aos.main.api.PostViewModel
 
 @Composable
 fun SaySomthingScreen(postRepository: PostRepository, loginManager: LoginManager, navController:NavController) {
-    val context = LocalContext.current
     val postViewModel: PostViewModel = viewModel(factory = SimpleViewModelFactory { PostViewModel(postRepository,loginManager) })
 
     val dataList = postViewModel.postList

@@ -50,15 +50,18 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
+import com.example.shinhan_qna_aos.login.api.LoginManager
+import com.example.shinhan_qna_aos.main.api.PostViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun InformationScreen(
-    viewModel: InfoViewModel,
-) {
-    val state = viewModel.state
+fun InformationScreen(infoRepository: InfoRepository,loginManager:LoginManager) {
+    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository,loginManager) })
+    val state = infoViewModel.uiState.data
     var expandedGrade by remember { mutableStateOf(false) }
     var expandedMajor by remember { mutableStateOf(false) }
 
@@ -106,7 +109,7 @@ fun InformationScreen(
             ) {
                 NameField(
                     value = state.name,
-                    onValueChange = viewModel::onNameChange,
+                    onValueChange = infoViewModel::onNameChange,
                     fontSize = 14.sp,
                 )
                 Row(
@@ -115,15 +118,15 @@ fun InformationScreen(
                 ) {
                     StudentIdField(
                         value = state.students,
-                        onValueChange = viewModel::onStudentIdChange,
+                        onValueChange = infoViewModel::onStudentIdChange,
                         fontSize = 14.sp,
                         modifier = Modifier.weight(0.55f)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     GradeDropdown(
                         selected = state.year,
-                        onSelectedChange = viewModel::onGradeChange,
-                        options = viewModel.gradeOptions,
+                        onSelectedChange = infoViewModel::onGradeChange,
+                        options = infoViewModel.gradeOptions,
                         expanded = expandedGrade,
                         onExpandedChange = { expandedGrade = it },
                         fontSize = 14.sp,
@@ -132,16 +135,16 @@ fun InformationScreen(
                 }
                 MajorDropdown(
                     selected = state.department,
-                    onSelectedChange = viewModel::onMajorChange,
-                    options = viewModel.majorOptions,
+                    onSelectedChange = infoViewModel::onMajorChange,
+                    options = infoViewModel.majorOptions,
                     expanded = expandedMajor,
                     onExpandedChange = { expandedMajor = it },
                     fontSize = 14.sp,
                 )
-                ImageInsert(viewModel = viewModel, fontSize = 14.sp)
+                ImageInsert(viewModel = infoViewModel, fontSize = 14.sp)
             }
             Spacer(modifier = Modifier.height(36.dp))
-            Request(fontSize = 14.sp, viewModel = viewModel, enabled = isFormValid)
+            Request(fontSize = 14.sp, viewModel = infoViewModel, enabled = isFormValid)
         }
     }
 }
@@ -329,7 +332,7 @@ fun MajorDropdown(
 @Composable
 fun ImageInsert(viewModel: InfoViewModel, fontSize: TextUnit) {
     val context = LocalContext.current
-    val imageUri = viewModel.state.imageUri
+    val imageUri = viewModel.uiState.data.imageUri
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -413,6 +416,6 @@ fun Request(
 @Composable
 @Preview(showBackground = true)
 fun Informationpreview(){
-    val viewModel : InfoViewModel = viewModel()
-    InformationScreen(viewModel)
+//    val viewModel : InfoViewModel = viewModel()
+//    InformationScreen(viewModel)
 }
