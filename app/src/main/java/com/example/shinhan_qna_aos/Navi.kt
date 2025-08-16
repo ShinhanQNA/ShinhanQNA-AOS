@@ -1,6 +1,5 @@
 package com.example.shinhan_qna_aos
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -13,13 +12,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.shinhan_qna_aos.API.APIInterface
-import com.example.shinhan_qna_aos.info.InfoRepository
+import com.example.shinhan_qna_aos.info.api.InfoRepository
 //import com.example.shinhan_qna_aos.info.InfoRepository
 import com.example.shinhan_qna_aos.info.InformationScreen
 import com.example.shinhan_qna_aos.info.WaitScreen

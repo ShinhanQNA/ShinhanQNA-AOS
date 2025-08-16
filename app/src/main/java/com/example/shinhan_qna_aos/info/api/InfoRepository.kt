@@ -1,6 +1,5 @@
-package com.example.shinhan_qna_aos.info
+package com.example.shinhan_qna_aos.info.api
 
-import android.util.Log
 import com.example.shinhan_qna_aos.API.APIInterface
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull

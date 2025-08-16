@@ -2,8 +2,8 @@ package com.example.shinhan_qna_aos.API
 
 //import com.example.shinhan_qna_aos.etc.Write
 //import com.example.shinhan_qna_aos.info.InfoData
-import com.example.shinhan_qna_aos.info.UserCheckResponse
-import com.example.shinhan_qna_aos.info.InfoResponse
+import com.example.shinhan_qna_aos.info.api.UserCheckResponse
+import com.example.shinhan_qna_aos.info.api.InfoResponse
 import com.example.shinhan_qna_aos.login.api.AdminRequest
 import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
@@ -19,8 +19,6 @@ import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
-import retrofit2.http.Path
-import retrofit2.http.Query
 
 interface APIInterface {
     //kakao

@@ -1,21 +1,16 @@
-package com.example.shinhan_qna_aos.info
+package com.example.shinhan_qna_aos.info.api
 
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.ImageUtils
 import com.example.shinhan_qna_aos.Data
-import com.jihan.lucide_icons.lucide.user
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.io.File
 
 class InfoViewModel(
     private val infoRepository: InfoRepository,
@@ -32,11 +27,8 @@ class InfoViewModel(
     }
 
     fun onStudentIdChange(newId: String) {
-        _uiState.value = _uiState.value.copy(
-            infoData = _uiState.value.infoData.copy(
-                students = newId.toIntOrNull() ?: 0
-            )
-        )
+        _uiState.value =
+            _uiState.value.copy(infoData = _uiState.value.infoData.copy(students = newId.toIntOrNull() ?: 0))
     }
 
     fun onGradeChange(newGrade: String) {
@@ -64,18 +56,11 @@ class InfoViewModel(
 
             val imageUri = _uiState.value.infoData.imageUri
             val compressedFile = ImageUtils.compressImage(context, imageUri)
-            if (compressedFile == null) {
-                _uiState.value = _uiState.value.copy()
+            if (compressedFile == null) { _uiState.value = _uiState.value.copy()
                 return@launch
             }
 
-            // 여기서 반환 타입(Result<String>)으로 받음
-            val result = infoRepository.submitStudentInfo(
-                accessToken,
-                _uiState.value.infoData,
-                compressedFile
-            )
-
+            val result = infoRepository.submitStudentInfo(accessToken, _uiState.value.infoData, compressedFile)
 
             if (result.isSuccess) {
                 val serverMsg = result.getOrNull() ?: ""

@@ -36,8 +36,6 @@ import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(repository: AuthRepository, loginManager: Data, navController: NavController) {

@@ -49,7 +49,7 @@ class Data(private val context: Context) {
         get() = prefs.getString(KEY_USER_NAME, null)
         set(value) = prefs.edit().putString(KEY_USER_NAME, value).apply()
 
-    var userEmail: String? // 유저 이름
+    var userEmail: String? // 유저 이메일
         get() = prefs.getString(KEY_USER_EMAIL, null)
         set(value) = prefs.edit().putString(KEY_USER_EMAIL, value).apply()
 

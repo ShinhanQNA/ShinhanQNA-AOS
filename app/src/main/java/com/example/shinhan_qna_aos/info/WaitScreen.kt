@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,11 +27,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.info.api.InfoRepository
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 
 // 대기 화면
 @Composable
-fun WaitScreen(infoRepository: InfoRepository,data: Data,navController: NavController) {
+fun WaitScreen(infoRepository: InfoRepository, data: Data, navController: NavController) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
