@@ -11,9 +11,10 @@ class Data(private val context: Context) {
         private const val KEY_ACCESS_TOKEN_EXP = "ACCESS_TOKEN_EXP"
         private const val KEY_REFRESH_TOKEN_EXP = "REFRESH_TOKEN_EXP"
         private const val KEY_IS_ADMIN = "IS_ADMIN"
-//        private const val KEY_USER_STATUS = "USER_STATUS"
-//        private const val KEY_USER_NAME = "USER_NAME"
-        private const val KEY_USER_INFO_SUBMITTED = "USER_INFO_SUBMITTED"
+        private const val KEY_USER_STATUS = "USER_STATUS" // 유저 가입 상태
+        private const val KEY_USER_NAME = "USER_NAME" // 유저 이름
+        private const val KEY_USER_INFO_SUBMITTED = "USER_INFO_SUBMITTED" // 가입 요청 여부
+        private const val KEY_USER_EMAIL = "USER_EMAIL"
     }
 
     var accessToken: String?  // 엑세스 토큰
@@ -36,17 +37,21 @@ class Data(private val context: Context) {
         get() = prefs.getBoolean(KEY_IS_ADMIN, false)
         set(value) = prefs.edit().putBoolean(KEY_IS_ADMIN, value).apply()
 
-//    var userStatus: String? // 유저 상태 저장
-//        get() = prefs.getString(KEY_USER_STATUS, null)
-//        set(value) = prefs.edit().putString(KEY_USER_STATUS, value).apply()
-//
-//    var userName: String? // 유저 이름
-//        get() = prefs.getString(KEY_USER_NAME, null)
-//        set(value) = prefs.edit().putString(KEY_USER_NAME, value).apply()
-//
     var userInfoSubmitted: Boolean  // 정보요청 처음 하는건지 파악
         get() = prefs.getBoolean(KEY_USER_INFO_SUBMITTED, false)
         set(value) = prefs.edit().putBoolean(KEY_USER_INFO_SUBMITTED, value).apply()
+
+    var userStatus: String? // 유저 상태 저장
+        get() = prefs.getString(KEY_USER_STATUS, null)
+        set(value) = prefs.edit().putString(KEY_USER_STATUS, value).apply()
+
+    var userName: String? // 유저 이름
+        get() = prefs.getString(KEY_USER_NAME, null)
+        set(value) = prefs.edit().putString(KEY_USER_NAME, value).apply()
+
+    var userEmail: String? // 유저 이름
+        get() = prefs.getString(KEY_USER_EMAIL, null)
+        set(value) = prefs.edit().putString(KEY_USER_EMAIL, value).apply()
 
     // 토큰 저장
     fun saveTokens(
@@ -68,9 +73,5 @@ class Data(private val context: Context) {
     fun isAccessTokenExpired(): Boolean = System.currentTimeMillis() >= accessTokenExpiresAt
     fun isRefreshTokenExpired(): Boolean = System.currentTimeMillis() >= refreshTokenExpiresAt
 
-//    // 이메일 저장
-//    fun getUserEmail(): String? {
-//        return prefs.getString("user_email", null)
-//    }
 }
 

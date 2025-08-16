@@ -14,17 +14,9 @@ import java.io.FileOutputStream
  */
 class ImageUtils {
     companion object {
-        /**
-         * 이미지를 비동기로 압축 후 File 반환 (ex: 최대 2MB로 압축하고 싶으면 maxFileSizeMB=2)
-         * @param context 컨텍스트 (ContentResolver 접근 등)
-         * @param imageUri 압축할 이미지 Uri
-         * @param maxFileSizeMB 최대 허용 파일 크기(MB)
-         * @return 압축된 이미지 File (실패시 null)
-         */
         suspend fun compressImage(
             context: Context,
             imageUri: Uri,
-            maxFileSizeMB: Int
         ): File? = withContext(Dispatchers.IO) {
             try {
                 // 이미지 Uri로부터 InputStream 얻기 (권한 필요 가능성 있음)
@@ -56,7 +48,7 @@ class ImageUtils {
                     }
                     fileSizeKB = compressedFile.length() / 1024
                     quality -= 5 // 품질 단계적으로 내리면서 파일 크기 줄임
-                } while (fileSizeKB > maxFileSizeMB * 1024 && quality > 5)
+                } while (fileSizeKB > 10 * 1024 && quality > 5)
 
                 // 조건 만족하면 파일 반환
                 compressedFile

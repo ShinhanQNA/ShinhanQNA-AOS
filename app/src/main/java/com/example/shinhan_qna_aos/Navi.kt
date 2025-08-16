@@ -13,12 +13,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.shinhan_qna_aos.API.APIInterface
+import com.example.shinhan_qna_aos.info.InfoRepository
 //import com.example.shinhan_qna_aos.info.InfoRepository
 import com.example.shinhan_qna_aos.info.InformationScreen
+import com.example.shinhan_qna_aos.info.WaitScreen
 //import com.example.shinhan_qna_aos.info.WaitScreen
 import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.login.api.LoginResult
@@ -42,7 +46,7 @@ fun AppNavigation(
     val authRepository = remember { AuthRepository(apiInterface, data) }
 //    val writeRepository = remember { WriteRepository(apiInterface, loginManager) }
 //    val postRepository = remember { PostRepository(apiInterface, loginManager) }
-//    val infoRepository = remember { InfoRepository(apiInterface) }
+    val infoRepository = remember { InfoRepository(apiInterface) }
 
 // 뷰모델 초기화
     val onboardingViewModel: OnboardingViewModel = viewModel(factory = SimpleViewModelFactory { OnboardingViewModel(onboardingRepository) })
@@ -71,21 +75,19 @@ fun AppNavigation(
             }
             // 최초 가입요청(정보 입력)한 적 없는 경우 → info로 이동
             val didSubmitInfo = data.userInfoSubmitted // (예: sharedPrefs/DB 저장)
-            if (!didSubmitInfo) {
+            if (didSubmitInfo) {
+                // 이미 가입요청한 경우에는 서버에 UserCheck 요청해서 state에 따라 화면 분기
+                val userStatus = data.userStatus
+                initialRoute = when (userStatus) {
+                    "가입 완료" -> "main"
+                    "가입 대기 중" -> "wait"
+                    else -> "info"
+                }
+            }
+            else {
                 initialRoute = "info"
             }
-//            else {
-//                // 이미 가입요청한 경우에는 서버에 UserCheck 요청해서 state에 따라 화면 분기
-//                val userStatus = data.userStatus
-//                val userName = data.userName
-//                initialRoute = when (userStatus) {
-//                    "가입 완료" -> "main"
-//                    "가입 대기 중" -> "wait/${userName ?: "학생"}"
-////                    null -> "wait/${userName ?: "학생"}"
-//                    else -> "info"
-//                }
-//            }
-//            return@LaunchedEffect
+            return@LaunchedEffect
         }
         initialRoute = "login"
     }
@@ -107,22 +109,14 @@ fun AppNavigation(
             )
         }
 
-        composable("login") {
-            LoginScreen(authRepository, data, navController)
-        }
+        composable("login") { LoginScreen(authRepository, data, navController) }
 
-        composable("manager_login") {
-            ManagerLoginScreen(authRepository, navController, data)
-        }
+        composable("manager_login") { ManagerLoginScreen(authRepository, navController, data) }
 
-        composable("info") {
-            InformationScreen(
-//                infoRepository,
-                data,navController)
-        }
-//
-//        composable("wait/{userName}") { WaitScreen(infoRepository,data,navController) }
-//
+        composable("info") { InformationScreen(infoRepository, data,navController) }
+
+        composable("wait") { WaitScreen(infoRepository, data, navController) }
+
 //        composable("main") {
 //            MainScreen(postRepository, loginManager, navController)
 //        }

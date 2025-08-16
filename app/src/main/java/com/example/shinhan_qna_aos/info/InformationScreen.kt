@@ -62,38 +62,30 @@ import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun InformationScreen(
-//    infoRepository: InfoRepository,
-    loginManager: Data,navController: NavController) {
+fun InformationScreen(infoRepository: InfoRepository, data: Data, navController: NavController) {
     val context = LocalContext.current
-//    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory {
-//        InfoViewModel(infoRepository, loginManager)
-//    })
-//
-//    val uiState by infoViewModel.uiState.collectAsState()
+    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data) })
 
+    val uiState by infoViewModel.uiState.collectAsState()
+
+    // 드랍시트 관리
     var expandedGrade by remember { mutableStateOf(false) }
     var expandedMajor by remember { mutableStateOf(false) }
-//
-//    val isFormValid = remember(uiState.data) {
-//        uiState.data.name.isNotBlank()
-//                && uiState.data.students != 0
-//                && uiState.data.year != 0
-//                && uiState.data.department.isNotBlank()
-//                && uiState.data.imageUri != Uri.EMPTY
-//    }
-//
-//    // 가입 요청 성공 후 -> UserCheck API 조회하고 결과 저장, 화면전환까지
-//    LaunchedEffect(uiState.navigateTo) {
-//        uiState.navigateTo?.let {
-//            // 가입 정보 입력 완료 플래그 갱신
-//            if(loginManager.userInfoSubmitted ) {
-//                navController.navigate(it) {
-//                    popUpTo("info") { inclusive = true }
-//                }
-//            }
-//        }
-//    }
+
+    // 가입 요청 모든 필드 입력시에만 누를 수 있도록
+    val isFormValid = remember(uiState.infoData) { uiState.infoData.name.isNotBlank() && uiState.infoData.students != 0 && uiState.infoData.year != 0 && uiState.infoData.department.isNotBlank() && uiState.infoData.imageUri != Uri.EMPTY }
+
+    // 가입 요청 성공 후 -> UserCheck API 조회하고 결과 저장, 화면전환까지
+    LaunchedEffect(uiState.navigateTo) {
+        uiState.navigateTo?.let {
+            // 가입 정보 입력 완료 플래그 갱신
+            if(data.userInfoSubmitted ) {
+                navController.navigate(it) {
+                    popUpTo("info") { inclusive = true }
+                }
+            }
+        }
+    }
 
     BoxWithConstraints(
         modifier = Modifier
@@ -129,44 +121,44 @@ fun InformationScreen(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 modifier = Modifier.fillMaxWidth(contentWidthFraction)
             ) {
-//                NameField(
-//                    value = uiState.data.name,
-//                    onValueChange = infoViewModel::onNameChange,
-//                    fontSize = 14.sp,
-//                )
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    StudentIdField(
-//                        value = uiState.data.students,
-//                        onValueChange = infoViewModel::onStudentIdChange,
-//                        fontSize = 14.sp,
-//                        modifier = Modifier.weight(0.55f)
-//                    )
-//                    Spacer(modifier = Modifier.width(12.dp))
-//                    GradeDropdown(
-//                        selected = uiState.data.year,
-//                        onSelectedChange = infoViewModel::onGradeChange,
-//                        options = listOf("1학년", "2학년", "3학년", "4학년"),
-//                        expanded = expandedGrade,  // 상태 추가 필요
-//                        onExpandedChange = { expandedGrade = it },
-//                        fontSize = 14.sp,
-//                        modifier = Modifier.weight(0.45f)
-//                    )
-//                }
-//                MajorDropdown(
-//                    selected = uiState.data.department,
-//                    onSelectedChange = infoViewModel::onMajorChange,
-//                    options = listOf("소프트웨어융합", "기계공학과"),
-//                    expanded = expandedMajor,  // 상태 추가 필요
-//                    onExpandedChange = {expandedMajor=it},
-//                    fontSize = 14.sp,
-//                )
-//                ImageInsert(viewModel = infoViewModel, fontSize = 14.sp)
+                NameField(
+                    value = uiState.infoData.name,
+                    onValueChange = infoViewModel::onNameChange,
+                    fontSize = 14.sp,
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    StudentIdField(
+                        value = uiState.infoData.students,
+                        onValueChange = infoViewModel::onStudentIdChange,
+                        fontSize = 14.sp,
+                        modifier = Modifier.weight(0.55f)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    GradeDropdown(
+                        selected = uiState.infoData.year,
+                        onSelectedChange = infoViewModel::onGradeChange,
+                        options = listOf("1학년", "2학년", "3학년", "4학년"),
+                        expanded = expandedGrade,
+                        onExpandedChange = { expandedGrade = it },
+                        fontSize = 14.sp,
+                        modifier = Modifier.weight(0.45f)
+                    )
+                }
+                MajorDropdown(
+                    selected = uiState.infoData.department,
+                    onSelectedChange = infoViewModel::onMajorChange,
+                    options = listOf("소프트웨어융합"),
+                    expanded = expandedMajor,
+                    onExpandedChange = {expandedMajor=it},
+                    fontSize = 14.sp,
+                )
+                ImageInsert(viewModel = infoViewModel, fontSize = 14.sp)
             }
-//            Spacer(modifier = Modifier.height(36.dp))
-//            Request(fontSize = 14.sp, onClick = { infoViewModel.submitStudentInfo(context) }, enabled = isFormValid)
+            Spacer(modifier = Modifier.height(36.dp))
+            Request(fontSize = 14.sp, onClick = { infoViewModel.submitStudentInfo(context) }, enabled = isFormValid)
         }
     }
 }
@@ -300,58 +292,59 @@ fun MajorDropdown(
     fontSize = fontSize,
     modifier = modifier
 )
-//// 이미지 첨부 영역
-//@Composable
-//fun ImageInsert(viewModel: InfoViewModel, fontSize: TextUnit) {
-//    val uiState by viewModel.uiState.collectAsState()
-//    val imageUri = uiState.data.imageUri
-//
-//    val launcher =
-//        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-//            uri?.let { viewModel.onImageChange(it) }
-//        }
-//
-//    Column(modifier = Modifier.fillMaxWidth()) {
-//        Text(
-//            text = "재학 확인서 첨부(학생증, 재학증명서)",
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Normal,
-//                fontSize = fontSize,
-//            )
-//        )
-//        Spacer(modifier = Modifier.height(8.dp))
-//        Row(
-//            modifier = Modifier.fillMaxWidth(),
-//            verticalAlignment = Alignment.CenterVertically,
-//        ) {
-//            Button(
-//                onClick = { launcher.launch("image/*") },
-//                colors = ButtonDefaults.buttonColors(Color.Black),
-//                modifier = Modifier.defaultMinSize(minHeight = 36.dp),
-//                shape = RoundedCornerShape(12.dp),
-//                contentPadding = PaddingValues(0.dp),
-//            ) {
-//                Text(
-//                    text = "사진 첨부",
-//                    color = Color.White,
-//                    style = TextStyle(
-//                        fontFamily = pretendard,
-//                        fontWeight = FontWeight.Normal,
-//                        fontSize = fontSize,
-//                    ),
-//                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-//                )
-//            }
-//            Spacer(modifier = Modifier.width(10.dp))
-//            Text(
-//                text = imageUri.lastPathSegment ?: "첨부된 사진이 없습니다.",
-//                maxLines = 1,
-//                modifier = Modifier.weight(1f),
-//            )
-//        }
-//    }
-//}
+// 이미지 첨부 영역
+@Composable
+fun ImageInsert(viewModel: InfoViewModel, fontSize: TextUnit) {
+
+    val uiState by viewModel.uiState.collectAsState()
+    val imageUri = uiState.infoData.imageUri
+
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let { viewModel.onImageChange(it) }
+        }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "재학 확인서 첨부(학생증, 재학증명서)",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = fontSize,
+            )
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Button(
+                onClick = { launcher.launch("image/*") },
+                colors = ButtonDefaults.buttonColors(Color.Black),
+                modifier = Modifier.defaultMinSize(minHeight = 36.dp),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(0.dp),
+            ) {
+                Text(
+                    text = "사진 첨부",
+                    color = Color.White,
+                    style = TextStyle(
+                        fontFamily = pretendard,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = fontSize,
+                    ),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = imageUri.lastPathSegment ?: "첨부된 사진이 없습니다.",
+                maxLines = 1,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
 
 // 가입 요청 버튼
 @Composable

@@ -65,7 +65,10 @@ class LoginViewModel(
         }
     }
 
-    //  토큰 재발급 시도
+    /**
+     * 토큰 재발급 시도: Access Token 유효/재발급 성공 시 로그인 성공 상태로 업데이트,
+     * 실패 시 로그인 실패 상태로 변경 (재로그인 필요)
+     */
     fun tryRefreshTokenIfNeeded() {
         viewModelScope.launch {
             val access = data.accessToken
@@ -87,7 +90,7 @@ class LoginViewModel(
                     )
                 } else {
                     _loginResult.value = LoginResult.Failure(-1, "재로그인 필요")
-                    // 필요 시 로그아웃 처리 콜백 호출 가능
+                    // 로그아웃 처리
                 }
             }
         }

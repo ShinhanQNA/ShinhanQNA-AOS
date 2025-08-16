@@ -12,6 +12,8 @@ class AuthRepository(
     private val apiInterface: APIInterface,
     private val data: Data // 토큰, 관리자 여부 저장 객체
 ) {
+    @Volatile
+    private var isRefreshing = false // 재발급 중복 방지용 플래그
 
     //  관리자 로그인
     suspend fun loginAdmin(id: String, password: String): Result<LoginTokensResponse> {
@@ -55,19 +57,37 @@ class AuthRepository(
         }
     }
 
-    //  토큰 재발급 처리
+    /**
+     * 토큰 재발급 처리 (중복 호출 방지 락 적용)
+     * @return true: 재발급 성공 혹은 Access Token 유효 / false: 재발급 실패 (재로그인 필요)
+     */
     suspend fun refreshTokenIfNeeded(): Boolean {
-        if (!data.isAccessTokenExpired()) return true // 아직 유효하면 그대로 사용
+        // 이미 재발급 중이면 중복 실행 방지
+        if (isRefreshing) {
+            return false
+        }
+
+        // Access Token이 유효하면 true 반환, 재발급 불필요함
+        if (!data.isAccessTokenExpired()) {
+            return true
+        }
 
         val refreshToken = data.refreshToken ?: return false
         if (data.isRefreshTokenExpired()) return false
 
-        val response = apiInterface.ReToken(RefreshTokenRequest(refreshToken))
-        return if (response.isSuccessful) {
-            response.body()?.let { saveTokens(it, isAdmin = data.isAdmin) }
-            true
-        } else {
-            false
+        isRefreshing = true // 재발급 시작 플래그 설정
+        try {
+            val response = apiInterface.ReToken(RefreshTokenRequest(refreshToken))
+            return if (response.isSuccessful) {
+                response.body()?.let {
+                    saveTokens(it, isAdmin = data.isAdmin) // 기존 관리자 여부 유지하며 토큰 저장
+                }
+                true
+            } else {
+                false
+            }
+        } finally {
+            isRefreshing = false // 재발급 완료 후 플래그 해제
         }
     }
 
