@@ -9,42 +9,61 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
-//class ImageUtils {
-//    companion object {
-//        suspend fun compressImage(context: Context, imageUri: Uri, maxFileSizeMB: Int): File? {
-//            return withContext(Dispatchers.IO) {
-//                try {
-//                    val inputStream = context.contentResolver.openInputStream(imageUri)
-//                        ?: return@withContext null
-//                    val originalBitmap = BitmapFactory.decodeStream(inputStream)
-//                    inputStream.close()
-//                    if (originalBitmap == null) return@withContext null
-//
-//                    val compressedFile =
-//                        File(context.cacheDir, "compressed_image_${System.currentTimeMillis()}.jpg")
-//                    var quality = 100
-//                    var fileSizeKB: Long
-//
-//                    do {
-//                        if (compressedFile.exists()) compressedFile.delete()
-//                        FileOutputStream(compressedFile).use { outputStream ->
-//                            val compressed = originalBitmap.compress(
-//                                Bitmap.CompressFormat.JPEG,
-//                                quality,
-//                                outputStream
-//                            )
-//                            if (!compressed) return@withContext null
-//                            outputStream.flush()
-//                        }
-//                        fileSizeKB = compressedFile.length() / 1024
-//                        quality -= 5
-//                    } while (fileSizeKB > maxFileSizeMB * 1024 && quality > 5)
-//
-//                    compressedFile
-//                } catch (e: Exception) {
-//                    null
-//                }
-//            }
-//        }
-//    }
-//}
+/**
+ * 이미지 URI를 지정한 최대 크기 이하로 JPEG 압축해 임시 파일로 저장하는 유틸리티 클래스
+ */
+class ImageUtils {
+    companion object {
+        /**
+         * 이미지를 비동기로 압축 후 File 반환 (ex: 최대 2MB로 압축하고 싶으면 maxFileSizeMB=2)
+         * @param context 컨텍스트 (ContentResolver 접근 등)
+         * @param imageUri 압축할 이미지 Uri
+         * @param maxFileSizeMB 최대 허용 파일 크기(MB)
+         * @return 압축된 이미지 File (실패시 null)
+         */
+        suspend fun compressImage(
+            context: Context,
+            imageUri: Uri,
+            maxFileSizeMB: Int
+        ): File? = withContext(Dispatchers.IO) {
+            try {
+                // 이미지 Uri로부터 InputStream 얻기 (권한 필요 가능성 있음)
+                val inputStream = context.contentResolver.openInputStream(imageUri)
+                    ?: return@withContext null
+                val originalBitmap = BitmapFactory.decodeStream(inputStream)
+                inputStream.close()
+                if (originalBitmap == null) return@withContext null
+
+                // 임시 파일 생성 경로(캐시)
+                val compressedFile = File(
+                    context.cacheDir,
+                    "compressed_image_${System.currentTimeMillis()}.jpg"
+                )
+                var quality = 100 // JPEG 품질 초기값
+                var fileSizeKB: Long
+
+                // 반복적으로 파일 골격 압축하여 원하는 사이즈 이하로 만듦
+                do {
+                    if (compressedFile.exists()) compressedFile.delete()
+                    FileOutputStream(compressedFile).use { outputStream ->
+                        val compressed = originalBitmap.compress(
+                            Bitmap.CompressFormat.JPEG,
+                            quality,
+                            outputStream
+                        )
+                        if (!compressed) return@withContext null // 압축 실패시 null
+                        outputStream.flush()
+                    }
+                    fileSizeKB = compressedFile.length() / 1024
+                    quality -= 5 // 품질 단계적으로 내리면서 파일 크기 줄임
+                } while (fileSizeKB > maxFileSizeMB * 1024 && quality > 5)
+
+                // 조건 만족하면 파일 반환
+                compressedFile
+            } catch (e: Exception) {
+                // 예외 발생 시 null 반환
+                null
+            }
+        }
+    }
+}

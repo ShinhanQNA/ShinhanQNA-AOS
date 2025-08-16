@@ -2,7 +2,7 @@ package com.example.shinhan_qna_aos.login.api
 
 import com.google.gson.annotations.SerializedName
 
-
+// admin ui
 data class ManagerLoginData(
     val managerId: String = "",
     val managerPassword: String = ""
@@ -25,7 +25,7 @@ data class LoginTokensResponse(
 
 // ViewModel 내부 상태 표현용 sealed class
 sealed class LoginResult {
-    object Idle : LoginResult()
+    data object Idle : LoginResult() // 대기 상태
     data class Success(
         val accessToken: String,
         val refreshToken: String,

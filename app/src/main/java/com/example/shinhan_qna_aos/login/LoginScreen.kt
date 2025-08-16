@@ -36,11 +36,23 @@ import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(repository: AuthRepository, loginManager: Data, navController: NavController) {
     val context = LocalContext.current
     val viewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(repository,loginManager) })
+    val loginResult by viewModel.loginResult.collectAsState()
+
+    LaunchedEffect(loginResult) {
+        if (loginResult is LoginResult.Success) {
+            navController.navigate("info") {
+                popUpTo("login") { inclusive = true }
+            }
+        }
+    }
+
     val googleSignInLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
@@ -55,8 +67,6 @@ fun LoginScreen(repository: AuthRepository, loginManager: Data, navController: N
                 Log.e("LoginScreen", "Google login failed: ${e.localizedMessage}", e)
             }
         }
-
-    val loginResult by viewModel.loginResult.collectAsState()
 
     BoxWithConstraints(
         modifier = Modifier
@@ -120,7 +130,7 @@ fun LoginScreen(repository: AuthRepository, loginManager: Data, navController: N
                         fontWeight = FontWeight.Normal,
                         fontSize = 12.sp
                     ),
-                    modifier = Modifier.clickable { navController.navigate("manager login") }
+                    modifier = Modifier.clickable { navController.navigate("manager_login") }
                 )
             }
         }

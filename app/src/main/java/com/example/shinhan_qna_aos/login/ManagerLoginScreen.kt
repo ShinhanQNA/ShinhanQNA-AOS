@@ -42,13 +42,22 @@ import com.example.shinhan_qna_aos.ui.theme.pretendard
 @Composable
 fun ManagerLoginScreen(
     authRepository: AuthRepository,
-    loginManager: Data,
-    navController: NavController
+    navController: NavController,         // 네비게이션 컨트롤러 추가
+    data: Data                    // 로그인 관리자 상태 저장소 추가
 ) {
     val viewModel: ManagerLoginViewModel = viewModel(factory = SimpleViewModelFactory { ManagerLoginViewModel(authRepository) })
     val loginResult by viewModel.loginResult.collectAsState()
-    val isAdmin = loginManager.isAdmin
 
+    // 로그인 성공 시 즉시 화면 전환 처리 (관리자이므로 main 화면으로 이동)
+    LaunchedEffect(loginResult) {
+        if (loginResult is LoginResult.Success) {
+           if( data.isAdmin ) {
+               navController.navigate("main") {
+                   popUpTo("manager_login") { inclusive = true }
+               }
+           }
+        }
+    }
 
     BoxWithConstraints(
         modifier = Modifier

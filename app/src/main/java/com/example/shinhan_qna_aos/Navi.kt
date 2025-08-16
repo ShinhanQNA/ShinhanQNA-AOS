@@ -1,5 +1,6 @@
 package com.example.shinhan_qna_aos
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -16,22 +17,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.shinhan_qna_aos.API.APIInterface
-//import com.example.shinhan_qna_aos.etc.WriteRepository
-//import com.example.shinhan_qna_aos.info.InfoRepository
-//import com.example.shinhan_qna_aos.info.InformationScreen
-//import com.example.shinhan_qna_aos.info.WaitScreen
+import com.example.shinhan_qna_aos.info.InfoRepository
+import com.example.shinhan_qna_aos.info.InformationScreen
+import com.example.shinhan_qna_aos.info.WaitScreen
 import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.LoginScreen
 import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.example.shinhan_qna_aos.login.ManagerLoginScreen
-//import com.example.shinhan_qna_aos.main.MainScreen
-//import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
 fun AppNavigation(
@@ -41,64 +37,55 @@ fun AppNavigation(
     val context = LocalContext.current
 
     // 데이터 및 리포지토리 초기화
-    val loginManager = remember { Data(context) }
+    val data = remember { Data(context) }
     val onboardingRepository = remember { OnboardingRepository(context) }
-    val authRepository = remember { AuthRepository(apiInterface, loginManager) }
+    val authRepository = remember { AuthRepository(apiInterface, data) }
 //    val writeRepository = remember { WriteRepository(apiInterface, loginManager) }
 //    val postRepository = remember { PostRepository(apiInterface, loginManager) }
-//    val infoRepository = remember { InfoRepository(apiInterface) }
+    val infoRepository = remember { InfoRepository(apiInterface) }
 
 // 뷰모델 초기화
     val onboardingViewModel: OnboardingViewModel = viewModel(factory = SimpleViewModelFactory { OnboardingViewModel(onboardingRepository) })
-    val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository, loginManager) })
+    val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository, data) })
 
-    val loginResult by loginViewModel.loginResult.collectAsState()
     val showOnboarding by onboardingViewModel.showOnboarding.collectAsState()
+    val loginResult by loginViewModel.loginResult.collectAsState()
 
-// 앱 첫 진입 시 라우팅 목적지 결정용 상태
+    // 앱 첫 진입 시 라우팅 목적지 결정용 상태
     var initialRoute by remember { mutableStateOf<String?>(null) }
-
-// 앱 시작 또는 상태 변화 시 분기 처리
+    // 앱 시작 또는 상태 변화 시 분기 처리
     LaunchedEffect(showOnboarding, loginResult) {
         if (showOnboarding == true) {
             initialRoute = "onboarding"
             return@LaunchedEffect
         }
-
         if (loginResult is LoginResult.Success) {
-            if (loginManager.isAdmin) {
+            if (data.isAdmin) {
                 initialRoute = "main"
                 return@LaunchedEffect
             }
-
-            val accessToken = loginManager.accessToken
+            val accessToken = data.accessToken
             if (accessToken.isNullOrEmpty()) {
                 initialRoute = "login"
                 return@LaunchedEffect
             }
-
-//            val route = withContext(Dispatchers.IO) {
-//                try {
-//                    val response = apiInterface.UserCheck("Bearer $accessToken")
-//                    if (response.isSuccessful) {
-//                        val user = response.body()
-//                        when (user?.status) {
-//                            "가입 완료" -> "main"
-//                            "가입 대기 중" -> "wait/${user.name}"
-//                            null -> "wait/${user?.name}"
-//                            else -> "info"
-//                        }
-//                    } else {
-//                        "info"
-//                    }
-//                } catch (e: Exception) {
-//                    "info"
-//                }
-//            }
-//            initialRoute = route
+            // 최초 가입요청(정보 입력)한 적 없는 경우 → info로 이동
+            val didSubmitInfo = data.userInfoSubmitted // (예: sharedPrefs/DB 저장)
+            if (!didSubmitInfo) {
+                initialRoute = "info"
+            } else {
+                // 이미 가입요청한 경우에는 서버에 UserCheck 요청해서 state에 따라 화면 분기
+                val userStatus = data.userStatus
+                val userName = data.userName
+                initialRoute = when (userStatus) {
+                    "가입 완료" -> "main"
+                    "가입 대기 중" -> "wait/${userName ?: "학생"}"
+//                    null -> "wait/${userName ?: "학생"}"
+                    else -> "info"
+                }
+            }
             return@LaunchedEffect
         }
-
         initialRoute = "login"
     }
     if (initialRoute == null) {
@@ -121,21 +108,18 @@ fun AppNavigation(
         }
 
         composable("login") {
-            LoginScreen(authRepository, loginManager, navController)
+            LoginScreen(authRepository, data, navController)
         }
 
         composable("manager_login") {
-            ManagerLoginScreen(authRepository, loginManager, navController)
+            ManagerLoginScreen(authRepository, navController, data)
         }
 
-//        composable("info") {
-//            InformationScreen(infoRepository, loginManager)
-//        }
-//
-//        composable("wait/{userName}") { backStackEntry ->
-//            val userName = backStackEntry.arguments?.getString("userName") ?: "학생"
-//            WaitScreen(userName = userName)
-//        }
+        composable("info") {
+            InformationScreen(infoRepository, data,navController)
+        }
+
+        composable("wait/{userName}") { WaitScreen(infoRepository,data,navController) }
 //
 //        composable("main") {
 //            MainScreen(postRepository, loginManager, navController)

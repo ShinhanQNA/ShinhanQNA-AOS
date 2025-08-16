@@ -12,6 +12,7 @@ class AuthRepository(
     private val apiInterface: APIInterface,
     private val loginManager: Data
 ) {
+
     // 관리자 로그인
     suspend fun loginAdmin(id: String, password: String): Result<LoginTokensResponse> {
         return runCatching {

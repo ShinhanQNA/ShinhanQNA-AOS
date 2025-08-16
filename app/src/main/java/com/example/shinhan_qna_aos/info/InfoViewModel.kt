@@ -1,102 +1,88 @@
 package com.example.shinhan_qna_aos.info
 
-//import android.content.Context
-//import android.net.Uri
-//import androidx.compose.runtime.getValue
-//import androidx.compose.runtime.mutableStateOf
-//import androidx.compose.runtime.setValue
-//import androidx.lifecycle.ViewModel
-//import androidx.lifecycle.viewModelScope
-//import com.example.shinhan_qna_aos.ImageUtils
-//import com.example.shinhan_qna_aos.Data
-//import kotlinx.coroutines.launch
-//import java.io.File
+import android.content.Context
+import android.net.Uri
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.shinhan_qna_aos.ImageUtils
+import com.example.shinhan_qna_aos.Data
+import com.jihan.lucide_icons.lucide.user
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import java.io.File
 
-//class InfoViewModel(
-//    private val repository: InfoRepository,
-//    private val loginManager: Data
-//) : ViewModel() {
-//
-//    var uiState by mutableStateOf(InfoUiState())
-//
-//    private val TAG = "InfoViewModel"
-//
-//    val gradeOptions = listOf("1학년", "2학년", "3학년", "4학년")
-//    val majorOptions = listOf("소프트웨어융합학과")
-//
-//    var compressedImageFile: File? by mutableStateOf(null)
-//
-//    fun onNameChange(newName: String) {
-//        uiState = uiState.copy(data = uiState.data.copy(name = newName))
-//    }
-//
-//    fun onStudentIdChange(newId: String) {
-//        val idInt = newId.toIntOrNull() ?: 0
-//        uiState = uiState.copy(data = uiState.data.copy(students = idInt))
-//    }
-//
-//    fun onGradeChange(newGrade: String) {
-//        val yearInt = newGrade.replace("학년", "").toIntOrNull() ?: 0
-//        uiState = uiState.copy(data = uiState.data.copy(year = yearInt))
-//    }
-//
-//    fun onMajorChange(newMajor: String) {
-//        uiState = uiState.copy(data = uiState.data.copy(department = newMajor))
-//    }
-//
-//    fun onImageChange(context: Context, uri: Uri) {
-//        uiState = uiState.copy(data = uiState.data.copy(imageUri = uri))
-//        viewModelScope.launch {
-//            compressedImageFile = ImageUtils.compressImage(context, uri, 10)
-//        }
-//    }
-//
-//    // 사용자 정보/상태 조회 후 목적 화면으로 이동
-//    fun checkUserStatusAndNavigate() {
-//        val token = loginManager.accessToken
-//        if (token.isNullOrEmpty()) {
-//            uiState = uiState.copy(errorMessage = "로그인 정보가 없습니다. 다시 로그인해주세요.")
-//            return
-//        }
-//
-//        viewModelScope.launch {
-//            uiState = uiState.copy(isLoading = true, errorMessage = null)
-//            val result = repository.checkUserStatus(token)
-//            uiState = uiState.copy(isLoading = false)
-//
-//            result.onSuccess { userCheck ->
-//                when (userCheck.status) {
-//                    "가입 대기 중" -> uiState = uiState.copy(navigateTo = "wait/${userCheck.name}")
-//                    "가입 완료" -> uiState = uiState.copy(navigateTo = "main")
-//                }
-//            }.onFailure {
-//                uiState = uiState.copy(errorMessage = it.message)
-//            }
-//        }
-//    }
-//
-//    fun submitStudentInfo() {
-//        val token = loginManager.accessToken
-//        if (token.isNullOrEmpty()) {
-//            uiState = uiState.copy(errorMessage = "로그인 정보가 없습니다.")
-//            return
-//        }
-//
-//        if (uiState.data.imageUri == Uri.EMPTY || compressedImageFile == null) {
-//            uiState = uiState.copy(errorMessage = "사진 첨부는 필수입니다.")
-//            return
-//        }
-//
-//        viewModelScope.launch {
-//            uiState = uiState.copy(isLoading = true)
-//            val result = repository.submitStudentInfo(token, uiState.data, compressedImageFile!!)
-//            uiState = uiState.copy(isLoading = false)
-//
-//            result.onSuccess {
-//                checkUserStatusAndNavigate()
-//            }.onFailure {
-//                uiState = uiState.copy(errorMessage = it.message)
-//            }
-//        }
-//    }
-//}
+class InfoViewModel(
+    private val infoRepository: InfoRepository,
+    private val data: Data
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(InfoUiState())
+    var uiState: StateFlow<InfoUiState> = _uiState.asStateFlow()
+
+    val user = _uiState.value.data
+    private val TAG = "InfoViewModel"
+
+    // 학생 정보 상태 갱신 함수들
+    fun onNameChange(newName: String) {
+        _uiState.value = _uiState.value.copy(data = _uiState.value.data.copy(name = newName))
+    }
+    fun onStudentIdChange(newId: String) {
+        _uiState.value = _uiState.value.copy(data = _uiState.value.data.copy(students = newId.toIntOrNull() ?: 0))
+    }
+    fun onGradeChange(newGrade: String) {
+        val gradeInt = newGrade.removeSuffix("학년").toIntOrNull() ?: 0
+        _uiState.value = _uiState.value.copy(data = _uiState.value.data.copy(year = gradeInt))
+    }
+    fun onMajorChange(newMajor: String) {
+        _uiState.value = _uiState.value.copy(data = _uiState.value.data.copy(department = newMajor))
+    }
+    fun onImageChange(uri: Uri) {
+        // 이미지 Uri를 파일 경로로 변환 후 UI 상태에 반영 (간단히 Uri 저장)
+        _uiState.value = _uiState.value.copy(data = _uiState.value.data.copy(imageUri = uri))
+    }
+
+    // 가입 요청 제출 함수
+    fun submitStudentInfo(context: Context){
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+            val accessToken = data.accessToken ?: return@launch
+
+            // 이미지 Uri를 압축 후 File로 변환
+            val imageUri = _uiState.value.data.imageUri
+            val compressedFile = ImageUtils.compressImage(context, imageUri, 10)
+            if (compressedFile == null) {
+                _uiState.value = _uiState.value.copy(isLoading = false, errorMessage = "이미지 압축 실패")
+                return@launch
+            }
+
+            // 서버에 학생 정보(압축이미지 포함) 제출
+            val result = infoRepository.submitStudentInfo(accessToken, _uiState.value.data, compressedFile)
+            if (result.isSuccess) {
+                // 가입 요청 성공 시 가입 상태 재조회
+                val checkResult = infoRepository.checkUserStatus(accessToken)
+                if (checkResult.isSuccess) {
+                    val status = checkResult.getOrNull()?.status ?: ""
+                    data.userName = user.name
+                    data.userInfoSubmitted = true   // 정보 제출 기록!
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        navigateTo = when (status) {
+                            "가입 완료" -> "main"
+                            "가입 대기 중" -> "wait/${data.userName}"
+                            else -> "info"
+                        }
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(isLoading = false, errorMessage = "가입 상태 조회 실패")
+                }
+            } else {
+                _uiState.value = _uiState.value.copy(isLoading = false, errorMessage = result.exceptionOrNull()?.localizedMessage ?: "가입 요청 실패")
+            }
+        }
+    }
+}

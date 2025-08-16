@@ -47,26 +47,26 @@ interface APIInterface {
     suspend fun AdminLoginData(
         @Body adminRequest : AdminRequest
     ):Response<LoginTokensResponse>
-//
-//    // 학생 정보
-//    @Multipart
-//    @POST("/users/certify")
-//    suspend fun InfoStudent(
-//        @Header("Authorization") accessToken: String,
-//        @Part("students") students: RequestBody,
-//        @Part("name") name: RequestBody,
-//        @Part("department") department: RequestBody,
-//        @Part("year") year: RequestBody,
-//        @Part("role") role: RequestBody,
-//        @Part image: MultipartBody.Part
-//    ): Response<InfoData>
-//
-//    //유저 정보 조회
-//    @Headers("Content-Type: application/json")
-//    @GET("/users/me")
-//    suspend fun UserCheck(
-//        @Header("Authorization") accessToken: String
-//    ): Response<UserCheckResponse>
+
+    // 학생 정보
+    @Multipart
+    @POST("/users/certify")
+    suspend fun InfoStudent(
+        @Header("Authorization") accessToken: String,
+        @Part("students") students: RequestBody,
+        @Part("name") name: RequestBody,
+        @Part("department") department: RequestBody,
+        @Part("year") year: RequestBody,
+        @Part("role") role: RequestBody,
+        @Part image: MultipartBody.Part
+    ): Response<InfoData>
+
+    //유저 정보 조회
+    @Headers("Content-Type: application/json")
+    @GET("/users/me")
+    suspend fun UserCheck(
+        @Header("Authorization") accessToken: String
+    ): Response<UserCheckResponse>
 
 //    //게시글 조회
 //    @Headers("Content-Type: application/json")
