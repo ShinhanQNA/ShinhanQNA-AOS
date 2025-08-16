@@ -1,15 +1,15 @@
 package com.example.shinhan_qna_aos.API
 
 //import com.example.shinhan_qna_aos.etc.Write
-import com.example.shinhan_qna_aos.info.InfoData
-import com.example.shinhan_qna_aos.info.UserCheckResponse
+//import com.example.shinhan_qna_aos.info.InfoData
+//import com.example.shinhan_qna_aos.info.UserCheckResponse
 import com.example.shinhan_qna_aos.login.api.AdminRequest
 import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
 //import com.example.shinhan_qna_aos.main.api.Post
 //import com.example.shinhan_qna_aos.main.api.PostDetail
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
+//import okhttp3.MultipartBody
+//import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -17,9 +17,9 @@ import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
-import retrofit2.http.Part
-import retrofit2.http.Path
-import retrofit2.http.Query
+//import retrofit2.http.Part
+//import retrofit2.http.Path
+//import retrofit2.http.Query
 
 interface APIInterface {
     //kakao
@@ -48,25 +48,25 @@ interface APIInterface {
         @Body adminRequest : AdminRequest
     ):Response<LoginTokensResponse>
 
-    // 학생 정보
-    @Multipart
-    @POST("/users/certify")
-    suspend fun InfoStudent(
-        @Header("Authorization") accessToken: String,
-        @Part("students") students: RequestBody,
-        @Part("name") name: RequestBody,
-        @Part("department") department: RequestBody,
-        @Part("year") year: RequestBody,
-        @Part("role") role: RequestBody,
-        @Part image: MultipartBody.Part
-    ): Response<InfoData>
-
-    //유저 정보 조회
-    @Headers("Content-Type: application/json")
-    @GET("/users/me")
-    suspend fun UserCheck(
-        @Header("Authorization") accessToken: String
-    ): Response<UserCheckResponse>
+//    // 학생 정보
+//    @Multipart
+//    @POST("/users/certify")
+//    suspend fun InfoStudent(
+//        @Header("Authorization") accessToken: String,
+//        @Part("students") students: RequestBody,
+//        @Part("name") name: RequestBody,
+//        @Part("department") department: RequestBody,
+//        @Part("year") year: RequestBody,
+//        @Part("role") role: RequestBody,
+//        @Part image: MultipartBody.Part
+//    ): Response<InfoData>
+//
+//    //유저 정보 조회
+//    @Headers("Content-Type: application/json")
+//    @GET("/users/me")
+//    suspend fun UserCheck(
+//        @Header("Authorization") accessToken: String
+//    ): Response<UserCheckResponse>
 
 //    //게시글 조회
 //    @Headers("Content-Type: application/json")

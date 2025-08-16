@@ -16,23 +16,23 @@ class Data(private val context: Context) {
         private const val KEY_USER_INFO_SUBMITTED = "USER_INFO_SUBMITTED"
     }
 
-    var accessToken: String?
+    var accessToken: String?  // 엑세스 토큰
         get() = prefs.getString(KEY_ACCESS_TOKEN, null)
         set(value) = prefs.edit().putString(KEY_ACCESS_TOKEN, value).apply()
 
-    var refreshToken: String?
+    var refreshToken: String? // 리프래쉬 토큰
         get() = prefs.getString(KEY_REFRESH_TOKEN, null)
         set(value) = prefs.edit().putString(KEY_REFRESH_TOKEN, value).apply()
 
-    var accessTokenExpiresAt: Long
+    var accessTokenExpiresAt: Long // 엑세스 만료
         get() = prefs.getLong(KEY_ACCESS_TOKEN_EXP, 0L)
         set(value) = prefs.edit().putLong(KEY_ACCESS_TOKEN_EXP, value).apply()
 
-    var refreshTokenExpiresAt: Long
+    var refreshTokenExpiresAt: Long // 리프래쉬 만료
         get() = prefs.getLong(KEY_REFRESH_TOKEN_EXP, 0L)
         set(value) = prefs.edit().putLong(KEY_REFRESH_TOKEN_EXP, value).apply()
 
-    var isAdmin: Boolean
+    var isAdmin: Boolean // 관리자 관련
         get() = prefs.getBoolean(KEY_IS_ADMIN, false)
         set(value) = prefs.edit().putBoolean(KEY_IS_ADMIN, value).apply()
 
@@ -40,7 +40,7 @@ class Data(private val context: Context) {
         get() = prefs.getString(KEY_USER_STATUS, null)
         set(value) = prefs.edit().putString(KEY_USER_STATUS, value).apply()
 
-    var userName: String?
+    var userName: String? // 유저 이름
         get() = prefs.getString(KEY_USER_NAME, null)
         set(value) = prefs.edit().putString(KEY_USER_NAME, value).apply()
 
