@@ -10,11 +10,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ManagerLoginViewModel(
-    private val repository: AuthRepository //  Repository 의존
+    private val repository: AuthRepository // Repository 의존성 주입
 ) : ViewModel() {
 
     var state by mutableStateOf(ManagerLoginData())
 
+    // 로그인 결과를 Flow 로 관리
     private val _loginResult = MutableStateFlow<LoginResult>(LoginResult.Idle)
     val loginResult: StateFlow<LoginResult> get() = _loginResult
 
@@ -26,7 +27,7 @@ class ManagerLoginViewModel(
         state = state.copy(managerPassword = newPw)
     }
 
-    // ✅ 관리자 로그인
+    //  관리자 로그인 시도
     fun login() {
         viewModelScope.launch {
             repository.loginAdmin(state.managerId, state.managerPassword)
@@ -35,7 +36,10 @@ class ManagerLoginViewModel(
                         LoginResult.Success(it.accessToken, it.refreshToken, it.expiresIn)
                 }
                 .onFailure { e ->
-                    _loginResult.value = LoginResult.Failure(-1, e.localizedMessage ?: "관리자 로그인 실패")
+                    _loginResult.value = LoginResult.Failure(
+                        -1,
+                        e.localizedMessage ?: "관리자 로그인 실패"
+                    )
                 }
         }
     }

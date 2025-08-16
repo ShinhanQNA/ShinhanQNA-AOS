@@ -18,7 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.shinhan_qna_aos.API.APIInterface
 //import com.example.shinhan_qna_aos.info.InfoRepository
-//import com.example.shinhan_qna_aos.info.InformationScreen
+import com.example.shinhan_qna_aos.info.InformationScreen
 //import com.example.shinhan_qna_aos.info.WaitScreen
 import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.login.api.LoginResult
@@ -69,11 +69,12 @@ fun AppNavigation(
                 initialRoute = "login"
                 return@LaunchedEffect
             }
-//            // 최초 가입요청(정보 입력)한 적 없는 경우 → info로 이동
-//            val didSubmitInfo = data.userInfoSubmitted // (예: sharedPrefs/DB 저장)
-//            if (!didSubmitInfo) {
-//                initialRoute = "info"
-//            } else {
+            // 최초 가입요청(정보 입력)한 적 없는 경우 → info로 이동
+            val didSubmitInfo = data.userInfoSubmitted // (예: sharedPrefs/DB 저장)
+            if (!didSubmitInfo) {
+                initialRoute = "info"
+            }
+//            else {
 //                // 이미 가입요청한 경우에는 서버에 UserCheck 요청해서 state에 따라 화면 분기
 //                val userStatus = data.userStatus
 //                val userName = data.userName
@@ -88,9 +89,8 @@ fun AppNavigation(
         }
         initialRoute = "login"
     }
-    if (initialRoute == null) {
-        return
-    }
+    if (initialRoute == null) return
+
 
     NavHost(
         navController = navController,
@@ -115,9 +115,11 @@ fun AppNavigation(
             ManagerLoginScreen(authRepository, navController, data)
         }
 
-//        composable("info") {
-//            InformationScreen(infoRepository, data,navController)
-//        }
+        composable("info") {
+            InformationScreen(
+//                infoRepository,
+                data,navController)
+        }
 //
 //        composable("wait/{userName}") { WaitScreen(infoRepository,data,navController) }
 //

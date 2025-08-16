@@ -12,29 +12,23 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(
     private val repository: AuthRepository,
-    loginManager: Data
+    private val data: Data // 토큰 저장소 (예: SharedPreferences or DB)
 ) : ViewModel() {
 
     private val _loginResult = MutableStateFlow<LoginResult>(LoginResult.Idle)
     val loginResult: StateFlow<LoginResult> get() = _loginResult
 
     init {
-        val access = loginManager.accessToken
-        if (!access.isNullOrBlank() && !loginManager.isAccessTokenExpired()) {
-            _loginResult.value = LoginResult.Success(
-                accessToken = access,
-                refreshToken = loginManager.refreshToken.orEmpty(),
-                expiresIn = ((loginManager.accessTokenExpiresAt - System.currentTimeMillis()) / 1000).toInt()
-            )
-        }
+        // 필요 시 리프래시 토큰으로 갱신
         tryRefreshTokenIfNeeded()
     }
 
-    // 카카오 로그인
+    //  카카오 로그인
     fun loginWithKakao(context: Context) {
         val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             if (error != null) {
-                _loginResult.value = LoginResult.Failure(-1, error.localizedMessage ?: "로그인 실패")
+                _loginResult.value =
+                    LoginResult.Failure(-1, error.localizedMessage ?: "카카오 로그인 실패")
             } else if (token != null) {
                 viewModelScope.launch {
                     repository.loginWithKakao(token.accessToken.trim())
@@ -56,7 +50,7 @@ class LoginViewModel(
         }
     }
 
-    // 구글 로그인
+    //  구글 로그인 (AuthCode 전달)
     fun sendGoogleAuthCodeToServer(authCode: String) {
         viewModelScope.launch {
             repository.loginWithGoogle(authCode)
@@ -65,17 +59,36 @@ class LoginViewModel(
                         LoginResult.Success(it.accessToken, it.refreshToken, it.expiresIn)
                 }
                 .onFailure { e ->
-                    _loginResult.value = LoginResult.Failure(-1, e.localizedMessage ?: "구글 로그인 실패")
+                    _loginResult.value =
+                        LoginResult.Failure(-1, e.localizedMessage ?: "구글 로그인 실패")
                 }
         }
     }
 
-    // 토큰 재발급 시도
+    //  토큰 재발급 시도
     fun tryRefreshTokenIfNeeded() {
         viewModelScope.launch {
-            if (!repository.refreshTokenIfNeeded()) {
-                _loginResult.value = LoginResult.Failure(-1, "재로그인 필요")
-                // 필요시 로그아웃 처리로직 추가 가능
+            val access = data.accessToken
+            if (!access.isNullOrBlank() && !data.isAccessTokenExpired()) {
+                // Access Token 유효 → 즉시 로그인 성공 상태 변경
+                _loginResult.value = LoginResult.Success(
+                    accessToken = access,
+                    refreshToken = data.refreshToken.orEmpty(),
+                    expiresIn = ((data.accessTokenExpiresAt - System.currentTimeMillis()) / 1000).toInt()
+                )
+            } else {
+                // 토큰 만료 또는 없으면 재발급 시도
+                if (repository.refreshTokenIfNeeded()) {
+                    val newAccess = data.accessToken ?: ""
+                    _loginResult.value = LoginResult.Success(
+                        accessToken = newAccess,
+                        refreshToken = data.refreshToken.orEmpty(),
+                        expiresIn = ((data.accessTokenExpiresAt - System.currentTimeMillis()) / 1000).toInt()
+                    )
+                } else {
+                    _loginResult.value = LoginResult.Failure(-1, "재로그인 필요")
+                    // 필요 시 로그아웃 처리 콜백 호출 가능
+                }
             }
         }
     }
