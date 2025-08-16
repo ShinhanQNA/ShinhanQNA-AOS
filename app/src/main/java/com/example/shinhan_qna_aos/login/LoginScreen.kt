@@ -40,8 +40,8 @@ import com.google.android.gms.common.api.ApiException
 @Composable
 fun LoginScreen(repository: AuthRepository, loginManager: Data, navController: NavController) {
     val context = LocalContext.current
-    val viewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(repository,loginManager) })
-    val loginResult by viewModel.loginResult.collectAsState()
+    val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(repository,loginManager) })
+    val loginResult by loginViewModel.loginResult.collectAsState()
 
     LaunchedEffect(loginResult) {
         if (loginResult is LoginResult.Success) {
@@ -59,7 +59,7 @@ fun LoginScreen(repository: AuthRepository, loginManager: Data, navController: N
                 val authCode = account?.serverAuthCode
                 if (!authCode.isNullOrEmpty()) {
                     // ViewModel로 Authorization Code 전달
-                    viewModel.sendGoogleAuthCodeToServer(authCode)
+                    loginViewModel.sendGoogleAuthCodeToServer(authCode)
                 }
             } catch (e: Exception) {
                 Log.e("LoginScreen", "Google login failed: ${e.localizedMessage}", e)
@@ -97,9 +97,7 @@ fun LoginScreen(repository: AuthRepository, loginManager: Data, navController: N
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
-                            viewModel.loginWithKakao(context)
-                        }
+                        .clickable { loginViewModel.loginWithKakao(context) }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 

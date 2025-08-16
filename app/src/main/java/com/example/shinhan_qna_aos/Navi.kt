@@ -26,6 +26,7 @@ import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.LoginScreen
 import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.example.shinhan_qna_aos.login.ManagerLoginScreen
+import com.example.shinhan_qna_aos.main.MainScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
@@ -114,9 +115,9 @@ fun AppNavigation(
 
         composable("wait") { WaitScreen(infoRepository, data, navController) }
 
-//        composable("main") {
-//            MainScreen(postRepository, loginManager, navController)
-//        }
+        composable("main") { MainScreen(
+//            postRepository,
+            data, navController) }
 //        // 학생용 상세 게시글
 //        composable(
 //            "postDetail/{postId}",
