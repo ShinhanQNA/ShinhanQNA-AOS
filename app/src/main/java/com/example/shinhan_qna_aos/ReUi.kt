@@ -61,20 +61,20 @@ import com.jihan.lucide_icons.lucide
 //data class SelectData(val year: Int,val month: Int, val week: Int, val count: Int, val responseState: String = "응답 상태")
 //data class StringData(val content:String)
 //data class TitleYearData(val name: String,val studentid: String, val grade: String,val major: String,val year: Int,val month: Int,val day: Int)
-//
-//val TitleTextStyle = TextStyle(
-//    fontFamily = pretendard,
-//    fontWeight = FontWeight.Bold,
-//    fontSize = 20.sp,
-//    color = Color.Black
-//)
-//
-//val ContentTextStyle = TextStyle(
-//    fontFamily = pretendard,
-//    fontWeight = FontWeight.Normal,
-//    fontSize = 14.sp,
-//    color = Color(0xffA5A5A5)
-//)
+
+val TitleTextStyle = TextStyle(
+    fontFamily = pretendard,
+    fontWeight = FontWeight.Bold,
+    fontSize = 20.sp,
+    color = Color.Black
+)
+
+val ContentTextStyle = TextStyle(
+    fontFamily = pretendard,
+    fontWeight = FontWeight.Normal,
+    fontSize = 14.sp,
+    color = Color(0xffA5A5A5)
+)
 
 // 공통 레이블 + 필드
 @Composable
@@ -126,53 +126,53 @@ fun PlainInputField(
     )
 }
 
-//
-//// 게시글 + 좋아요/신고/차단 + 관리자 드롭다운
-//@Composable
-//fun TitleContentLikeButton(
-//    title: String,
-//    content: String,
-//    likeCount: Int,
-//    flagsCount: Int = 0,
-//    banCount: Int = 0,
-//    isAdmin: Boolean = false,
-//    responseState: String = "응답 상태",
-//    onResponseStateChange: (String) -> Unit = {},
-//    onClick:()->Unit
-//) {
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .background(Color.White)
-//            .padding(horizontal = 20.dp, vertical = 16.dp)
-//            .clickable { onClick() },
-//        horizontalArrangement = Arrangement.SpaceBetween,
-//        verticalAlignment = Alignment.CenterVertically
-//    ) {
-//        Column {
-//            Text(title, style = TitleTextStyle)
-//            Spacer(modifier = Modifier.height(8.dp))
-//            Text(
-//                content,
-//                style = ContentTextStyle,
-//                maxLines = 1,
-//                overflow = TextOverflow.Ellipsis
-//            )
-//            Spacer(modifier = Modifier.height(8.dp))
-//            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-//                InfoIconCount(lucide.thumbs, "좋아요 표시", likeCount, Color.Black, 16)
-//                if (isAdmin) {
-//                    InfoIconCount(R.drawable.flag, "신고 표시", flagsCount, Color(0xffFF9F43), 16)
-//                    InfoIconCount(lucide.ban, "차단 표시", banCount, Color(0xffFC4F4F), 16)
-//                }
-//            }
-//        }
-//        if (isAdmin) {
-//            ManagerDropDown(responseState, onResponseStateChange = onResponseStateChange)
-//        }
-//    }
-//}
-//
+
+// 게시글 + 좋아요/신고/차단 + 관리자 드롭다운
+@Composable
+fun TitleContentLikeButton(
+    title: String,
+    content: String,
+    likeCount: Int,
+    flagsCount: Int = 0,
+    banCount: Int = 0,
+    isAdmin: Boolean = false,
+    responseState: String = "응답 상태",
+    onResponseStateChange: (String) -> Unit = {},
+    onClick:()->Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .clickable { onClick() },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(title, style = TitleTextStyle)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                content,
+                style = ContentTextStyle,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                InfoIconCount(lucide.thumbs, "좋아요 표시", likeCount, Color.Black, 16)
+                if (isAdmin) {
+                    InfoIconCount(R.drawable.flag, "신고 표시", flagsCount, Color(0xffFF9F43), 16)
+                    InfoIconCount(lucide.ban, "차단 표시", banCount, Color(0xffFC4F4F), 16)
+                }
+            }
+        }
+        if (isAdmin) {
+            ManagerDropDown(responseState, onResponseStateChange = onResponseStateChange)
+        }
+    }
+}
+
 //// 일반 게시글 컴포저블
 //@Composable
 //fun TitleContentButton(title: String, content: String) {
@@ -232,53 +232,53 @@ fun PlainInputField(
 //        }
 //    }
 //}
-//
-//// 관리자용 응답 상태 드롭다운
-//@Composable
-//fun ManagerDropDown(
-//    responseState: String,
-//    responseOptions: List<String> = listOf("대기", "응답중", "응답 완료"),
-//    onResponseStateChange: (String) -> Unit
-//){
-//    var expanded by remember { mutableStateOf(false) }  // 드롭다운 확장 상태 내부 관리
-//    Box {
-//        Row(
-//            modifier = Modifier
-//                .border(1.dp, Color(0xFFdfdfdf), RoundedCornerShape(10.dp))
-//                .clickable { expanded = true }
-//                .padding(horizontal = 12.dp, vertical = 8.dp),
-//            verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.spacedBy(4.dp)
-//        ) {
-//            Text(
-//                text = if (responseState.isBlank() || responseState == "응답 상태") "응답 상태" else responseState,
-//                fontSize = 13.sp,
-//                fontFamily = pretendard,
-//                color =  Color.Black
-//            )
-//            Icon(
-//                painter = painterResource(lucide.chevron_down),
-//                contentDescription = "응답 상태 선택",
-//                modifier = Modifier.size(18.dp),
-//                tint = Color.Black
-//            )
-//        }
-//        DropdownMenu(
-//            expanded = expanded,
-//            onDismissRequest = { expanded = false }
-//        ) {
-//            responseOptions.forEach { option ->
-//                DropdownMenuItem(
-//                    text = { Text(option, fontFamily = pretendard, fontSize = 14.sp) },
-//                    onClick = {
-//                        onResponseStateChange(option)
-//                        expanded = false
-//                    }
-//                )
-//            }
-//        }
-//    }
-//}
+
+// 관리자용 응답 상태 드롭다운
+@Composable
+fun ManagerDropDown(
+    responseState: String,
+    responseOptions: List<String> = listOf("대기", "응답중", "응답 완료"),
+    onResponseStateChange: (String) -> Unit
+){
+    var expanded by remember { mutableStateOf(false) }  // 드롭다운 확장 상태 내부 관리
+    Box {
+        Row(
+            modifier = Modifier
+                .border(1.dp, Color(0xFFdfdfdf), RoundedCornerShape(10.dp))
+                .clickable { expanded = true }
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = if (responseState.isBlank() || responseState == "응답 상태") "응답 상태" else responseState,
+                fontSize = 13.sp,
+                fontFamily = pretendard,
+                color =  Color.Black
+            )
+            Icon(
+                painter = painterResource(lucide.chevron_down),
+                contentDescription = "응답 상태 선택",
+                modifier = Modifier.size(18.dp),
+                tint = Color.Black
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            responseOptions.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option, fontFamily = pretendard, fontSize = 14.sp) },
+                    onClick = {
+                        onResponseStateChange(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
 //// 탑바
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
@@ -460,31 +460,31 @@ fun PlainInputField(
 //    }
 //}
 //
-//// 공통 아이콘+숫자 표시 컴포저블
-//@Composable
-//fun InfoIconCount(
-//    icon: Int,
-//    desc: String,
-//    count: Int,
-//    color: Color,
-//    fontSize: Int
-//) {
-//    Row(verticalAlignment = Alignment.CenterVertically) {
-//        Icon(
-//            painter = painterResource(icon),
-//            contentDescription = desc,
-//            modifier = Modifier.size(16.dp),
-//            tint = color
-//        )
-//        Spacer(modifier = Modifier.width(4.dp))
-//        Text(
-//            count.toString(),
-//            color = color,
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Normal,
-//                fontSize = fontSize.sp
-//            ),
-//        )
-//    }
-//}
+// 공통 아이콘+숫자 표시 컴포저블
+@Composable
+fun InfoIconCount(
+    icon: Int,
+    desc: String,
+    count: Int,
+    color: Color,
+    fontSize: Int
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = desc,
+            modifier = Modifier.size(16.dp),
+            tint = color
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            count.toString(),
+            color = color,
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = fontSize.sp
+            ),
+        )
+    }
+}

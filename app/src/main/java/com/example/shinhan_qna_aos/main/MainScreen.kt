@@ -38,21 +38,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.main.api.PostRepository
 //import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun MainScreen(
-//    postRepository: PostRepository,
-               data: Data, navController: NavController){
+fun MainScreen(postRepository: PostRepository, data: Data, navController: NavController){
 
     Box(modifier = Modifier.fillMaxSize()){
         Column{
             MainTopbar(navController)
-            Selectboard(
-//                postRepository,
-                data,navController)
+            Selectboard(postRepository,data,navController)
         }
         Text(
             "배너광고",
@@ -142,9 +139,7 @@ fun TopIcon(navController: NavController){
 
 //게시판 선택
 @Composable
-fun Selectboard(
-//    postRepository: PostRepository,
-    data: Data, navController: NavController) {
+fun Selectboard(postRepository: PostRepository, data: Data, navController: NavController) {
 
     val tabData = listOf(
         Pair("말해봐요", R.drawable.trumpet),
@@ -215,7 +210,7 @@ fun Selectboard(
 
         // 페이지별 본문 표시
         when (selectedIndex) {
-//            0 -> SaySomthingScreen(postRepository, loginManager ,navController =  navController)
+            0 -> SaySomthingScreen(postRepository, data , navController)
 //            1 -> SelectedOpinionsScreen()
 //            2 -> AnsweredScreen()
         }

@@ -27,6 +27,7 @@ import com.example.shinhan_qna_aos.login.LoginScreen
 import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.example.shinhan_qna_aos.login.ManagerLoginScreen
 import com.example.shinhan_qna_aos.main.MainScreen
+import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
@@ -43,7 +44,7 @@ fun AppNavigation(
     val onboardingRepository = remember { OnboardingRepository(context) }
     val authRepository = remember { AuthRepository(apiInterface, data) }
 //    val writeRepository = remember { WriteRepository(apiInterface, loginManager) }
-//    val postRepository = remember { PostRepository(apiInterface, loginManager) }
+    val postRepository = remember { PostRepository(apiInterface, data) }
     val infoRepository = remember { InfoRepository(apiInterface) }
 
 // 뷰모델 초기화
@@ -115,9 +116,7 @@ fun AppNavigation(
 
         composable("wait") { WaitScreen(infoRepository, data, navController) }
 
-        composable("main") { MainScreen(
-//            postRepository,
-            data, navController) }
+        composable("main") { MainScreen(postRepository, data, navController) }
 //        // 학생용 상세 게시글
 //        composable(
 //            "postDetail/{postId}",
