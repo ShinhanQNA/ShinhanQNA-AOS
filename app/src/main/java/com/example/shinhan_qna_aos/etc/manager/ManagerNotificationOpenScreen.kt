@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.DetailContent
-import com.example.shinhan_qna_aos.LikeFlagBan
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
@@ -40,7 +39,7 @@ import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun ManagerWriteOpenScreen(
+fun ManagerNotificationOpenScreen(
     postId: Int,
     postRepository:PostRepository,
     data: Data,
@@ -66,17 +65,6 @@ fun ManagerWriteOpenScreen(
             // API에서 가져온 데이터로 표시
             postDetail?.let { DetailContent(title = it.title, content = postDetail.content) }
 
-            // 공지사항이 아닌 경우 좋아요/신고 영역 표시
-            if (!data.isNotice) {
-                Spacer(modifier = Modifier.height(16.dp))
-                if (postDetail != null) {
-                    LikeFlagBan(
-                        likeCount = postDetail.likes,
-                        flagsCount = 0, // 나중에 API
-                        banCount = 34 // 나중에 API
-                    )
-                }
-            }
 
             Spacer(modifier = Modifier.height(32.dp))
             ManagerFunctionButton(data.isNotice)

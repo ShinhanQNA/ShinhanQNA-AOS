@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.etc.user
+package com.example.shinhan_qna_aos.etc
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +33,8 @@ import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.LikeFlagBan
+import com.example.shinhan_qna_aos.etc.manager.ManagerFunctionButton
 import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.PostViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
@@ -66,9 +68,15 @@ fun WriteOpenScreen (
                 TopBar(null) { navController.popBackStack() }
                 DetailContent(post_detail.title, post_detail.content)
                 Spacer(modifier = Modifier.height(16.dp))
-                Like(post_detail.likes)
+                LikeFlagBan(
+                    post_detail.likes,
+                     0, // 나중에 API
+                     34, // 나중에 API
+                     data
+                )
                 Spacer(modifier = Modifier.height(36.dp))
-                FunctionButton(isOwner)
+                if(!data.isAdmin){ FunctionButton(isOwner) }
+                ManagerFunctionButton(data.isNotice)
             }
             Text(
                 "배너광고",

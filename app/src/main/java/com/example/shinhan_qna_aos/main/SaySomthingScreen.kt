@@ -38,13 +38,7 @@ fun SaySomthingScreen(postRepository: PostRepository, data: Data, navController:
                 onResponseStateChange = { newState ->
                     responseState = newState
                 },
-                onClick = {
-                    if (data.isAdmin) {
-                        navController.navigate("managerPostDetail/${board.postID}")
-                    } else {
-                        navController.navigate("postDetail/${board.postID}")
-                    }
-                }
+                onClick = { navController.navigate("postDetail/${board.postID}") }
             )
             Divider()
         }

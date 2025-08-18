@@ -446,7 +446,7 @@ fun DetailContent(title: String, content: String) {
 //}
 // 좋아요, 신고, 차단 아이콘과 카운트 컴포저블
 @Composable
-fun LikeFlagBan(likeCount: Int, flagsCount: Int, banCount: Int) {
+fun LikeFlagBan(likeCount: Int, flagsCount: Int, banCount: Int, data:Data) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -455,7 +455,9 @@ fun LikeFlagBan(likeCount: Int, flagsCount: Int, banCount: Int) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        InfoIconCount(lucide.thumbs, "좋아요 표시", likeCount, Color.Black, 14)
+        if(!data.isAdmin) {
+            InfoIconCount(lucide.thumbs, "좋아요 표시", likeCount, Color.Black, 14)
+        }
         InfoIconCount(R.drawable.flag, "신고 표시", flagsCount, Color(0xffFF9F43), 14)
         InfoIconCount(lucide.ban, "차단 표시", banCount, Color(0xffFC4F4F), 14)
     }
