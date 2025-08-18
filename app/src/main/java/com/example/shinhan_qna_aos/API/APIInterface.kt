@@ -2,6 +2,8 @@ package com.example.shinhan_qna_aos.API
 
 //import com.example.shinhan_qna_aos.etc.Write
 //import com.example.shinhan_qna_aos.info.InfoData
+import androidx.annotation.RequiresPermission
+import com.example.shinhan_qna_aos.etc.api.Write
 import com.example.shinhan_qna_aos.info.api.UserCheckResponse
 import com.example.shinhan_qna_aos.info.api.InfoResponse
 import com.example.shinhan_qna_aos.login.api.AdminRequest
@@ -84,19 +86,19 @@ interface APIInterface {
     @Headers("Content-Type: application/json")
     @GET("/boards/{postId}")
     suspend fun getPostsDetail(
-        @Header("Authorization") code : String,
+        @Header("Authorization") accessToken : String,
         @Path("postId") postId: Int
     ):Response<PostDetail>
 
-//    // 게시글 쓰기
-//    @Multipart
-//    @POST
-//    suspend fun writeBoards(
-//        @Header("Authorization") code: String,
-//        @Part("title") title: RequestBody,
-//        @Part("content") content: RequestBody,
-//        @Part("category") category: RequestBody,
-//        @Part image: MultipartBody.Part?
-//    ):Response<Write>
+    // 게시글 쓰기
+    @Multipart
+    @POST("/boards")
+    suspend fun writeBoards(
+        @Header("Authorization") accessToken: String,
+        @Part("title") title: RequestBody,
+        @Part("content") content: RequestBody,
+        @Part("category") category: RequestBody, // API 사라질 예정
+        @Part image: MultipartBody.Part?
+    ):Response<Write>
 }
 

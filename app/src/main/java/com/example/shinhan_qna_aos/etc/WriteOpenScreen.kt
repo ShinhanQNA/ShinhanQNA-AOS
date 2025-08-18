@@ -75,8 +75,10 @@ fun WriteOpenScreen (
                      data
                 )
                 Spacer(modifier = Modifier.height(36.dp))
-                if(!data.isAdmin){ FunctionButton(isOwner) }
-                ManagerFunctionButton(data.isNotice)
+                if(data.isAdmin){
+                    ManagerFunctionButton(data.isNotice)
+                }
+                FunctionButton(isOwner)
             }
             Text(
                 "배너광고",

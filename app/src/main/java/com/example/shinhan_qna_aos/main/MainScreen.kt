@@ -89,7 +89,7 @@ fun TopIcon(navController: NavController){
             modifier = Modifier
                 .border(1.dp, color = Color(0xffDFDFDF), RoundedCornerShape(10.dp))
                 .padding(6.dp)
-                .clickable { navController.navigate("writeboard")}
+                .clickable { navController.navigate("writeBoard")}
         ) {
             Icon(
                 painter = painterResource(lucide.plus),

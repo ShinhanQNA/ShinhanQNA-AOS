@@ -1,9 +1,4 @@
-package com.example.shinhan_qna_aos.etc
-
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+package com.example.shinhan_qna_aos.etc.api
 
 //class NotificationWritingViewModel:ViewModel() {
 //    var state by mutableStateOf(

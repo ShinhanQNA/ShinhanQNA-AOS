@@ -19,6 +19,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.etc.WriteOpenScreen
+import com.example.shinhan_qna_aos.etc.WritingScreen
+import com.example.shinhan_qna_aos.etc.api.WriteRepository
 import com.example.shinhan_qna_aos.info.api.InfoRepository
 import com.example.shinhan_qna_aos.info.InformationScreen
 import com.example.shinhan_qna_aos.info.WaitScreen
@@ -44,7 +46,7 @@ fun AppNavigation(
     val data = remember { Data(context) }
     val onboardingRepository = remember { OnboardingRepository(context) }
     val authRepository = remember { AuthRepository(apiInterface, data) }
-//    val writeRepository = remember { WriteRepository(apiInterface, loginManager) }
+    val writeRepository = remember { WriteRepository(apiInterface, data) }
     val postRepository = remember { PostRepository(apiInterface, data) }
     val infoRepository = remember { InfoRepository(apiInterface) }
 
@@ -130,10 +132,9 @@ fun AppNavigation(
             WriteOpenScreen(navController, postRepository,postId, data)
         }
 
-
-//        composable("writeboard"){
-//            WritingScreen(writeRepository,navController)
-//        }
+        composable("writeBoard"){
+            WritingScreen(writeRepository,navController)
+        }
     }
 }
 
