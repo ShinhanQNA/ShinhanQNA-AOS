@@ -87,6 +87,9 @@ fun AppNavigation(
                 }
             }
             else {
+                if(data.isAdmin){
+                    initialRoute = "main"
+                }
                 initialRoute = "info"
             }
             return@LaunchedEffect
