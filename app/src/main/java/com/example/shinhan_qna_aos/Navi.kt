@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.shinhan_qna_aos.API.APIInterface
+import com.example.shinhan_qna_aos.etc.manager.ManagerWriteOpenScreen
 import com.example.shinhan_qna_aos.etc.user.WriteOpenScreen
 import com.example.shinhan_qna_aos.info.api.InfoRepository
 import com.example.shinhan_qna_aos.info.InformationScreen
@@ -118,6 +119,10 @@ fun AppNavigation(
         composable("wait") { WaitScreen(infoRepository, data, navController) }
 
         composable("main") { MainScreen(postRepository, data, navController) }
+
+        /**
+         *  게시글 관련 API
+         */
         // 학생용 상세 게시글
         composable( // postID를 같이 넘기는
             "postDetail/{postId}",
@@ -126,14 +131,18 @@ fun AppNavigation(
             val postId = backStackEntry.arguments?.getInt("postId") ?: 0
             WriteOpenScreen(navController, postRepository,postId, data)
         }
-//        // 관리자용 상세 게시글
-//        composable(
-//            "managerPostDetail/{postId}",
-//            arguments = listOf(navArgument("postId") { type = NavType.IntType })
-//        ) { backStackEntry ->
-//            val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-//            ManagerWriteOpenScreen(isNotice = false, postRepository = postRepository , loginManager =loginManager , navController = navController, postId = postId)
-//        }
+
+        // 관리자용 상세 게시글
+        composable(
+            "managerPostDetail/{postId}",
+            arguments = listOf(navArgument("postId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getInt("postId") ?: 0
+            ManagerWriteOpenScreen(postId, postRepository, data ,navController)
+        }
+
+        //--------------------------
+
 //        composable("writeboard"){
 //            WritingScreen(writeRepository,navController)
 //        }

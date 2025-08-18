@@ -15,10 +15,10 @@ class PostRepository(
      * @param sort 정렬 방식 (예: "day")
      */
     suspend fun getPosts(size: Int, sort: String): Result<List<TitleContentLike>> {
-        val accesstoken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
+        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
 
         return try {
-            val response = apiInterface.getPosts("Bearer $accesstoken", size, sort)
+            val response = apiInterface.getPosts("Bearer $accessToken", size, sort)
             if (response.isSuccessful) {
                 val body = response.body()?.map {
                     TitleContentLike(
@@ -26,8 +26,8 @@ class PostRepository(
                         title = it.title,
                         content = it.content,
                         likeCount = it.likes,
-                        flagsCount = 0,
-                        banCount = 0,
+                        flagsCount = 0, // 나중에 API
+                        banCount = 0, // 나중에 API
                         responseState = it.status
                     )
                 } ?: emptyList()
