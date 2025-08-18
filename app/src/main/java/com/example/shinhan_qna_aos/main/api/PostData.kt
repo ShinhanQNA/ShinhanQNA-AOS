@@ -25,16 +25,16 @@ data class TitleContentLike(
     val banCount: Int = 0,  // 관리자 api 로 받아와야함
     val responseState: String = "응답 상태" // 관리자 api 로 받아와야함
 )
-
-//data class PostDetail(
-//    val postId: Int,
-//    val title: String,
-//    val content: String,
-//    val likes: Int,
-//    val date: String,
-//    val imagePath: String?,
-//    val category: String,
-//    val status: String,
-//    val email: String, // 작성자 Email
-//    val year: String
-//)
+//API 상세 조회
+data class PostDetail(
+    val postId: Int,
+    val title: String,
+    val content: String,
+    val likes: Int,
+    val date: String,
+    val imagePath: String?,
+    val category: String,
+    val status: String,
+    val email: String, // 작성자 Email
+    val year: String
+)

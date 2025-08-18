@@ -279,79 +279,80 @@ fun ManagerDropDown(
         }
     }
 }
-//// 탑바
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun TopBar(
-//    title : String?,
-//    onNavigationClick: () -> Unit
-//) {
-//    TopAppBar(
-//        title = {
-//            Box(modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(end = 24.dp)) {
-//                Text(
-//                    text = title ?: "",
-//                    modifier = Modifier.align(Alignment.Center),
-//                    style = TextStyle(
-//                        fontFamily = pretendard,
-//                        fontWeight = FontWeight.Bold,
-//                        fontSize = 16.sp,
-//                        color = Color.Black
-//                    ),
-//                    maxLines = 1,
-//                )
-//            }
-//        },
-//        navigationIcon = {
-//            Icon(
-//                painter = painterResource(id = lucide.chevron_left),
-//                contentDescription = "Navigation Icon",
-//                modifier = Modifier
-//                    .size(24.dp)
-//                    .clickable { onNavigationClick() }
-//            )
-//        },
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(horizontal = 8.dp)
-//            .background(color = Color.White),
-//        colors = TopAppBarDefaults.topAppBarColors(Color.White)
-//    )
-//}
-//
-//// 상세보기 [제목 + 내용]
-//@Composable
-//fun DetailContent(title: String, content: String) {
-//    Column(
-//        modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
-//    ) {
-//        Text(
-//            title,
-//            color = Color.Black,
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Bold,
-//                fontSize = 24.sp
-//            ),
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//        Spacer(modifier = Modifier.height(16.dp))
-//        Text(
-//            content,
-//            color = Color.Black,
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Normal,
-//                fontSize = 16.sp
-//            ),
-//            lineHeight = 28.sp
-//        )
-//    }
-//}
-//
-//
+
+// 탑바
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(
+    title : String?,
+    onNavigationClick: () -> Unit
+) {
+    TopAppBar(
+        title = {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 24.dp)) {
+                Text(
+                    text = title ?: "",
+                    modifier = Modifier.align(Alignment.Center),
+                    style = TextStyle(
+                        fontFamily = pretendard,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = Color.Black
+                    ),
+                    maxLines = 1,
+                )
+            }
+        },
+        navigationIcon = {
+            Icon(
+                painter = painterResource(id = lucide.chevron_left),
+                contentDescription = "Navigation Icon",
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { onNavigationClick() }
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+            .background(color = Color.White),
+        colors = TopAppBarDefaults.topAppBarColors(Color.White)
+    )
+}
+
+// 상세보기 [제목 + 내용]
+@Composable
+fun DetailContent(title: String, content: String) {
+    Column(
+        modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
+    ) {
+        Text(
+            title,
+            color = Color.Black,
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            content,
+            color = Color.Black,
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp
+            ),
+            lineHeight = 28.sp
+        )
+    }
+}
+
+
 //// 개인정보처리방침, 이용약관, 법적고지 텍스트 영역 컴포저블
 //@Composable
 //fun Caution() {

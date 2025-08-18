@@ -17,8 +17,8 @@ class PostViewModel(
     // 게시글 리스트
     var postList by mutableStateOf<List<TitleContentLike>>(emptyList())
 
-//    var selectedPost by mutableStateOf<PostDetail?>(null)
-//        private set
+    var selectedPost by mutableStateOf<PostDetail?>(null)
+        private set
 
     var isLoading by mutableStateOf(false)
         private set
@@ -44,17 +44,17 @@ class PostViewModel(
         }
     }
 
-//    /**
-//     * 게시글 상세 로드
-//     */
-//    fun loadPostDetail(postId: Int, onComplete: (() -> Unit)? = null) {
-//        viewModelScope.launch {
-//            isLoading = true
-//            repository.getPostDetail(postId)
-//                .onSuccess { selectedPost = it }
-//                .onFailure { errorMessage = it.message }
-//            isLoading = false
-//            onComplete?.invoke()
-//        }
-//    }
+    /**
+     * 게시글 상세 로드
+     */
+    fun loadPostDetail(postId: Int, onComplete: (() -> Unit)? = null) {
+        viewModelScope.launch {
+            isLoading = true
+            repository.getPostDetail(postId)
+                .onSuccess { selectedPost = it }
+                .onFailure { errorMessage = it.message }
+            isLoading = false
+            onComplete?.invoke()
+        }
+    }
 }

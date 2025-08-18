@@ -8,6 +8,7 @@ import com.example.shinhan_qna_aos.login.api.AdminRequest
 import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
 import com.example.shinhan_qna_aos.main.api.Post
+import com.example.shinhan_qna_aos.main.api.PostDetail
 //import com.example.shinhan_qna_aos.main.api.Post
 //import com.example.shinhan_qna_aos.main.api.PostDetail
 import okhttp3.MultipartBody
@@ -20,6 +21,7 @@ import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface APIInterface {
@@ -78,14 +80,14 @@ interface APIInterface {
         @Query("sort") sort: String
     ):Response<List<Post>>
 
-//    //게시글 상세조회
-//    @Headers("Content-Type: application/json")
-//    @GET("/boards/{postId}")
-//    suspend fun getPostsDetail(
-//        @Header("Authorization") code : String,
-//        @Path("postId") postId: Int
-//    ):Response<PostDetail>
-//
+    //게시글 상세조회
+    @Headers("Content-Type: application/json")
+    @GET("/boards/{postId}")
+    suspend fun getPostsDetail(
+        @Header("Authorization") code : String,
+        @Path("postId") postId: Int
+    ):Response<PostDetail>
+
 //    // 게시글 쓰기
 //    @Multipart
 //    @POST
