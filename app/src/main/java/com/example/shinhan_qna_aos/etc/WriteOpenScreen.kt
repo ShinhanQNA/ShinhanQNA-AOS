@@ -34,7 +34,7 @@ import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.LikeFlagBan
-import com.example.shinhan_qna_aos.etc.manager.ManagerFunctionButton
+import com.example.shinhan_qna_aos.ManagerFunctionButton
 import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.PostViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
@@ -87,33 +87,6 @@ fun WriteOpenScreen (
                     .align(Alignment.BottomCenter)
             )
         }
-    }
-}
-
-@Composable
-fun Like(likeCount:Int){
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(24.dp)
-            .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(lucide.thumbs),
-            contentDescription = "좋아요 표시",
-            modifier = Modifier.size(16.dp)
-        )
-        Spacer(modifier = Modifier.width(5.dp))
-        Text(
-            likeCount.toString(),
-            color = Color.Black,
-            style = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.sp
-            ),
-        )
     }
 }
 

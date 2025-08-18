@@ -491,3 +491,55 @@ fun InfoIconCount(
         )
     }
 }
+
+// 게시판관 공지 및에 버튼 *isNotice 로 구별
+@Composable
+fun ManagerFunctionButton(isNotice: Boolean) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.End
+    ) {
+        ManagerButton(
+            icon = if (isNotice) lucide.trash else lucide.list,
+            label = if (isNotice) "삭제" else "검토",
+            background = Color(0xffFC4F4F)
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        ManagerButton(
+            icon = if (isNotice) R.drawable.square_pen else lucide.flag,
+            label = if (isNotice) "수정" else "경고",
+            background = if (isNotice) Color.Black else Color(0xffFF9F43)
+        )
+    }
+}
+
+@Composable
+fun ManagerButton(icon: Int, label: String, background: Color) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier
+            .background(background, RoundedCornerShape(12.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = label,
+            modifier = Modifier.size(20.dp),
+            tint = Color.White
+        )
+        Text(
+            text = label,
+            color = Color.White,
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
+            )
+        )
+    }
+}
