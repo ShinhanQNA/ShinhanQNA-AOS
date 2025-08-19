@@ -10,7 +10,7 @@ data class Write(
     val likes: Int,
     val date: String,
     val imagePath: String?,
-    val category: String,
+    val category: String?,
     val status: String,
     val email: String,
     val year: String

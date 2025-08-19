@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.etc.api.WriteRepository
@@ -51,7 +56,8 @@ import com.jihan.lucide_icons.lucide
 @Composable
 fun WritingScreen(writeRepository: WriteRepository, navController: NavController) {
     val context = LocalContext.current
-    val writingViewModel : WritingViewModel = viewModel(factory = SimpleViewModelFactory { WritingViewModel(writeRepository) })
+    val writingViewModel: WritingViewModel =
+        viewModel(factory = SimpleViewModelFactory { WritingViewModel(writeRepository) })
 
     val state = writingViewModel.state
 
@@ -62,96 +68,98 @@ fun WritingScreen(writeRepository: WriteRepository, navController: NavController
             }
         }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
+    Box(
+        modifier = Modifier.fillMaxSize()
             .background(Color.White)
+            .imePadding() // 키보드에 반응
     ) {
-        TopBar("게시글 작성",  { navController.popBackStack() })
+        Column {
+            TopBar("게시글 작성", { navController.popBackStack() })
 
-        LazyColumn(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                WritingTitleField(
-                    value = state.title,
-                    onValueChange = writingViewModel::onTitleChange,
-                    fontSize = 14.sp
-                )
-            }
-            item {
-                WritingContentField(
-                    value = state.content,
-                    onValueChange = writingViewModel::onContentChange,
-                    fontSize = 14.sp
-                )
-            }
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ){
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier
-                            .background(Color.Black, RoundedCornerShape(12.dp))
-                            .padding(horizontal = 12.dp, vertical = 8.dp)
-                            .clickable { launcher.launch("image/*") },
-                    ) {
-                        Icon(
-                            painter = painterResource(lucide.images),
-                            contentDescription = "사진 첨부",
-                            modifier = Modifier.size(20.dp),
-                            tint = Color.White
-                        )
-                        Text("사진 첨부", color = Color.White, fontSize = 14.sp)
-                    }
-                    Text(
-                        state.imageUri?.lastPathSegment ?: "",
-                        maxLines = 1,
-                        modifier = Modifier.weight(1f)
+            LazyColumn(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    WritingTitleField(
+                        value = state.title,
+                        onValueChange = writingViewModel::onTitleChange,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
-            }
-            item {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    WriteInfo()
-                    Spacer(modifier = Modifier.height(50.dp))
+                item {
+                    WritingContentField(
+                        value = state.content,
+                        onValueChange = writingViewModel::onContentChange,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+                item {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier
-                            .background(Color.Black, RoundedCornerShape(12.dp))
-                            .padding(horizontal = 18.dp, vertical = 12.dp)
-                            .clickable {
-                                writingViewModel.uploadPost(
-                                    onSuccess = {
-                                        navController.navigate("main"){
-                                            popUpTo("writeBoard") { inclusive = true }
-                                        }
-                                    },
-                                    onError = {
-                                        Toast.makeText(context, "게시글 작성이 실패하였습니다", Toast.LENGTH_SHORT).show()
-                                    }
-                                )
-                            }
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(
-                            painter = painterResource(lucide.cloud_upload),
-                            contentDescription = "작성하기",
-                            modifier = Modifier.size(20.dp),
-                            tint = Color.White
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier
+                                .background(Color.Black, RoundedCornerShape(12.dp))
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                                .clickable { launcher.launch("image/*") },
+                        ) {
+                            Icon(
+                                painter = painterResource(lucide.images),
+                                contentDescription = "사진 첨부",
+                                modifier = Modifier.size(20.dp),
+                                tint = Color.White
+                            )
+                            Text("사진 첨부", color = Color.White, fontSize = 14.sp)
+                        }
+                        Text(
+                            state.imageUri?.lastPathSegment ?: "",
+                            maxLines = 1,
+                            modifier = Modifier.weight(1f)
                         )
-                        Text("작성하기", color = Color.White, fontSize = 14.sp)
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    WriteInfo()
+                    Spacer(modifier = Modifier.height(50.dp))
                 }
             }
+        }
+        // FAB처럼 동작하는 커스텀 버튼
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier
+                .align(Alignment.BottomEnd) // 화면 오른쪽 하단 고정
+                .padding(20.dp)             // FAB 기본 여백 느낌
+                .background(Color.Black, RoundedCornerShape(12.dp))
+                .padding(horizontal = 18.dp, vertical = 12.dp)
+                .clickable {
+                    writingViewModel.uploadPost(
+                        onSuccess = {
+                            navController.navigate("main") {
+                                popUpTo("writeBoard") { inclusive = true }
+                            }
+                        },
+                        onError = {
+                            Toast.makeText(context, "게시글 작성이 실패하였습니다", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    )
+                }
+        ) {
+            Icon(
+                painter = painterResource(lucide.cloud_upload),
+                contentDescription = "작성하기",
+                modifier = Modifier.size(20.dp),
+                tint = Color.White
+            )
+            Text("작성하기", color = Color.White, fontSize = 14.sp)
         }
     }
 }
@@ -162,6 +170,7 @@ fun WritingTitleField(
     value: String?,
     onValueChange: (String) -> Unit,
     fontSize: TextUnit,
+    fontWeight: FontWeight,
     keyboardType: KeyboardType = KeyboardType.Text,
     modifier: Modifier = Modifier
 ) {
@@ -177,8 +186,8 @@ fun WritingTitleField(
                 text = "제목을 입력해주세요.",
                 color = Color(0xffDFDFDF),
                 fontSize = fontSize,
+                fontWeight = fontWeight,
                 fontFamily = pretendard,
-                lineHeight = fontSize,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
         }
@@ -189,8 +198,9 @@ fun WritingTitleField(
             textStyle = TextStyle(
                 color = Color.Black,
                 fontSize = fontSize,
+                fontWeight = fontWeight,
                 fontFamily = pretendard,
-                lineHeight = fontSize
+                lineHeight = 32.sp
             ),
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             modifier = Modifier.fillMaxWidth()
@@ -204,18 +214,17 @@ fun WritingContentField(
     value: String?,
     onValueChange: (String) -> Unit,
     fontSize: TextUnit,
+    fontWeight: FontWeight,
     keyboardType: KeyboardType = KeyboardType.Text,
     modifier: Modifier = Modifier
 ) {
-    val scrollState = rememberScrollState()
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(250.dp)
+            .heightIn(min = 320.dp)  // 최소 높이 지정
             .border(1.dp, Color(0xFFdfdfdf), RoundedCornerShape(10.dp))
             .padding(horizontal = 12.dp, vertical = 8.dp)
-            .verticalScroll(scrollState)
     ) {
         if (value.isNullOrEmpty()) {
             Text(
@@ -223,6 +232,7 @@ fun WritingContentField(
                 color = Color(0xffDFDFDF),
                 fontSize = fontSize,
                 fontFamily = pretendard,
+                fontWeight = fontWeight,
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.TopStart),
@@ -235,8 +245,9 @@ fun WritingContentField(
             textStyle = TextStyle(
                 color = Color.Black,
                 fontSize = fontSize,
+                fontWeight = fontWeight,
                 fontFamily = pretendard,
-                lineHeight = fontSize
+                lineHeight = 28.sp
             ),
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             modifier = Modifier.fillMaxWidth()
@@ -273,5 +284,6 @@ fun WriteInfo(){
 @Composable
 fun WritinScreenPreview(){
 //    val writingViewModel = WritingViewModel()
-//    WritingScreen(writingViewModel)
+    val navController : NavHostController = rememberNavController()
+//    WritingScreen(navController = navController)
 }

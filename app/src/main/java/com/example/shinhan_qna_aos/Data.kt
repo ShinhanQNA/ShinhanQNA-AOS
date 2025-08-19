@@ -16,6 +16,7 @@ class Data(private val context: Context) {
         private const val KEY_USER_INFO_SUBMITTED = "USER_INFO_SUBMITTED" // 가입 요청 여부
         private const val KEY_USER_EMAIL = "USER_EMAIL"
         private const val KEY_IS_NOTICE = "IS_NOTICE"
+        private const val KEY_POST_ID = "POST_ID"
     }
 
     var accessToken: String?  // 엑세스 토큰
@@ -38,7 +39,7 @@ class Data(private val context: Context) {
         get() = prefs.getBoolean(KEY_IS_ADMIN, false)
         set(value) = prefs.edit().putBoolean(KEY_IS_ADMIN, value).apply()
 
-    var userInfoSubmitted: Boolean  // 정보요청 처음 하는건지 파악
+    var userInfoSubmitted: Boolean  // 정보 요청 처음 하는 건지 파악
         get() = prefs.getBoolean(KEY_USER_INFO_SUBMITTED, false)
         set(value) = prefs.edit().putBoolean(KEY_USER_INFO_SUBMITTED, value).apply()
 
@@ -54,9 +55,13 @@ class Data(private val context: Context) {
         get() = prefs.getString(KEY_USER_EMAIL, null)
         set(value) = prefs.edit().putString(KEY_USER_EMAIL, value).apply()
 
-    var isNotice: Boolean  // 정보요청 처음 하는건지 파악
+    var isNotice: Boolean  // 공지 사항 여부
         get() = prefs.getBoolean(KEY_IS_NOTICE, false)
         set(value) = prefs.edit().putBoolean(KEY_IS_NOTICE, value).apply()
+
+    var PostId: String? // 유저 이메일
+        get() = prefs.getString(KEY_POST_ID, null)
+        set(value) = prefs.edit().putString(KEY_POST_ID, value).apply()
 
     // 토큰 저장
     fun saveTokens(

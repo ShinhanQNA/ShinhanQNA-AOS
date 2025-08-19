@@ -2,7 +2,6 @@ package com.example.shinhan_qna_aos.API
 
 //import com.example.shinhan_qna_aos.etc.Write
 //import com.example.shinhan_qna_aos.info.InfoData
-import androidx.annotation.RequiresPermission
 import com.example.shinhan_qna_aos.etc.api.Write
 import com.example.shinhan_qna_aos.info.api.UserCheckResponse
 import com.example.shinhan_qna_aos.info.api.InfoResponse
@@ -22,6 +21,7 @@ import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -86,19 +86,31 @@ interface APIInterface {
     @Headers("Content-Type: application/json")
     @GET("/boards/{postId}")
     suspend fun getPostsDetail(
-        @Header("Authorization") accessToken : String,
-        @Path("postId") postId: Int
+        @Header("Authorization") accessToken: String,
+        @Path("postId") postId: String?
     ):Response<PostDetail>
 
     // 게시글 쓰기
     @Multipart
     @POST("/boards")
-    suspend fun writeBoards(
+    suspend fun uploadPost(
         @Header("Authorization") accessToken: String,
         @Part("title") title: RequestBody,
         @Part("content") content: RequestBody,
         @Part("category") category: RequestBody, // API 사라질 예정
         @Part image: MultipartBody.Part?
     ):Response<Write>
+
+    // 게시글 수정
+    @Multipart
+    @PUT("/boards/{postsid}")
+    suspend fun updatePost(
+        @Header("Authorization") accessToken: String,
+        @Path("postsid") postsid: Int,
+        @Part("title") title: RequestBody,
+        @Part("content") content: RequestBody,
+        @Part("category") category: RequestBody,
+        @Part image: MultipartBody.Part?
+    ): Response<Write>
 }
 

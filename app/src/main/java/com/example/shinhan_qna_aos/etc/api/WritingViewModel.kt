@@ -21,8 +21,6 @@ class WritingViewModel(
     var state by mutableStateOf(WriteData(title = "", content = "", category = null, imageUri = null))
         private set
 
-    var isLoading by mutableStateOf(false)
-        private set
 
     fun onTitleChange(newTitle: String) {
         state = state.copy(title = newTitle)
@@ -38,18 +36,35 @@ class WritingViewModel(
             compressedImageFile = ImageUtils.compressImage(context, uri)
         }
     }
-
+    // 게시글 작성
     fun uploadPost(onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
-            isLoading = true
             val result = writeRepository.writeBoards(
                 title = state.title,
                 content = state.content,
                 imageFile = compressedImageFile // ← 여기서 Repository로 전달
             )
-            isLoading = false
-            result.onSuccess { onSuccess() }
+            result
+                .onSuccess { onSuccess() }
                 .onFailure { onError(it.message ?: "알 수 없는 오류 발생") }
         }
     }
+
+    fun updatePost(
+        title: String,
+        content: String,
+        category: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            val result = writeRepository.updatePost(title, content, category)
+            result.onSuccess {
+                onSuccess()
+            }.onFailure {
+                onError(it.message ?: "수정 실패")
+            }
+        }
+    }
+
 }

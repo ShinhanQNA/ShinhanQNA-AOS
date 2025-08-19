@@ -79,7 +79,6 @@ class InfoViewModel(
                     data.userStatus = status
                     data.userName = name
                     data.userEmail = email
-                    data.userInfoSubmitted = true
 
                     // UI 상태 업데이트 (화면 전환용)
                     _uiState.value = _uiState.value.copy(

@@ -28,7 +28,6 @@ import com.example.shinhan_qna_aos.main.api.PostViewModel
 
 @Composable
 fun ManagerNotificationOpenScreen(
-    postId: Int,
     postRepository:PostRepository,
     data: Data,
     navController: NavController,
@@ -37,8 +36,8 @@ fun ManagerNotificationOpenScreen(
     val postDetail = postViewModel.selectedPost
 
     // 처음 진입 시 API 호출
-    LaunchedEffect(postId) {
-        postViewModel.loadPostDetail(postId)
+    LaunchedEffect(Unit) {
+        postViewModel.loadPostDetail()
     }
 
     Box {
@@ -52,7 +51,6 @@ fun ManagerNotificationOpenScreen(
 
             // API에서 가져온 데이터로 표시
             postDetail?.let { DetailContent(title = it.title, content = postDetail.content) }
-
 
             Spacer(modifier = Modifier.height(32.dp))
             ManagerFunctionButton(data.isNotice)

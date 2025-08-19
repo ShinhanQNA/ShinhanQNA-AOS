@@ -38,7 +38,7 @@ fun SaySomthingScreen(postRepository: PostRepository, data: Data, navController:
                 onResponseStateChange = { newState ->
                     responseState = newState
                 },
-                onClick = { navController.navigate("postDetail/${board.postID}") }
+                onClick = { navController.navigate("postDetail") }
             )
             Divider()
         }

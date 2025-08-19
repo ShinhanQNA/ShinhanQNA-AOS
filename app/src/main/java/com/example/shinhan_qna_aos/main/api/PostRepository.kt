@@ -3,7 +3,6 @@ package com.example.shinhan_qna_aos.main.api
 import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.Data
 
-// PostRepository.kt
 class PostRepository(
     private val apiInterface: APIInterface,
     private val data: Data
@@ -43,11 +42,11 @@ class PostRepository(
     /**
      * 게시글 상세 조회
      */
-    suspend fun getPostDetail(postId: Int): Result<PostDetail> {
+    suspend fun getPostDetail(): Result<PostDetail> {
         val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
 
         return try {
-            val response = apiInterface.getPostsDetail("Bearer $accessToken", postId)
+            val response = apiInterface.getPostsDetail("Bearer $accessToken", data.PostId)
             if (response.isSuccessful) {
                 response.body()?.let { Result.success(it) }
                     ?: Result.failure(Exception("상세 데이터 없음"))

@@ -31,7 +31,7 @@ class WriteRepository(
                 MultipartBody.Part.createFormData("image", file.name, requestFile)
             }
 
-            val response = apiInterface.writeBoards(
+            val response = apiInterface.uploadPost(
                 accessToken = "Bearer $accessToken",
                 title = titleBody,
                 content = contentBody,
@@ -48,4 +48,34 @@ class WriteRepository(
             Result.failure(e)
         }
     }
+    suspend fun updatePost(
+        title: String,
+        content: String,
+        category: String
+    ): Result<Unit> {
+        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
+
+        val titleBody = title.toRequestBody("text/plain".toMediaTypeOrNull())
+        val contentBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
+        val categoryBody = category.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        return try {
+            val response = apiInterface.updatePost(
+                accessToken = "Bearer $accessToken",
+                postsid = data.PostId!!.toInt(),
+                title = titleBody,
+                content = contentBody,
+                category = categoryBody,
+                image = null  // 이미지 수정 미반영, 필요 시 확장
+            )
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }

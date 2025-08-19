@@ -157,7 +157,13 @@ fun InformationScreen(infoRepository: InfoRepository, data: Data, navController:
                 ImageInsert(viewModel = infoViewModel, fontSize = 14.sp)
             }
             Spacer(modifier = Modifier.height(36.dp))
-            Request(fontSize = 14.sp, onClick = { infoViewModel.submitStudentInfo(context) }, enabled = isFormValid)
+            Request(
+                fontSize = 14.sp,
+                onClick = {
+                    infoViewModel.submitStudentInfo(context)
+                    data.userInfoSubmitted = true
+                },
+                enabled = isFormValid)
         }
     }
 }

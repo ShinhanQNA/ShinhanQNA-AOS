@@ -124,19 +124,10 @@ fun AppNavigation(
 
         composable("main") { MainScreen(postRepository, data, navController) }
 
-        /**
-         *  게시글 관련 API
-         */
-        composable( // postID를 같이 넘기는
-            "postDetail/{postId}",
-            arguments = listOf(navArgument("postId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-            WriteOpenScreen(navController, postRepository,postId, data)
-        }
+        composable("postDetail") { WriteOpenScreen(navController, postRepository, writeRepository, data) }
 
         composable("writeBoard"){
-            WritingScreen(writeRepository,navController)
+            WritingScreen(writeRepository, navController)
         }
     }
 }

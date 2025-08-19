@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.Data
 import kotlinx.coroutines.launch
 
-
 class PostViewModel(
     private val repository: PostRepository,   // API 호출 담당
     private val data: Data                 // 관리자 여부 체크용
@@ -18,9 +17,6 @@ class PostViewModel(
     var postList by mutableStateOf<List<TitleContentLike>>(emptyList())
 
     var selectedPost by mutableStateOf<PostDetail?>(null)
-        private set
-
-    var isLoading by mutableStateOf(false)
         private set
 
     var errorMessage by mutableStateOf<String?>(null)
@@ -36,25 +32,25 @@ class PostViewModel(
      */
     fun loadPosts() {
         viewModelScope.launch {
-            isLoading = true
             repository.getPosts(300, "day") // 나중에 관리자인 경우 sort 선택 가능(day,year,like) 유저는 day
-                .onSuccess { postList = it }
+                .onSuccess {
+                    postList = it
+                    if (it.isNotEmpty()) {
+                        data.PostId = it[0].postID.toString()  // 첫번째 게시글 postID 저장
+                    }
+                }
                 .onFailure { errorMessage = it.message }
-            isLoading = false
         }
     }
 
     /**
      * 게시글 상세 로드
      */
-    fun loadPostDetail(postId: Int, onComplete: (() -> Unit)? = null) {
+    fun loadPostDetail() {
         viewModelScope.launch {
-            isLoading = true
-            repository.getPostDetail(postId)
+            repository.getPostDetail()
                 .onSuccess { selectedPost = it }
                 .onFailure { errorMessage = it.message }
-            isLoading = false
-            onComplete?.invoke()
         }
     }
 }
