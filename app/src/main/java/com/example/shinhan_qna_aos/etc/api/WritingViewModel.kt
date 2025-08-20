@@ -5,9 +5,12 @@ import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.ImageUtils
+import com.example.shinhan_qna_aos.main.api.Post
+import com.example.shinhan_qna_aos.main.api.PostDetail
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -20,7 +23,15 @@ class WritingViewModel(
         private set
 
     // Compose에서 상태 관찰 (제목, 내용, 카테고리, 이미지 URI)
-    var state by mutableStateOf(WriteData(title = "", content = "", category = null, imageUri = null))
+    var state by mutableStateOf(
+        WriteData(
+            title = "",
+            content = "",
+            category = null,
+            imageUri = null,
+            isEditMode = false
+        )
+    )
         private set
 
     // 제목 입력 변경 시 호출
@@ -42,26 +53,24 @@ class WritingViewModel(
         }
     }
 
-    // 글쓰기 화면 진입 시 기존 데이터 세팅(수정모드)
-    fun setEditMode(
-        title: String,
-        content: String,
-        category: String? = null,
-        imageUri: Uri? = null,
-        context: Context
-    ) {
+    // ✅ 수정 모드 진입
+    fun enterEditMode(postDetail: PostDetail, context: Context) {
         state = state.copy(
-            title = title,
-            content = content,
-            category = category,
-            imageUri = imageUri
+            title = postDetail.title,
+            content = postDetail.content,
+            category = postDetail.category ?: "없음",
+            imageUri = postDetail.imagePath?.toUri(),
+            isEditMode = true
         )
-        if (imageUri != null) {
-            // 바로 이미지 파일 압축 준비
+        postDetail.imagePath?.let {
             viewModelScope.launch {
-                compressedImageFile = ImageUtils.compressImage(context, imageUri)
+                compressedImageFile = ImageUtils.compressImage(context, it.toUri())
             }
         }
+    }
+
+    fun exitEditMode() {
+        state = state.copy(isEditMode = false)
     }
 
     // 게시글 작성
@@ -77,25 +86,26 @@ class WritingViewModel(
                 .onFailure { onError(it.message ?: "알 수 없는 오류 발생") }
         }
     }
+
     // 게시글 수정
     fun updatePost(
         postId: String,
-        title: String,
-        content: String,
-        category: String = "없음",
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
         viewModelScope.launch {
             val result = writeRepository.updatePost(
                 postId = postId,
-                title = title,
-                content = content,
-                category = category,
-                imageFile = compressedImageFile // 압축 이미지 파일(없으면 기존 이미지 그대로)
+                title = state.title,
+                content = state.content,
+                category = state.category ?: "없음",
+                imageFile = compressedImageFile
             )
             result
-                .onSuccess { onSuccess() }
+                .onSuccess {
+                    exitEditMode()
+                    onSuccess()
+                }
                 .onFailure { onError() }
         }
     }

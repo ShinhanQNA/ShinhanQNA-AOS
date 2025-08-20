@@ -2,6 +2,7 @@ package com.example.shinhan_qna_aos.etc.api
 
 import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.main.api.PostDetail
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -17,7 +18,7 @@ class WriteRepository(
         content: String,
         category: String = "없음",
         imageFile: File? // ← File 직접 전달받기
-    ): Result<Write> {
+    ): Result<PostDetail> {
         val accessToken = data.accessToken
             ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
 
