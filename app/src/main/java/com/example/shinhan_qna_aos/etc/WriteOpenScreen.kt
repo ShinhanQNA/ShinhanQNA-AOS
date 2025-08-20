@@ -2,6 +2,7 @@ package com.example.shinhan_qna_aos.etc
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -115,18 +116,28 @@ fun WriteOpenScreen(
                     )
                 } else {
                     //  읽기 모드
-                    DetailContent(detail.title, detail.content, detail.imagePath)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    LikeFlagBan(detail.likes, 0, 34, data)
-                    Spacer(modifier = Modifier.height(36.dp))
-
-                    if (data.isAdmin) {
-                        ManagerFunctionButton(data.isNotice)
-                    } else {
-                        FunctionButton(
-                            isOwner,
-                            onEditClick = { writingViewModel.enterEditMode(detail, context) }
-                        )
+                    Log.d("Compose", "postDetail.imagePath: ${postDetail.imagePath}")
+                    LazyColumn {
+                        item {
+                            DetailContent(detail.title, detail.content, detail.imagePath)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            LikeFlagBan(detail.likes, 0, 34, data)
+                            Spacer(modifier = Modifier.height(36.dp))
+                            if (data.isAdmin) {
+                                ManagerFunctionButton(data.isNotice)
+                            } else {
+                                FunctionButton(
+                                    isOwner,
+                                    onEditClick = {
+                                        writingViewModel.enterEditMode(
+                                            detail,
+                                            context
+                                        )
+                                    }
+                                )
+                                Spacer(modifier = Modifier.height(36.dp))
+                            }
+                        }
                     }
                 }
             }
@@ -209,6 +220,9 @@ fun EditPostContent(
                             modifier = Modifier.weight(1f)
                         )
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    WriteInfo()
+                    Spacer(modifier = Modifier.height(50.dp))
                 }
             }
         }

@@ -6,7 +6,6 @@ import com.example.shinhan_qna_aos.login.api.AdminRequest
 import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
 import com.example.shinhan_qna_aos.main.api.Post
-import com.example.shinhan_qna_aos.main.api.PostDetail
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -83,7 +82,7 @@ interface APIInterface {
     suspend fun getPostsDetail(
         @Header("Authorization") accessToken: String,
         @Path("postId") postId: String?
-    ):Response<PostDetail>
+    ):Response<Post>
 
     // 게시글 쓰기
     @Multipart
@@ -94,7 +93,7 @@ interface APIInterface {
         @Part("content") content: RequestBody,
         @Part("category") category: RequestBody, // API 사라질 예정
         @Part image: MultipartBody.Part?
-    ):Response<PostDetail>
+    ):Response<Post>
 
     // 게시글 수정
     @Multipart
@@ -106,6 +105,6 @@ interface APIInterface {
         @Part("content") content: RequestBody,
         @Part("category") category: RequestBody,
         @Part image: MultipartBody.Part?
-    ): Response<PostDetail>
+    ): Response<Post>
 }
 

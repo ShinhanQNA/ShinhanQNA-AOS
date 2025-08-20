@@ -1,5 +1,6 @@
 package com.example.shinhan_qna_aos.main.api
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,7 +17,7 @@ class PostViewModel(
     // 게시글 리스트
     var postList by mutableStateOf<List<TitleContentLike>>(emptyList())
 
-    var selectedPost by mutableStateOf<PostDetail?>(null)
+    var selectedPost by mutableStateOf<Post?>(null)
         private set
 
     var errorMessage by mutableStateOf<String?>(null)
@@ -46,8 +47,14 @@ class PostViewModel(
     fun loadPostDetail(postId: String) {
         viewModelScope.launch {
             postRepository.getPostDetail(postId)
-                .onSuccess { selectedPost = it }
-                .onFailure { errorMessage = it.message }
+                .onSuccess {
+                    selectedPost = it
+                    Log.d("PostViewModel", "loadPostDetail onSuccess, imagePath: ${it.imagePath}")
+                }
+                .onFailure {
+                    errorMessage = it.message
+                    Log.e("PostViewModel", "loadPostDetail error: ${it.message}")
+                }
         }
     }
 }

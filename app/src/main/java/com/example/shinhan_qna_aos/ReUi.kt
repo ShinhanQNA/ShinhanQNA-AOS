@@ -1,5 +1,7 @@
 package com.example.shinhan_qna_aos
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -335,7 +337,7 @@ fun TopBar(
 fun DetailContent(
     title: String,
     content: String,
-    imageUrl: String? = null  // 이미지 URL 또는 Uri 문자열 (null 가능)
+    imagePath: String? = null  // 이미지 URL 또는 Uri 문자열 (null 가능)
 ) {
     Column(
         modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
@@ -353,20 +355,6 @@ fun DetailContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 이미지 있으면 보여주기
-        if (!imageUrl.isNullOrEmpty()) {
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = "게시글 이미지",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(10.dp)),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
         Text(
             content,
             color = Color.Black,
@@ -377,6 +365,17 @@ fun DetailContent(
             ),
             lineHeight = 28.sp
         )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (!imagePath.isNullOrEmpty()) {
+            AsyncImage(
+                model = imagePath,
+                contentDescription = "게시글 이미지",
+                modifier = Modifier.width(300.dp),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
     }
 }
 

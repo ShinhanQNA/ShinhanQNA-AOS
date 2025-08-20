@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.ImageUtils
 import com.example.shinhan_qna_aos.main.api.Post
-import com.example.shinhan_qna_aos.main.api.PostDetail
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -54,17 +53,17 @@ class WritingViewModel(
     }
 
     // ✅ 수정 모드 진입
-    fun enterEditMode(postDetail: PostDetail, context: Context) {
+    fun enterEditMode(post: Post, context: Context) {
         state = state.copy(
-            title = postDetail.title,
-            content = postDetail.content,
-            category = postDetail.category ?: "없음",
-            imageUri = postDetail.imagePath?.toUri(),
+            title = post.title,
+            content = post.content,
+            category = post.category ?: "없음",
+            imageUri = post.imagePath?.toUri(),
             isEditMode = true
         )
-        postDetail.imagePath?.let {
+        post.imagePath.let {
             viewModelScope.launch {
-                compressedImageFile = ImageUtils.compressImage(context, it.toUri())
+                compressedImageFile = ImageUtils.compressImage(context, it!!.toUri())
             }
         }
     }

@@ -9,7 +9,7 @@ data class Post(
     @SerializedName("content") val content: String,
     @SerializedName("likes") val likes: Int,
     @SerializedName("date") val date: String,
-    @SerializedName("imagePath") val imagePath: String,
+    @SerializedName("imagePath") val imagePath: String?,
     @SerializedName("category") val category: String,
     @SerializedName("status") val status: String,
     @SerializedName("email") val email: String?,
@@ -24,17 +24,4 @@ data class TitleContentLike(
     val flagsCount: Int = 0, // 관리자 api 로 받아와야함
     val banCount: Int = 0,  // 관리자 api 로 받아와야함
     val responseState: String = "응답 상태" // 관리자 api 로 받아와야함
-)
-//API 상세 조회
-data class PostDetail(
-    val postId: Int,
-    val title: String,
-    val content: String,
-    val likes: Int,
-    val date: String,
-    val imagePath: String?,
-    val category: String,
-    val status: String,
-    val email: String, // 작성자 Email
-    val year: String
 )
