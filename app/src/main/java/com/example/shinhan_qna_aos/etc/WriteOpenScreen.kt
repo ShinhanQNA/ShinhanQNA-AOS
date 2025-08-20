@@ -126,15 +126,21 @@ fun WriteOpenScreen(
                             if (data.isAdmin) {
                                 ManagerFunctionButton(data.isNotice)
                             } else {
-                                FunctionButton(
-                                    isOwner,
-                                    onEditClick = {
-                                        writingViewModel.enterEditMode(
-                                            detail,
-                                            context
-                                        )
-                                    }
-                                )
+                                if(isOwner){
+                                    EditDeleteButton(
+                                        onEditClick = {
+                                            writingViewModel.enterEditMode(detail, context)
+                                        }
+                                    )
+                                }else{
+                                    FlagLikeButton(
+                                        onLikeClick = {
+                                            Log.d("Compose", "좋아요 버튼 클릭됨")
+                                            postViewModel.toggleLike(postId.toInt())
+                                            postViewModel.loadPostDetail(postId)
+                                        },
+                                    )
+                                }
                                 Spacer(modifier = Modifier.height(36.dp))
                             }
                         }
@@ -263,9 +269,8 @@ fun EditPostContent(
 
 
 @Composable
-fun FunctionButton(
-    isOwner: Boolean,
-    onEditClick: () -> Unit = {}
+fun FlagLikeButton( // 작성자가 아닐때
+    onLikeClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -280,18 +285,16 @@ fun FunctionButton(
             modifier = Modifier
                 .background(Color(0xffFF9F43), RoundedCornerShape(12.dp))
                 .padding(horizontal = 12.dp, vertical = 8.dp)
-                .clickable { if (isOwner) onEditClick() }  // 수정 버튼 눌리면 콜백 호출
+                .clickable {  }  // 신고 버튼 눌리면 콜백 호출
         ) {
             Icon(
-                painter = painterResource(
-                    if (isOwner) R.drawable.square_pen else R.drawable.flag
-                ),
-                contentDescription = if (isOwner) "수정" else "신고",
+                painter = painterResource( R.drawable.flag),
+                contentDescription =  "신고",
                 modifier = Modifier.size(20.dp),
                 tint = Color.White
             )
             Text(
-                text = if (isOwner) "수정" else "신고",
+                text = "신고",
                 color = Color.White,
                 style = TextStyle(
                     fontFamily = pretendard,
@@ -303,27 +306,89 @@ fun FunctionButton(
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        // 두 번째 버튼: 삭제 or 추천 (기존대로)
+        // 두 번째 버튼: 추천
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier
-                .background(
-                    if (isOwner) Color(0xffFC4F4F) else Color.Black,
-                    RoundedCornerShape(12.dp)
-                )
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .background(Color.Black, RoundedCornerShape(12.dp))
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .clickable { onLikeClick() }
         ) {
             Icon(
-                painter = painterResource(
-                    if (isOwner) lucide.trash else lucide.thumbs
-                ),
-                contentDescription = if (isOwner) "삭제" else "추천",
+                painter = painterResource(lucide.thumbs),
+                contentDescription = "추천",
                 modifier = Modifier.size(20.dp),
                 tint = Color.White
             )
             Text(
-                text = if (isOwner) "삭제" else "추천",
+                text =  "추천" ,
+                color = Color.White,
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+fun EditDeleteButton( // 작성자
+    onEditClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.End,
+    ) {
+        // 첫 번째 버튼: 수정
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier
+                .background(Color(0xffFF9F43), RoundedCornerShape(12.dp))
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .clickable { onEditClick() }  // 수정 버튼 눌리면 콜백 호출
+        ) {
+            Icon(
+                painter = painterResource( R.drawable.square_pen ),
+                contentDescription = "수정",
+                modifier = Modifier.size(20.dp),
+                tint = Color.White
+            )
+            Text(
+                text = "수정",
+                color = Color.White,
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp
+                ),
+            )
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // 두 번째 버튼: 삭제
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier
+                .background(Color(0xffFC4F4F), RoundedCornerShape(12.dp))
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .clickable { }
+        ) {
+            Icon(
+                painter = painterResource( lucide.trash ),
+                contentDescription = "삭제/추천",
+                modifier = Modifier.size(20.dp),
+                tint = Color.White
+            )
+            Text(
+                text = "삭제",
                 color = Color.White,
                 style = TextStyle(
                     fontFamily = pretendard,

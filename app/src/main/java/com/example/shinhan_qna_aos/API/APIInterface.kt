@@ -6,6 +6,7 @@ import com.example.shinhan_qna_aos.login.api.AdminRequest
 import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
 import com.example.shinhan_qna_aos.main.api.Post
+import com.example.shinhan_qna_aos.main.api.PostLike
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -106,5 +107,19 @@ interface APIInterface {
         @Part("category") category: RequestBody,
         @Part image: MultipartBody.Part?
     ): Response<Post>
+
+    // 게시글 공감
+    @POST("/boards/{postId}/like")
+    suspend fun PostLike(
+        @Header("Authorization") accessToken: String,
+        @Path("postId") postId: Int,  // postId로 수정 (URL 변수명과 같아야 함)
+    ): Response<PostLike>
+
+    // 게시글 공감 취소
+    @POST("/boards/{postId}/unlike")
+    suspend fun PostUnlike(
+        @Header("Authorization") accessToken: String,
+        @Path("postId") postId: Int,
+    ): Response<PostLike>
 }
 

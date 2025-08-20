@@ -58,4 +58,41 @@ class PostRepository(
             Result.failure(e)
         }
     }
+
+    /**
+     * 게시글 좋아요
+     */
+    suspend fun PostLike(postId: Int): Result<PostLike> {
+        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
+
+        return try {
+            val response = apiInterface.PostLike("Bearer $accessToken", postId)
+            if (response.isSuccessful) {
+                response.body()?.let { Result.success(it) } ?: Result.failure(Exception("좋아요 누름"))
+            } else {
+                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+    * 게시글 좋아요 취소
+    */
+    suspend fun PostUnlike(postId: Int): Result<PostLike> {
+        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
+
+        return try {
+            val response = apiInterface.PostUnlike("Bearer $accessToken", postId)
+            if (response.isSuccessful) {
+                response.body()?.let { Result.success(it) } ?: Result.failure(Exception("좋아요 취소 실패"))
+            } else {
+                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }

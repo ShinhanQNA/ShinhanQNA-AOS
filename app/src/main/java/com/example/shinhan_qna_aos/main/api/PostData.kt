@@ -25,3 +25,7 @@ data class TitleContentLike(
     val banCount: Int = 0,  // 관리자 api 로 받아와야함
     val responseState: String = "응답 상태" // 관리자 api 로 받아와야함
 )
+
+data class PostLike(
+    val likes: Int
+)

@@ -23,6 +23,10 @@ class PostViewModel(
     var errorMessage by mutableStateOf<String?>(null)
         private set
 
+    // 좋아요 상태 (해당 게시글에 사용자가 좋아요 눌렀는지)
+    var hasLiked by mutableStateOf(false)
+        private set
+
     init {
         // ViewModel 초기화 시 목록 불러오기
         loadPosts()
@@ -55,6 +59,29 @@ class PostViewModel(
                     errorMessage = it.message
                     Log.e("PostViewModel", "loadPostDetail error: ${it.message}")
                 }
+        }
+    }
+
+    // 좋아요 토글 함수: 좋아요 <-> 좋아요 취소
+    fun toggleLike(postId: Int) {
+        viewModelScope.launch {
+            try {
+                val result = if (!hasLiked) {
+                    postRepository.PostLike(postId)
+                } else {
+                    postRepository.PostUnlike(postId)
+                }
+                if (result.isSuccess) {
+                    val postLike = result.getOrNull()
+                    hasLiked = !hasLiked
+                    loadPostDetail(postId.toString())
+                } else {
+                    errorMessage = result.exceptionOrNull()?.message
+                    Log.e("PostViewModel", "toggleLike 실패: $errorMessage")
+                }
+            } catch (e: Exception) {
+                Log.e("PostViewModel", "toggleLike 예외: ${e.message}")
+            }
         }
     }
 }
