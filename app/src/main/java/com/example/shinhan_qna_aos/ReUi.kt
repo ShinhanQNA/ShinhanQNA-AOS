@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -50,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 //
@@ -328,9 +330,13 @@ fun TopBar(
     )
 }
 
-// 상세보기 [제목 + 내용]
+// 상세보기 [제목 + 내용 + 이미지 ]
 @Composable
-fun DetailContent(title: String, content: String) {
+fun DetailContent(
+    title: String,
+    content: String,
+    imageUrl: String? = null  // 이미지 URL 또는 Uri 문자열 (null 가능)
+) {
     Column(
         modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
@@ -344,7 +350,23 @@ fun DetailContent(title: String, content: String) {
             ),
             modifier = Modifier.fillMaxWidth()
         )
+
         Spacer(modifier = Modifier.height(16.dp))
+
+        // 이미지 있으면 보여주기
+        if (!imageUrl.isNullOrEmpty()) {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = "게시글 이미지",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(10.dp)),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
         Text(
             content,
             color = Color.Black,

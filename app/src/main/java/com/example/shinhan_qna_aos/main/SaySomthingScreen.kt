@@ -4,6 +4,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,7 +21,11 @@ import com.example.shinhan_qna_aos.main.api.PostViewModel
 @Composable
 fun SaySomthingScreen(postRepository: PostRepository, data: Data, navController:NavController) {
     val postViewModel: PostViewModel =
-        viewModel(factory = SimpleViewModelFactory { PostViewModel(postRepository, data) })
+        viewModel(factory = SimpleViewModelFactory { PostViewModel(postRepository) })
+
+    LaunchedEffect(Unit) {
+        postViewModel.loadPosts()
+    }
 
     val dataList = postViewModel.postList
 
@@ -38,7 +43,7 @@ fun SaySomthingScreen(postRepository: PostRepository, data: Data, navController:
                 onResponseStateChange = { newState ->
                     responseState = newState
                 },
-                onClick = { navController.navigate("postDetail") }
+                onClick = { navController.navigate("writeOpen/${board.postID}") }
             )
             Divider()
         }

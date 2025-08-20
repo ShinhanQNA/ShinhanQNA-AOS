@@ -124,7 +124,13 @@ fun AppNavigation(
 
         composable("main") { MainScreen(postRepository, data, navController) }
 
-        composable("postDetail") { WriteOpenScreen(navController, postRepository, writeRepository, data) }
+        composable(
+            "writeOpen/{postId}",
+            arguments = listOf(navArgument("postId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getString("postId") ?: ""
+            WriteOpenScreen(navController, postRepository, writeRepository, data, postId)
+        }
 
         composable("writeBoard"){
             WritingScreen(writeRepository, navController)

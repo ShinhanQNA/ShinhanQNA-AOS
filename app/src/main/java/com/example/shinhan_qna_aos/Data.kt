@@ -59,9 +59,9 @@ class Data(private val context: Context) {
         get() = prefs.getBoolean(KEY_IS_NOTICE, false)
         set(value) = prefs.edit().putBoolean(KEY_IS_NOTICE, value).apply()
 
-    var PostId: String? // 유저 이메일
-        get() = prefs.getString(KEY_POST_ID, null)
-        set(value) = prefs.edit().putString(KEY_POST_ID, value).apply()
+//    var PostId: String? // 포스트 아이디
+//        get() = prefs.getString(KEY_POST_ID, null)
+//        set(value) = prefs.edit().putString(KEY_POST_ID, value).apply()
 
     // 토큰 저장
     fun saveTokens(
