@@ -228,7 +228,7 @@ fun EditPostContent(
                         onSuccess = {
                             postViewModel.loadPostDetail(postId) // 상세 조회 로드
                             postViewModel.loadPosts() // 전체 조회 로드
-                            navController.popBackStack()
+                            navController.navigate("writeOpen/$postId")
                         },
                         onError = {
                             Toast.makeText(context, "게시글 수정 실패", Toast.LENGTH_SHORT).show()
