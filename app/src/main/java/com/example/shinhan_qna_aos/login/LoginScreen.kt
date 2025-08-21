@@ -45,6 +45,17 @@ fun LoginScreen(repository: AuthRepository, data: Data, navController: NavContro
 
     LaunchedEffect(loginResult) {
         if (loginResult is LoginResult.Success) {
+            if (data.studentCertified) {
+                // 이미 가입요청한 경우에는 서버에 UserCheck 요청해서 state에 따라 화면 분기
+                val navi  = when (data.userStatus) {
+                    "가입 완료" -> "main"
+                    "가입 대기 중" -> "wait"
+                    else -> "info"
+                }
+                navController.navigate(navi) {
+                    popUpTo("login") { inclusive = true }
+                }
+            }
             navController.navigate("info") {
                 popUpTo("login") { inclusive = true }
             }
