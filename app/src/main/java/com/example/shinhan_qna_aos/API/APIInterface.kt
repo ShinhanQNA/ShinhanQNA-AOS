@@ -86,14 +86,13 @@ interface APIInterface {
         @Path("postId") postId: String?
     ):Response<Post>
 
-    // 게시글 쓰기
+    // 게시글 작성
     @Multipart
     @POST("/boards")
     suspend fun uploadPost(
         @Header("Authorization") accessToken: String,
         @Part("title") title: RequestBody,
         @Part("content") content: RequestBody,
-        @Part("category") category: RequestBody, // API 사라질 예정
         @Part image: MultipartBody.Part?
     ):Response<Post>
 

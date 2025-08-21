@@ -57,7 +57,6 @@ class WritingViewModel(
         state = state.copy(
             title = post.title,
             content = post.content,
-            category = post.category ?: "없음",
             imageUri = post.imagePath?.toUri(),
             isEditMode = true
         )

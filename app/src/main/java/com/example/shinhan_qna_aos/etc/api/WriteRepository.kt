@@ -16,7 +16,6 @@ class WriteRepository(
     suspend fun writeBoards(
         title: String,
         content: String,
-        category: String = "없음",
         imageFile: File? // ← File 직접 전달받기
     ): Result<Post> {
         val accessToken = data.accessToken
@@ -25,8 +24,6 @@ class WriteRepository(
         return try {
             val titleBody = title.toRequestBody("text/plain".toMediaTypeOrNull())
             val contentBody = content.toRequestBody("text/plain".toMediaTypeOrNull())
-            val categoryBody = category.toRequestBody("text/plain".toMediaTypeOrNull())
-
             val imagePart = imageFile?.let { file ->
                 val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
                 MultipartBody.Part.createFormData("image", file.name, requestFile)
@@ -36,7 +33,6 @@ class WriteRepository(
                 accessToken = "Bearer $accessToken",
                 title = titleBody,
                 content = contentBody,
-                category = categoryBody,
                 image = imagePart
             )
 

@@ -50,7 +50,6 @@ data class Post(
     @SerializedName("likes") val likes: Int,
     @SerializedName("date") val date: String,
     @SerializedName("imagePath") val imagePath: String?,
-    @SerializedName("category") val category: String,
     @SerializedName("status") val status: String,
     @SerializedName("email") val email: String?,
     @SerializedName("year") val year: String?
