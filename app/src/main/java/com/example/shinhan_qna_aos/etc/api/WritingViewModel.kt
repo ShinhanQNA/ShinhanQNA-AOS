@@ -26,7 +26,6 @@ class WritingViewModel(
         WriteData(
             title = "",
             content = "",
-            category = null,
             imageUri = null,
             isEditMode = false
         )
@@ -60,9 +59,9 @@ class WritingViewModel(
             imageUri = post.imagePath?.toUri(),
             isEditMode = true
         )
-        post.imagePath.let {
+        post.imagePath?.let { imagePath ->
             viewModelScope.launch {
-                compressedImageFile = ImageUtils.compressImage(context, it!!.toUri())
+                compressedImageFile = ImageUtils.compressImage(context, imagePath.toUri())
             }
         }
     }
@@ -96,7 +95,6 @@ class WritingViewModel(
                 postId = postId,
                 title = state.title,
                 content = state.content,
-                category = state.category ?: "없음",
                 imageFile = compressedImageFile
             )
             result

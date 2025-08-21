@@ -53,7 +53,6 @@ import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.LikeFlagBan
 import com.example.shinhan_qna_aos.ManagerFunctionButton
-import com.example.shinhan_qna_aos.PlainInputField
 import com.example.shinhan_qna_aos.etc.api.WriteData
 import com.example.shinhan_qna_aos.etc.api.WriteRepository
 import com.example.shinhan_qna_aos.etc.api.WritingViewModel

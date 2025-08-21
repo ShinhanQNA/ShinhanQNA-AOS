@@ -51,6 +51,6 @@ data class Post(
     @SerializedName("date") val date: String,
     @SerializedName("imagePath") val imagePath: String?,
     @SerializedName("status") val status: String,
-    @SerializedName("email") val email: String?,
+    @SerializedName("email") val email: String,
     @SerializedName("year") val year: String?
 )

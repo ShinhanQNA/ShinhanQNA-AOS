@@ -104,7 +104,6 @@ interface APIInterface {
         @Path("postsid") postsid: Int,
         @Part("title") title: RequestBody,
         @Part("content") content: RequestBody,
-        @Part("category") category: RequestBody,
         @Part image: MultipartBody.Part?
     ): Response<Post>
 

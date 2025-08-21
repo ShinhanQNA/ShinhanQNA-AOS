@@ -6,7 +6,6 @@ import android.net.Uri
 data class WriteData(
     val title: String,
     val content: String,
-    val category: String?,
     val imageUri: Uri?,
     val isEditMode: Boolean
 )
