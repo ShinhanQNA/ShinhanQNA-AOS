@@ -39,7 +39,6 @@ import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.main.api.PostRepository
-//import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
@@ -126,6 +125,7 @@ fun TopIcon(navController: NavController){
             modifier = Modifier
                 .border(1.dp, color = Color(0xffDFDFDF), RoundedCornerShape(10.dp))
                 .padding(6.dp)
+                .clickable { navController.navigate("mypage")}
         ){
             Icon(
                 painter = painterResource(R.drawable.shield_user),

@@ -380,31 +380,32 @@ fun DetailContent(
 }
 
 
-//// 개인정보처리방침, 이용약관, 법적고지 텍스트 영역 컴포저블
-//@Composable
-//fun Caution() {
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
-//        horizontalArrangement = Arrangement.Center,
-//    ) {
-//        val items = listOf("개인정보처리방침", "이용약관", "법적고지")
-//        items.forEachIndexed { index, item ->
-//            Text(
-//                text = item,
-//                color = Color(0xffa5a5a5),
-//                style = TextStyle(
-//                    fontFamily = pretendard,
-//                    fontWeight = if (index == 0) FontWeight.Bold else FontWeight.Normal,
-//                    fontSize = 12.sp
-//                ),
-//                modifier = Modifier.clickable { /* TODO: 클릭 처리 */ }
-//            )
-//            if (index < items.lastIndex) Spacer(modifier = Modifier.width(8.dp))
-//        }
-//    }
-//}
+// 개인정보처리방침, 이용약관, 법적고지 텍스트 영역 컴포저블
+@Composable
+fun Caution() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        val items = listOf("개인정보처리방침", "이용약관", "법적고지")
+        items.forEachIndexed { index, item ->
+            Text(
+                text = item,
+                color = Color(0xffa5a5a5),
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = if (index == 0) FontWeight.Bold else FontWeight.Normal,
+                    fontSize = 12.sp
+                ),
+                modifier = Modifier.clickable { /* TODO: 클릭 처리 */ }
+            )
+            if (index < items.lastIndex) Spacer(modifier = Modifier.width(8.dp))
+        }
+    }
+}
+
 //// 제목이 학생 이름, 학번, 학년, 전공 + 날짜
 //@Composable
 //fun TitleYearButton(name: String, studentid:String, grade:String ,major:String,year: Int, month:Int, day:Int) {

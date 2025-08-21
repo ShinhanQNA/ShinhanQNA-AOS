@@ -34,6 +34,7 @@ import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
+import com.example.shinhan_qna_aos.servepage.MypageScreen
 
 @Composable
 fun AppNavigation(
@@ -135,6 +136,8 @@ fun AppNavigation(
         composable("writeBoard"){
             WritingScreen(writeRepository, navController)
         }
+
+        composable("myPage"){ MypageScreen(navController) }
     }
 }
 
