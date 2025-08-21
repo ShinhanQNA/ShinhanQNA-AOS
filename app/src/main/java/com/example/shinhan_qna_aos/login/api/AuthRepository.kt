@@ -96,4 +96,25 @@ class AuthRepository(
         data.saveTokens(tokens.accessToken, tokens.refreshToken, tokens.expiresIn)
         data.isAdmin = isAdmin
     }
+
+    /**
+     * 로그아웃
+     */
+    suspend fun logout(): Result<LogoutData> {
+        val refreshToken = data.refreshToken
+        return try {
+            val response = apiInterface.LogOut("Bearer $refreshToken")
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    data.clearTokens()
+                    Result.success(it)
+                } ?: Result.failure(Exception("서버 응답이 비어있습니다."))
+            } else {
+                val errorBody = response.errorBody()?.string() ?: ""
+                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()} $errorBody"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

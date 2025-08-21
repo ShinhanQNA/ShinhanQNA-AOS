@@ -183,20 +183,21 @@ fun TitleContentLikeButton(
     }
 }
 
-//// 일반 게시글 컴포저블
-//@Composable
-//fun TitleContentButton(title: String, content: String) {
-//    Column(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .background(color = Color.White)
-//            .padding(horizontal = 20.dp, vertical = 16.dp)
-//    ) {
-//        Text(title, style = TitleTextStyle)
-//        Spacer(modifier = Modifier.height(8.dp))
-//        Text(content, style = ContentTextStyle, maxLines = 2, minLines = 2, overflow = TextOverflow.Ellipsis)
-//    }
-//}
+// 일반 게시글 컴포저블
+@Composable
+fun TitleContentButton(title: String, content: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = Color.White)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+    ) {
+        Text(title, style = TitleTextStyle)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(content, style = ContentTextStyle, maxLines = 2, minLines = 2, overflow = TextOverflow.Ellipsis)
+    }
+}
+
 //// 주차 선정 의견
 //@Composable
 //fun SelectDataButton(

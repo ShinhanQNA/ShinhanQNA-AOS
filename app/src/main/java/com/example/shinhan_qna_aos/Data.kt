@@ -38,7 +38,7 @@ class Data(private val context: Context) {
         get() = prefs.getBoolean(KEY_IS_ADMIN, false)
         set(value) = prefs.edit().putBoolean(KEY_IS_ADMIN, value).apply()
 
-    var userInfoSubmitted: Boolean  // 정보 요청 처음 하는 건지 파악
+    var studentCertified: Boolean  // 정보 요청 처음 하는 건지 파악
         get() = prefs.getBoolean(KEY_USER_INFO_SUBMITTED, false)
         set(value) = prefs.edit().putBoolean(KEY_USER_INFO_SUBMITTED, value).apply()
 
@@ -78,5 +78,13 @@ class Data(private val context: Context) {
     fun isAccessTokenExpired(): Boolean = System.currentTimeMillis() >= accessTokenExpiresAt
     fun isRefreshTokenExpired(): Boolean = System.currentTimeMillis() >= refreshTokenExpiresAt
 
+    //로그아웃 관련
+    fun clearTokens() {
+        accessToken = null
+        refreshToken = null
+        accessTokenExpiresAt = 0
+        refreshTokenExpiresAt = 0
+        isAdmin = false
+    }
 }
 

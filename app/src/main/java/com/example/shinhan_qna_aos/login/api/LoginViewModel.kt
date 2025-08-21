@@ -1,6 +1,7 @@
 package com.example.shinhan_qna_aos.login.api
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.Data
@@ -66,6 +67,22 @@ class LoginViewModel(
     }
 
     /**
+     * 로그아웃 시도
+     */
+    fun logout() {
+        viewModelScope.launch {
+            repository.logout()
+                .onSuccess {
+                    _loginResult.value = LoginResult.Idle
+                }
+                .onFailure { e ->
+                    // 로그아웃 실패처리 예: 로그 출력 또는 UI 알림
+                    Log.e("Logout", "로그아웃 실패: ${e.localizedMessage}")
+                }
+        }
+    }
+
+    /**
      * 토큰 재발급 시도: Access Token 유효/재발급 성공 시 로그인 성공 상태로 업데이트,
      * 실패 시 로그인 실패 상태로 변경 (재로그인 필요)
      */
@@ -91,6 +108,7 @@ class LoginViewModel(
                 } else {
                     _loginResult.value = LoginResult.Failure(-1, "재로그인 필요")
                     // 로그아웃 처리
+                    logout()
                 }
             }
         }

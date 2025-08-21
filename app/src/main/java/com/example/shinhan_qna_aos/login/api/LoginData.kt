@@ -42,3 +42,7 @@ sealed class LoginResult {
         val message: String
     ) : LoginResult()
 }
+
+data class LogoutData(
+    val message: String
+)

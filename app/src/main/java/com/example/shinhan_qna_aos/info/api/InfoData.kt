@@ -1,11 +1,11 @@
 package com.example.shinhan_qna_aos.info.api
 
 import android.net.Uri
+import com.google.gson.annotations.SerializedName
 
 //API 학생 정보 받음
 data class InfoResponse(
     val message:String,
-    val status: Int? = null    // 200, 401, 500 등이 올 수 있으니 optional로 둠
 )
 
 //API 학생 정보를 multipart 폼으로 제출
@@ -15,6 +15,7 @@ data class InfoData(
     val department: String = "",   // 학과
     val year: Int = 0,             // 학년
     val role: String = "학생",     // 역할
+    val studentCertified: Boolean = true,
     val imageUri: Uri = Uri.EMPTY  // 이미지 Uri
 )
 
@@ -29,6 +30,8 @@ data class UserCheckResponse(
     val studentCardImagePath : String?="",
     val students : Int,
     val status : String,
+    @SerializedName("studentCertified") // Gson 사용 시
+    val studentCertified: Boolean? = null
 )
 
 // ui

@@ -4,6 +4,7 @@ import com.example.shinhan_qna_aos.info.api.UserCheckResponse
 import com.example.shinhan_qna_aos.info.api.InfoResponse
 import com.example.shinhan_qna_aos.login.api.AdminRequest
 import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
+import com.example.shinhan_qna_aos.login.api.LogoutData
 import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
 import com.example.shinhan_qna_aos.main.api.Post
 import com.example.shinhan_qna_aos.main.api.PostData
@@ -63,6 +64,7 @@ interface APIInterface {
         @Part("department") department: RequestBody,
         @Part("year") year: RequestBody,
         @Part("role") role: RequestBody,
+        @Part("studentCertified") studentCertified : RequestBody,
         @Part image: MultipartBody.Part
     ): Response<InfoResponse>
 
@@ -131,10 +133,17 @@ interface APIInterface {
         @Body reportReasonBody: ReportReasonBody   // 신고 이유 -> 없어도 됨
     ): Response<PostFlag>
 
+    // 게시글 삭제
     @DELETE("/boards/{postsid}")
     suspend fun PostDelete(
         @Header("Authorization") accessToken: String,
         @Path("postsid") postsid: Int,
     ): Response<Unit>
+
+    // 로그아웃
+    @POST("/users/logout")
+    suspend fun LogOut(
+        @Header("Authorization") refreshToken: String,
+    ): Response<LogoutData>
 }
 

@@ -38,9 +38,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
 @Composable
-fun LoginScreen(repository: AuthRepository, loginManager: Data, navController: NavController) {
+fun LoginScreen(repository: AuthRepository, data: Data, navController: NavController) {
     val context = LocalContext.current
-    val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(repository,loginManager) })
+    val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(repository,data) })
     val loginResult by loginViewModel.loginResult.collectAsState()
 
     LaunchedEffect(loginResult) {

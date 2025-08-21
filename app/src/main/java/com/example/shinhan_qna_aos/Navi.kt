@@ -77,7 +77,7 @@ fun AppNavigation(
                 return@LaunchedEffect
             }
             // 최초 가입요청(정보 입력)한 적 없는 경우 → info로 이동
-            val didSubmitInfo = data.userInfoSubmitted // (예: sharedPrefs/DB 저장)
+            val didSubmitInfo = data.studentCertified // (예: sharedPrefs/DB 저장)
             if (didSubmitInfo) {
                 // 이미 가입요청한 경우에는 서버에 UserCheck 요청해서 state에 따라 화면 분기
                 val userStatus = data.userStatus
@@ -137,7 +137,7 @@ fun AppNavigation(
             WritingScreen(writeRepository, navController)
         }
 
-        composable("myPage"){ MypageScreen(navController) }
+        composable("myPage"){ MypageScreen(authRepository, data, navController) }
     }
 }
 

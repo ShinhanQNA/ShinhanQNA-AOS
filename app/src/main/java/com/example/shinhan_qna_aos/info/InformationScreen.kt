@@ -1,6 +1,7 @@
 package com.example.shinhan_qna_aos.info
 
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -78,10 +79,9 @@ fun InformationScreen(infoRepository: InfoRepository, data: Data, navController:
     LaunchedEffect(uiState.navigateTo) {
         uiState.navigateTo?.let {
             // 가입 정보 입력 완료 플래그 갱신
-            if(data.userInfoSubmitted ) {
-                navController.navigate(it) {
-                    popUpTo("info") { inclusive = true }
-                }
+            Log.d("InformationScreen", "navigateTo changed: $it, userInfoSubmitted=${data.studentCertified}")
+            navController.navigate(it) {
+                popUpTo("info") { inclusive = true }
             }
         }
     }
@@ -161,7 +161,6 @@ fun InformationScreen(infoRepository: InfoRepository, data: Data, navController:
                 fontSize = 14.sp,
                 onClick = {
                     infoViewModel.submitStudentInfo(context)
-                    data.userInfoSubmitted = true
                 },
                 enabled = isFormValid)
         }

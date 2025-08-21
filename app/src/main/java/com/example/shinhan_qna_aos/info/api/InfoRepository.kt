@@ -36,6 +36,7 @@ class InfoRepository(private val apiInterface: APIInterface) {
             val namePart = infoData.name.toRequestBody("text/plain".toMediaType())
             val departmentPart = infoData.department.toRequestBody("text/plain".toMediaType())
             val rolePart = infoData.role.toRequestBody("text/plain".toMediaType())
+            val studentCertifiedPart = infoData.studentCertified.toString().toRequestBody("text/plain".toMediaType())
             val imagePart = imageFile.let {
                 val requestFile = it.asRequestBody("image/jpeg".toMediaTypeOrNull())
                 MultipartBody.Part.createFormData("image", it.name, requestFile)
@@ -48,6 +49,7 @@ class InfoRepository(private val apiInterface: APIInterface) {
                 department = departmentPart,
                 year = yearPart,
                 role = rolePart,
+                studentCertified = studentCertifiedPart,
                 image = imagePart
             )
 

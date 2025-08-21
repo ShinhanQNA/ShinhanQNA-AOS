@@ -16,6 +16,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,15 +28,39 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.Caution
+import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
+import com.example.shinhan_qna_aos.etc.api.WritingViewModel
+import com.example.shinhan_qna_aos.login.api.AuthRepository
+import com.example.shinhan_qna_aos.login.api.LoginResult
+import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun MypageScreen(navController: NavController){
+fun MypageScreen(authRepository: AuthRepository, data: Data, navController: NavController){
+    val loginViewModel: LoginViewModel =
+        viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository,data) })
+
+    val loginResult by loginViewModel.loginResult.collectAsState()
+
+    // 로그인 상태 관찰 후, Idle 이거나 실패 상태면 로그인 화면으로 이동
+    LaunchedEffect(loginResult) {
+        when (loginResult) {
+            is LoginResult.Idle, is LoginResult.Failure -> {
+                navController.navigate("login") {
+                    // 현재 스택 모두 제거하여 뒤로가기 방지
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+            else -> { /* 로그인 상태일 때는 그냥 유지 */ }
+        }
+    }
     Box(){
         Column(
             modifier = Modifier
@@ -42,7 +69,7 @@ fun MypageScreen(navController: NavController){
                 .background(Color.White)
         ) {
             TopBar("마이페이지", {navController.popBackStack()})
-            MypageButton()
+            MypageButton(onLogoutClick = { loginViewModel.logout() })
             Spacer(modifier = Modifier.height(48.dp))
             InApp()
             Spacer(modifier = Modifier.weight(1f))
@@ -60,7 +87,7 @@ fun MypageScreen(navController: NavController){
 }
 
 @Composable
-fun MypageButton(){
+fun MypageButton(onLogoutClick:() -> Unit){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -96,7 +123,7 @@ fun MypageButton(){
             modifier = Modifier
                 .fillMaxWidth()
                 .height(24.dp)
-                .clickable { },
+                .clickable {onLogoutClick() },
             contentAlignment = Alignment.CenterStart
         ) {
             Text(
