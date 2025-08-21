@@ -121,5 +121,13 @@ interface APIInterface {
         @Header("Authorization") accessToken: String,
         @Path("postId") postId: Int,
     ): Response<PostLike>
+
+    // 게시글 신고
+    @POST("/boards/{postId}/report")
+    suspend fun PostFlag(
+        @Header("Authorization") accessToken: String,
+        @Path("postId") postId: Int,
+        @Path("reportReason") reportReason:String // 신고 이유 -> 없어도 됨
+    )
 }
 
