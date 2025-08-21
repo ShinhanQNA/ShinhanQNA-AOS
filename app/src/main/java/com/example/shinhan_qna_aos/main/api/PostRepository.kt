@@ -111,7 +111,6 @@ class PostRepository(
     /**
      * 게시글 신고
      */
-    // PostRepository에서
     suspend fun Postflag(postId: Int, reportReason: String?): Result<PostFlag> {
         val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다"))
 
@@ -132,5 +131,22 @@ class PostRepository(
             Result.failure(e)
         }
     }
+    /**
+     * 게시글 취소
+     */
+    suspend fun PostDelete(postId: Int): Result<Unit> {
+        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다"))
 
+        return try {
+            val response = apiInterface.PostDelete("Bearer $accessToken", postId)
+            if (response.isSuccessful) {
+                Result.success(Unit) // response.body() 체크 없이 성공 처리
+            } else {
+                val errorBody = response.errorBody()?.string() ?: ""
+                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()} $errorBody"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

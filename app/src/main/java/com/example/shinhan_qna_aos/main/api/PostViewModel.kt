@@ -3,14 +3,11 @@ package com.example.shinhan_qna_aos.main.api
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shinhan_qna_aos.Data
 import kotlinx.coroutines.launch
 
 class PostViewModel(
@@ -87,7 +84,7 @@ class PostViewModel(
         }
     }
     // 신고 관련
-    fun PostFlag(
+    fun flagPost(
         postId: Int,
         reportReason: String?,
         context: Context
@@ -99,6 +96,18 @@ class PostViewModel(
                     Toast.makeText(context, "신고 되었습니다.", Toast.LENGTH_SHORT).show()
                 }
                 .onFailure { errorMessage = it.message }
+        }
+    }
+
+    // 삭제
+    fun deletePost(postId: Int) {
+        viewModelScope.launch {
+            val result = postRepository.PostDelete(postId)
+            if (result.isSuccess) {
+                Log.d("PostViewModel", "삭제 성공")
+            } else {
+                Log.e("PostViewModel", "삭제 실패: ${result.exceptionOrNull()?.message}")
+            }
         }
     }
 }

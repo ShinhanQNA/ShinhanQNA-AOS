@@ -15,6 +15,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
@@ -129,5 +130,11 @@ interface APIInterface {
         @Path("postId") postId: Int,
         @Body reportReasonBody: ReportReasonBody   // 신고 이유 -> 없어도 됨
     ): Response<PostFlag>
+
+    @DELETE("/boards/{postsid}")
+    suspend fun PostDelete(
+        @Header("Authorization") accessToken: String,
+        @Path("postsid") postsid: Int,
+    ): Response<Unit>
 }
 
