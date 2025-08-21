@@ -2,7 +2,7 @@ package com.example.shinhan_qna_aos.main.api
 
 import com.google.gson.annotations.SerializedName
 
-// API에서 받은 데이터 모델
+// API에서 받은 데이터 모델 (전체 조회)
 data class PostData(
     @SerializedName("postId") val postID: Int,
     @SerializedName("title") val title: String,
@@ -42,7 +42,7 @@ data class ReportReasonBody(
     val reportReason: String?
 )
 
-// API에서 받은 데이터 모델
+// API에서 받은 데이터 모델 게시글 수정/작성
 data class Post(
     @SerializedName("postId") val postID: Int,
     @SerializedName("title") val title: String,
@@ -53,4 +53,19 @@ data class Post(
     @SerializedName("status") val status: String,
     @SerializedName("email") val email: String,
     @SerializedName("year") val year: String?
+)
+
+// API에서 받은 데이터 모델 게시글 (상세 조회)
+data class PostDetail(
+    @SerializedName("postId") val postID: Int,
+    @SerializedName("title") val title: String,
+    @SerializedName("content") val content: String,
+    @SerializedName("likes") val likes: Int,
+    @SerializedName("date") val date: String,
+    @SerializedName("status") val status: String,
+    @SerializedName("reportCount") val reportCount: Int,
+    @SerializedName("warningStatus") val warningStatus: String,
+    @SerializedName("writerEmail") val writerEmail: String,
+    @SerializedName("imagePath") val imagePath: String?,
+
 )

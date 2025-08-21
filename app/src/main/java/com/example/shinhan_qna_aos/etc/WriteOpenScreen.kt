@@ -58,6 +58,7 @@ import com.example.shinhan_qna_aos.etc.api.WriteRepository
 import com.example.shinhan_qna_aos.etc.api.WritingViewModel
 import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.PostViewModel
+import com.example.shinhan_qna_aos.main.warningStatusToBanCount
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
@@ -89,7 +90,7 @@ fun WriteOpenScreen(
     }
 
     postDetail?.let { detail ->
-        val isOwner = data.userEmail == detail.email
+        val isOwner = data.userEmail == detail.writerEmail
 
         Box {
             Column(
@@ -120,7 +121,7 @@ fun WriteOpenScreen(
                         item {
                             DetailContent(detail.title, detail.content, detail.imagePath)
                             Spacer(modifier = Modifier.height(16.dp))
-                            LikeFlagBan(detail.likes, 0, 34, data)
+                            LikeFlagBan(detail.likes, detail.reportCount, warningStatusToBanCount(detail.warningStatus).toInt(), data)
                             Spacer(modifier = Modifier.height(36.dp))
                             if (data.isAdmin) {
                                 ManagerFunctionButton(data.isNotice)

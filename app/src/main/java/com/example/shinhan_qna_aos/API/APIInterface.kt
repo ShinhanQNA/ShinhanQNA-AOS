@@ -7,6 +7,7 @@ import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
 import com.example.shinhan_qna_aos.main.api.Post
 import com.example.shinhan_qna_aos.main.api.PostData
+import com.example.shinhan_qna_aos.main.api.PostDetail
 import com.example.shinhan_qna_aos.main.api.PostFlag
 import com.example.shinhan_qna_aos.main.api.PostLike
 import com.example.shinhan_qna_aos.main.api.ReportReasonBody
@@ -80,11 +81,11 @@ interface APIInterface {
 
     //게시글 상세조회
     @Headers("Content-Type: application/json")
-    @GET("/boards/{postId}")
+    @GET("/boards/{postsid}")
     suspend fun getPostsDetail(
         @Header("Authorization") accessToken: String,
-        @Path("postId") postId: String?
-    ):Response<Post>
+        @Path("postsid") postsid: String?
+    ):Response<PostDetail>
 
     // 게시글 작성
     @Multipart

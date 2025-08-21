@@ -20,7 +20,7 @@ class PostViewModel(
     // 게시글 리스트
     var postList by mutableStateOf<List<TitleContentLike>>(emptyList())
 
-    var selectedPost by mutableStateOf<Post?>(null)
+    var selectedPost by mutableStateOf<PostDetail?>(null)
         private set
 
     var errorMessage by mutableStateOf<String?>(null)
@@ -86,7 +86,7 @@ class PostViewModel(
             }
         }
     }
-
+    // 신고 관련
     fun PostFlag(
         postId: Int,
         reportReason: String?,
@@ -95,6 +95,7 @@ class PostViewModel(
         viewModelScope.launch {
             postRepository.Postflag(postId, reportReason)
                 .onSuccess {
+                    loadPostDetail(postId.toString())
                     Toast.makeText(context, "신고 되었습니다.", Toast.LENGTH_SHORT).show()
                 }
                 .onFailure { errorMessage = it.message }
