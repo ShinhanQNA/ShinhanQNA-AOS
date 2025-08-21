@@ -1,10 +1,13 @@
 package com.example.shinhan_qna_aos.main.api
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.Data
@@ -37,7 +40,7 @@ class PostViewModel(
      */
     fun loadPosts() {
         viewModelScope.launch {
-            postRepository.getPosts(300, "day") // 나중에 관리자인 경우 sort 선택 가능(day,year,like) 유저는 day
+            postRepository.getPosts() // 나중에 관리자인 경우 sort 선택 가능(day,year,like) 유저는 day
                 .onSuccess {
                     postList = it
                 }
@@ -72,7 +75,6 @@ class PostViewModel(
                     postRepository.PostUnlike(postId)
                 }
                 if (result.isSuccess) {
-                    val postLike = result.getOrNull()
                     hasLiked = !hasLiked
                     loadPostDetail(postId.toString())
                 } else {
@@ -82,6 +84,20 @@ class PostViewModel(
             } catch (e: Exception) {
                 Log.e("PostViewModel", "toggleLike 예외: ${e.message}")
             }
+        }
+    }
+
+    fun PostFlag(
+        postId: Int,
+        reportReason: String?,
+        context: Context
+    ) {
+        viewModelScope.launch {
+            postRepository.Postflag(postId, reportReason)
+                .onSuccess {
+                    Toast.makeText(context, "신고 되었습니다.", Toast.LENGTH_SHORT).show()
+                }
+                .onFailure { errorMessage = it.message }
         }
     }
 }

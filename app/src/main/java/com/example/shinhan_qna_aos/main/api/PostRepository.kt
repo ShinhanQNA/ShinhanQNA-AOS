@@ -14,20 +14,26 @@ class PostRepository(
      * @param size 가져올 개수
      * @param sort 정렬 방식 (예: "day")
      */
-    suspend fun getPosts(size: Int, sort: String): Result<List<TitleContentLike>> {
+    suspend fun getPosts(): Result<List<TitleContentLike>> {
         val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
 
         return try {
-            val response = apiInterface.getPosts("Bearer $accessToken", size, sort)
+            val response = apiInterface.getPosts("Bearer $accessToken")
             if (response.isSuccessful) {
                 val body = response.body()?.map {
+                    val banCountInt = when (it.warningStatus) {
+                        "없음" -> "0"
+                        "경고" -> "1"
+                        "차단" -> "2"
+                        else -> "0" // 기본값
+                    }
                     TitleContentLike(
                         postID = it.postID,
                         title = it.title,
                         content = it.content,
                         likeCount = it.likes,
-                        flagsCount = 0, // 나중에 API
-                        banCount = 0, // 나중에 API
+                        flagsCount = it.reportCount,
+                        banCount = banCountInt,
                         responseState = it.status
                     )
                 } ?: emptyList()
@@ -101,4 +107,30 @@ class PostRepository(
             Result.failure(e)
         }
     }
+
+    /**
+     * 게시글 신고
+     */
+    // PostRepository에서
+    suspend fun Postflag(postId: Int, reportReason: String?): Result<PostFlag> {
+        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다"))
+
+        return try {
+            val body = ReportReasonBody(reportReason)  // Body에 신고사유 세팅
+            val response = apiInterface.PostFlag(
+                accessToken = "Bearer $accessToken",
+                postId = postId,
+                reportReasonBody = body
+            )
+            if (response.isSuccessful) {
+                response.body()?.let { Result.success(it) } ?: Result.failure(Exception("신고 실패"))
+            } else {
+                val errorBody = response.errorBody()?.string() ?: ""
+                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()} $errorBody"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }

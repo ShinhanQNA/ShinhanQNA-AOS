@@ -6,7 +6,10 @@ import com.example.shinhan_qna_aos.login.api.AdminRequest
 import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
 import com.example.shinhan_qna_aos.main.api.Post
+import com.example.shinhan_qna_aos.main.api.PostData
+import com.example.shinhan_qna_aos.main.api.PostFlag
 import com.example.shinhan_qna_aos.main.api.PostLike
+import com.example.shinhan_qna_aos.main.api.ReportReasonBody
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -70,12 +73,10 @@ interface APIInterface {
 
     //게시글 조회
     @Headers("Content-Type: application/json")
-    @GET("/boards/search")
+    @GET("/boards")
     suspend fun getPosts(
-        @Header("Authorization") code : String,
-        @Query("size") size: Int,                        // 아이템 요청 개수
-        @Query("sort") sort: String
-    ):Response<List<Post>>
+        @Header("Authorization") code : String
+    ):Response<List<PostData>>
 
     //게시글 상세조회
     @Headers("Content-Type: application/json")
@@ -127,7 +128,7 @@ interface APIInterface {
     suspend fun PostFlag(
         @Header("Authorization") accessToken: String,
         @Path("postId") postId: Int,
-        @Path("reportReason") reportReason:String // 신고 이유 -> 없어도 됨
-    )
+        @Body reportReasonBody: ReportReasonBody   // 신고 이유 -> 없어도 됨
+    ): Response<PostFlag>
 }
 

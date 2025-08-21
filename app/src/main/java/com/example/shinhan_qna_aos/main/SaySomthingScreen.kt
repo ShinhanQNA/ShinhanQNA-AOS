@@ -38,7 +38,7 @@ fun SaySomthingScreen(postRepository: PostRepository, data: Data, navController:
                 likeCount = board.likeCount,
                 isAdmin = data.isAdmin,
                 flagsCount = board.flagsCount,
-                banCount = board.banCount,
+                banCount = warningStatusToBanCount(board.banCount).toInt(),
                 responseState = responseState,
                 onResponseStateChange = { newState ->
                     responseState = newState
@@ -48,6 +48,13 @@ fun SaySomthingScreen(postRepository: PostRepository, data: Data, navController:
             Divider()
         }
     }
+}
+
+fun warningStatusToBanCount(warningStatus: String): String = when (warningStatus) {
+    "없음" -> "0"
+    "경고" -> "1"
+    "차단" -> "2"
+    else -> "0"
 }
 
 @Composable

@@ -134,6 +134,11 @@ fun WriteOpenScreen(
                                     )
                                 }else{
                                     FlagLikeButton(
+                                        onFlagClick = {
+                                            Log.d("Compose", "신고 버튼 클릭됨")
+                                            postViewModel.PostFlag(postId.toInt(), "",context)
+                                            postViewModel.loadPostDetail(postId)
+                                        },
                                         onLikeClick = {
                                             Log.d("Compose", "좋아요 버튼 클릭됨")
                                             postViewModel.toggleLike(postId.toInt())
@@ -270,6 +275,7 @@ fun EditPostContent(
 
 @Composable
 fun FlagLikeButton( // 작성자가 아닐때
+    onFlagClick: () -> Unit,
     onLikeClick: () -> Unit,
 ) {
     Row(
@@ -285,7 +291,7 @@ fun FlagLikeButton( // 작성자가 아닐때
             modifier = Modifier
                 .background(Color(0xffFF9F43), RoundedCornerShape(12.dp))
                 .padding(horizontal = 12.dp, vertical = 8.dp)
-                .clickable {  }  // 신고 버튼 눌리면 콜백 호출
+                .clickable { onFlagClick() }  // 신고 버튼 눌리면 콜백 호출
         ) {
             Icon(
                 painter = painterResource( R.drawable.flag),

@@ -144,7 +144,7 @@ fun TitleContentLikeButton(
     content: String,
     likeCount: Int,
     flagsCount: Int = 0,
-    banCount: Int = 0,
+    banCount: Int,
     isAdmin: Boolean = false,
     responseState: String = "응답 상태",
     onResponseStateChange: (String) -> Unit = {},
