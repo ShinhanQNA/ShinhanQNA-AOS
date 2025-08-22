@@ -62,42 +62,65 @@ fun AppNavigation(
     val navigationRoute by infoViewModel.navigationRoute.collectAsState()
 
     // 앱 최초 진입 시 빠르게 보여줄 초기 화면 결정용 상태
-    var initialRoute by remember { mutableStateOf<String?>("") }
+    var initialRoute by remember { mutableStateOf<String?>(null) }
 
-    // 앱 첫 진입 시 라우팅 목적지 미리 결정
+//    // 앱 첫 진입 시 라우팅 목적지 미리 결정
+//    LaunchedEffect(loginResult) {
+//        when {
+//            data.onboarding -> {
+//                initialRoute = "onboarding"
+//            }
+//            loginResult is LoginResult.Success -> {
+//                Log.d("AppNavigation", "Login success detected in AppNavigation")
+//
+//                // 로그인 성공 시 서버에서 유저 상태 확인 요청
+//                infoViewModel.checkAndNavigateUserStatus(data.accessToken ?: "")
+//
+//                // navigationRoute가 아직 null일 수 있으므로 대기하지 말고 fallback 지정
+//                initialRoute = navigationRoute.takeIf { !it.isNullOrBlank() } ?: "login"
+//
+//                Log.d("AppNavigation", "Initial route set to $initialRoute based on navigationRoute or fallback")
+//            }
+//            else -> {
+//                initialRoute = "login"
+//            }
+//        }
+//    }
+//    // 서버에서 받은 navigationRoute 값이 변경되면 네비게이션 실행
+//    LaunchedEffect(navigationRoute) {
+//        navigationRoute?.let { route ->
+//            // 현재 화면(route)와 새로 이동할 경로가 다르고, 빈 문자열이 아닐 때 이동
+//            if (navController.currentDestination?.route != route && route.isNotBlank()) {
+//                Log.d("AppNavigation", "navigationRoute 변동 감지되어 $route 로 이동")
+//                navController.navigate(route) {
+//                    // 시작 지점까지 쌓인 화면 히스토리를 전부 제거하여 뒤로가기 시 혼란 방지
+//                    popUpTo(navController.graph.startDestinationId) {
+//                        inclusive = true
+//                    }
+//                }
+//            }
+//        }
+//    }
+    // 로그인 결과 바뀔 때 초기화 및 서버 상태 요청
     LaunchedEffect(loginResult) {
-        when {
-            data.onboarding -> {
-                initialRoute = "onboarding"
-            }
-            loginResult is LoginResult.Success -> {
-                Log.d("AppNavigation", "Login success detected in AppNavigation")
-
-                // 로그인 성공 시 서버에서 유저 상태 확인 요청
-                infoViewModel.checkAndNavigateUserStatus(data.accessToken ?: "")
-
-                // navigationRoute가 아직 null일 수 있으므로 대기하지 말고 fallback 지정
-                initialRoute = navigationRoute.takeIf { !it.isNullOrBlank() } ?: "login"
-
-                Log.d("AppNavigation", "Initial route set to $initialRoute based on navigationRoute or fallback")
-            }
-            else -> {
-                initialRoute = "login"
-            }
+        if (data.onboarding) {
+            initialRoute = "onboarding"
+        } else if (loginResult is LoginResult.Success) {
+            Log.d("AppNavigation", "로그인 성공 감지, 서버 상태 조회 시작")
+            infoViewModel.checkAndNavigateUserStatus(data.accessToken ?: "")
+            // 초기 화면은 navigationRoute가 정해질 때까지 null로 둔다
+            initialRoute = null
+        } else {
+            initialRoute = "login"
         }
     }
-    // 서버에서 받은 navigationRoute 값이 변경되면 네비게이션 실행
+
+    // navigationRoute가 바뀌면 초기 라우트로 고정
     LaunchedEffect(navigationRoute) {
-        navigationRoute?.let { route ->
-            // 현재 화면(route)와 새로 이동할 경로가 다르고, 빈 문자열이 아닐 때 이동
-            if (navController.currentDestination?.route != route && route.isNotBlank()) {
-                Log.d("AppNavigation", "navigationRoute 변동 감지되어 $route 로 이동")
-                navController.navigate(route) {
-                    // 시작 지점까지 쌓인 화면 히스토리를 전부 제거하여 뒤로가기 시 혼란 방지
-                    popUpTo(navController.graph.startDestinationId) {
-                        inclusive = true
-                    }
-                }
+        navigationRoute?.let {
+            if (initialRoute != it && it.isNotBlank()) {
+                Log.d("AppNavigation", "navigationRoute 확정: $it")
+                initialRoute = it
             }
         }
     }
