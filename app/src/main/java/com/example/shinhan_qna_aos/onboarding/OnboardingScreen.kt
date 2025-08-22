@@ -38,7 +38,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
+import com.example.shinhan_qna_aos.info.api.InfoViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -48,7 +51,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun OnboardingScreen(
-    onFinish: () -> Unit
+    navController: NavController,
+    data: Data
 ) {
     val pagerState = rememberPagerState(initialPage = 0)
 
@@ -84,7 +88,12 @@ fun OnboardingScreen(
                     1 -> OnboardingPage2(
                         maxW = maxW,
                         maxH = maxH,
-                        onFinish = onFinish
+                        onFinish = {
+                            data.onboarding = false
+                            navController.navigate("login") {
+                                popUpTo("onboarding") { inclusive = true }
+                            }
+                        }
                     )
                 }
             }
@@ -432,5 +441,5 @@ fun OnboardingPage2(
 @Composable
 @Preview(showBackground = true)
 fun preview(){
-    OnboardingScreen(onFinish = {}, )
+//    OnboardingScreen(onFinish = {}, )
 }

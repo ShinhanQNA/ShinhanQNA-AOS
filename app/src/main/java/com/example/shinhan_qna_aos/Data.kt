@@ -1,6 +1,7 @@
 package com.example.shinhan_qna_aos
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 
 class Data(private val context: Context) {
     private val prefs = context.getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
@@ -10,6 +11,7 @@ class Data(private val context: Context) {
         private const val KEY_REFRESH_TOKEN = "REFRESH_TOKEN"
         private const val KEY_ACCESS_TOKEN_EXP = "ACCESS_TOKEN_EXP"
         private const val KEY_REFRESH_TOKEN_EXP = "REFRESH_TOKEN_EXP"
+        private const val KEY_ONBOARDED = "ONBOARDED"
         private const val KEY_IS_ADMIN = "IS_ADMIN"
         private const val KEY_USER_STATUS = "USER_STATUS" // 유저 가입 상태
         private const val KEY_USER_NAME = "USER_NAME" // 유저 이름
@@ -33,6 +35,10 @@ class Data(private val context: Context) {
     var refreshTokenExpiresAt: Long // 리프래쉬 만료
         get() = prefs.getLong(KEY_REFRESH_TOKEN_EXP, 0L)
         set(value) = prefs.edit().putLong(KEY_REFRESH_TOKEN_EXP, value).apply()
+
+    var onboarding: Boolean // 관리자 관련
+        get() = prefs.getBoolean(KEY_IS_ADMIN, true)
+        set(value) = prefs.edit().putBoolean(KEY_IS_ADMIN, value).apply()
 
     var isAdmin: Boolean // 관리자 관련
         get() = prefs.getBoolean(KEY_IS_ADMIN, false)

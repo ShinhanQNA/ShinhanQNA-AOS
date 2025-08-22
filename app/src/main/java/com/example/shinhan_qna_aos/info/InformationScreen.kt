@@ -160,7 +160,7 @@ fun InformationScreen(infoRepository: InfoRepository, data: Data, navController:
             Request(
                 fontSize = 14.sp,
                 onClick = {
-                    infoViewModel.submitStudentInfo(context, navController)
+                    infoViewModel.submitStudentInfo(context)
                 },
                 enabled = isFormValid)
         }

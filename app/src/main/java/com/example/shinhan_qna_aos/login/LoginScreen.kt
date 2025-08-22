@@ -46,29 +46,14 @@ fun LoginScreen(authrepository: AuthRepository, infoRepository: InfoRepository ,
     val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authrepository,data) })
     val loginResult by loginViewModel.loginResult.collectAsState()
     val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository,data) })
-    val navigateTo by infoViewModel.navigationRoute.collectAsState(initial = null)
+    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
 
-// 로그인 결과 변화 감시에선 서버 요청과 상태 업데이트만 수행 (navController 직접 호출 제거)
-    LaunchedEffect(loginResult) {
+    LaunchedEffect(loginResult,navigationRoute) {
         if (loginResult is LoginResult.Success) {
-            val accessToken = data.accessToken
-            if (!accessToken.isNullOrEmpty()) {
-                val result = infoRepository.checkUserStatus(accessToken)
-                if (result.isSuccess) {
-                    val wrapper = result.getOrNull()
-                    if (wrapper != null) {
-                        infoViewModel.navigateBasedOnUserStatus(wrapper)
-                    }
+            navigationRoute?.let { route ->
+                navController.navigate(route) {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
                 }
-            }
-        }
-    }
-
-// uiState.navigateTo 상태가 바뀔 때 네비게이션 수행
-    LaunchedEffect(navigateTo) {
-        navigateTo?.let { route ->
-            navController.navigate(route) {
-                popUpTo("login") { inclusive = true }
             }
         }
     }

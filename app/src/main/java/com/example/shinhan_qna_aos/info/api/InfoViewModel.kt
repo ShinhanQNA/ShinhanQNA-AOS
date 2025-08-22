@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.ImageUtils
 import com.example.shinhan_qna_aos.Data
@@ -59,13 +60,9 @@ private val data: Data
     }
 
     /**
-     * 학생 정보 제출 함수
-     * - 현재 UI 상태에서 입력된 학생 정보를 서버에 multipart 폼으로 전송
-     * - 이미지 파일은 Uri를 받아서 압축 후 전송
-     * - 전송 성공 시 가입 상태 조회를 하여 사용자 상태 및 정보를 앱 내 저장소에 갱신
-     * - 이에 따라 UI 상태의 navigateTo 값 변경하여 화면 전환 유도
+     * 학생 정보 제출 (서버 업로드 후 상태 체크 및 분기)
      */
-    fun submitStudentInfo(context: Context, navController: NavController) {
+    fun submitStudentInfo(context: Context) {
         viewModelScope.launch {
             val accessToken = data.accessToken ?: return@launch
 
@@ -75,38 +72,34 @@ private val data: Data
 
             val submitResult = infoRepository.submitStudentInfo(accessToken, _uiState.value, compressedFile)
             if (submitResult.isSuccess) {
-                val checkResult = infoRepository.checkUserStatus(accessToken)
-                if (checkResult.isSuccess) {
-                    val wrapper = checkResult.getOrNull()
-                    if (wrapper != null) {
-                        navigateBasedOnUserStatus(wrapper)
-                    }
+                // 서버에 정보 제출 성공, 가입 상태 조회해서 화면 분기
+                val userStatusResult = infoRepository.checkUserStatus(accessToken)
+                userStatusResult.getOrNull()?.let {
+                    updateLocalAndNavigate(it)
                 }
             }
         }
     }
 
     /**
-     * 학생 인증 상태 및 경고/차단 상태 기반 화면 분기 함수
-     * @param userResponseWrapper 서버에서 받은 유저 & 경고 정보 래퍼
+     * 서버에서 유저 정보를 받아 로컬데이터 갱신 + 네비게이션 경로 상태 업데이트
      */
-    fun navigateBasedOnUserStatus(userResponseWrapper: UserResponseWrapper) {
+    fun updateLocalAndNavigate(userResponseWrapper: UserResponseWrapper) {
         val user = userResponseWrapper.user
         val warnings = userResponseWrapper.warnings.orEmpty()
 
-        // 로컬 데이터 저장 및 갱신
+        // 로컬 데이터 업데이트
         data.userStatus = user.status
         data.userName = user.name
         data.userEmail = user.email
-        data.studentCertified = user.studentCertified ?: false
+        data.studentCertified = user.studentCertified ?: false // null-safe
 
         // 경고/차단 여부 확인
         val hasBlock = warnings.any { it.status == "차단" }
-//        val hasWarning = warnings.any { it.status == "경고" }
 
         // 분기 경로 결정: 차단 > 경고 > 학생인증 상태 > 가입 상태
         val destination = when {
-//            hasBlock -> "block"         // 차단 화면(예시) -> 만들어야함
+            hasBlock -> "block"         // 차단 화면 -> 만들어야함
 //            hasWarning -> "warning"     // 경고 화면 -> 일단 해놨는데 경고에 대한 분기는 없을 예정
             !data.studentCertified -> "info" // 학생 인증 안 된 경우 인증 화면
             user.status == "가입 완료" -> "main"  // 가입 완료 시 메인 화면
@@ -115,44 +108,45 @@ private val data: Data
         }
         _navigationRoute.value = destination
     }
-    // 초기 진입시 사용자 상태 체크하고 네비게이션 경로 결정 (예: AppNavigation에서 호출)
-    fun determineInitialRoute(showOnboarding: Boolean, loginResult: LoginResult) {
+
+    /**
+     * 앱 진입 시 상태조회 → 화면분기용 함수(예: 로그인 등)
+     */
+    fun checkAndNavigateUserStatus(accessToken: String) {
         viewModelScope.launch {
-            if (showOnboarding) {
+            val result = infoRepository.checkUserStatus(accessToken)
+            result.getOrNull()?.let {
+                updateLocalAndNavigate(it)
+            }
+        }
+    }
+
+    /**
+     * 앱 진입 시 최초 라우트 결정
+     */
+    // (진입 시: showOnboarding/로그인 결과에 따라)
+    fun decideInitialRoute(loginResult: LoginResult, data: Data) {
+        viewModelScope.launch {
+            if (data.onboarding) {
                 _navigationRoute.value = "onboarding"
                 return@launch
             }
-
+            // 로그인 성공
             if (loginResult is LoginResult.Success) {
                 if (data.isAdmin) {
                     _navigationRoute.value = "main"
                     return@launch
                 }
-
                 val accessToken = data.accessToken
                 if (accessToken.isNullOrEmpty()) {
                     _navigationRoute.value = "login"
-                    return@launch
-                }
-
-                val didSubmitInfo = data.studentCertified
-                if (didSubmitInfo) {
-                    val checkResult = infoRepository.checkUserStatus(accessToken)
-                    if (checkResult.isSuccess) {
-                        val wrapper = checkResult.getOrNull()
-                        if (wrapper != null) {
-                            navigateBasedOnUserStatus(wrapper)
-                            return@launch
-                        }
-                    }
-                    _navigationRoute.value = "info"
-                    return@launch
                 } else {
-                    _navigationRoute.value = "info"
-                    return@launch
+                    // → 바로 유저 상태 체크 & 분기 (핵심!)
+                    checkAndNavigateUserStatus(accessToken)
                 }
+                return@launch
             }
-
+            // 로그인 실패
             _navigationRoute.value = "login"
         }
     }
