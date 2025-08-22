@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,15 +26,32 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.info.api.InfoRepository
+import com.example.shinhan_qna_aos.info.api.InfoViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 
 // 대기 화면
 @Composable
 fun WaitScreen(infoRepository: InfoRepository, data: Data, navController: NavController) {
+    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data) })
+
+    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
+
+    LaunchedEffect(navigationRoute) {
+        navigationRoute?.let { route ->
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+            if (route.isNotBlank() && currentRoute != route) {
+                navController.navigate(route) {
+                    popUpTo("wait") { inclusive = true }
+                }
+            }
+        }
+    }
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()

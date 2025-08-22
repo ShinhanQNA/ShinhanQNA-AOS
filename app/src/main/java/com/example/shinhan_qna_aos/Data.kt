@@ -1,7 +1,6 @@
 package com.example.shinhan_qna_aos
 
 import android.content.Context
-import androidx.datastore.preferences.core.booleanPreferencesKey
 
 class Data(private val context: Context) {
     private val prefs = context.getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
@@ -37,8 +36,8 @@ class Data(private val context: Context) {
         set(value) = prefs.edit().putLong(KEY_REFRESH_TOKEN_EXP, value).apply()
 
     var onboarding: Boolean // 관리자 관련
-        get() = prefs.getBoolean(KEY_IS_ADMIN, true)
-        set(value) = prefs.edit().putBoolean(KEY_IS_ADMIN, value).apply()
+        get() = prefs.getBoolean(KEY_ONBOARDED, true)
+        set(value) = prefs.edit().putBoolean(KEY_ONBOARDED, value).apply()
 
     var isAdmin: Boolean // 관리자 관련
         get() = prefs.getBoolean(KEY_IS_ADMIN, false)

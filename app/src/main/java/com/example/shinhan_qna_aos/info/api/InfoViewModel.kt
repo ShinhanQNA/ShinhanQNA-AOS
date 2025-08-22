@@ -5,11 +5,8 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.ImageUtils
 import com.example.shinhan_qna_aos.Data
-import com.example.shinhan_qna_aos.login.api.LoginResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -72,11 +69,7 @@ private val data: Data
 
             val submitResult = infoRepository.submitStudentInfo(accessToken, _uiState.value, compressedFile)
             if (submitResult.isSuccess) {
-                // 서버에 정보 제출 성공, 가입 상태 조회해서 화면 분기
-                val userStatusResult = infoRepository.checkUserStatus(accessToken)
-                userStatusResult.getOrNull()?.let {
-                    updateLocalAndNavigate(it)
-                }
+                checkAndNavigateUserStatus(accessToken)
             }
         }
     }
@@ -92,62 +85,35 @@ private val data: Data
         data.userStatus = user.status
         data.userName = user.name
         data.userEmail = user.email
-        data.studentCertified = user.studentCertified ?: false // null-safe
+        data.studentCertified = user.studentCertified ?: false
 
-        // 경고/차단 여부 확인
         val hasBlock = warnings.any { it.status == "차단" }
 
-        // 분기 경로 결정: 차단 > 경고 > 학생인증 상태 > 가입 상태
+        // 화면 분기 결정
         val destination = when {
-            hasBlock -> "block"         // 차단 화면 -> 만들어야함
-//            hasWarning -> "warning"     // 경고 화면 -> 일단 해놨는데 경고에 대한 분기는 없을 예정
+            hasBlock -> "block"          // 차단 화면 (구현 필요)
             !data.studentCertified -> "info" // 학생 인증 안 된 경우 인증 화면
-            user.status == "가입 완료" -> "main"  // 가입 완료 시 메인 화면
-            user.status == "가입 대기 중" -> "wait"  // 가입 대기 중시 대기 화면
-            else -> "info"              // 그 외 정보 입력 화면
+            user.status == "가입 완료" -> "main"
+            user.status == "가입 대기 중" -> "wait"
+            else -> "info"
         }
-        _navigationRoute.value = destination
+
+        // 무한 호출 방지: 이전 상태와 다를 때만 변경
+        if (_navigationRoute.value != destination) {
+            _navigationRoute.value = destination
+        }
     }
 
-    /**
-     * 앱 진입 시 상태조회 → 화면분기용 함수(예: 로그인 등)
-     */
+    // 유저 정보 서버 조회 후 상태 갱신 및 네비게이션 분기 함수
     fun checkAndNavigateUserStatus(accessToken: String) {
         viewModelScope.launch {
+            Log.d("InfoViewModel", "Checking user status from server")
             val result = infoRepository.checkUserStatus(accessToken)
             result.getOrNull()?.let {
                 updateLocalAndNavigate(it)
+            } ?: run {
+                Log.e("InfoViewModel", "Failed to get user status")
             }
-        }
-    }
-
-    /**
-     * 앱 진입 시 최초 라우트 결정
-     */
-    // (진입 시: showOnboarding/로그인 결과에 따라)
-    fun decideInitialRoute(loginResult: LoginResult, data: Data) {
-        viewModelScope.launch {
-            if (data.onboarding) {
-                _navigationRoute.value = "onboarding"
-                return@launch
-            }
-            // 로그인 성공
-            if (loginResult is LoginResult.Success) {
-                if (data.isAdmin) {
-                    _navigationRoute.value = "main"
-                    return@launch
-                }
-                val accessToken = data.accessToken
-                if (accessToken.isNullOrEmpty()) {
-                    _navigationRoute.value = "login"
-                } else {
-                    // → 바로 유저 상태 체크 & 분기 (핵심!)
-                    checkAndNavigateUserStatus(accessToken)
-                }
-                return@launch
-            }
-            // 로그인 실패
-            _navigationRoute.value = "login"
         }
     }
 }

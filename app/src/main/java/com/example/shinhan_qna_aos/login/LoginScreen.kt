@@ -48,11 +48,27 @@ fun LoginScreen(authrepository: AuthRepository, infoRepository: InfoRepository ,
     val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository,data) })
     val navigationRoute by infoViewModel.navigationRoute.collectAsState()
 
-    LaunchedEffect(loginResult,navigationRoute) {
+    // 로그인 성공 시 학생 인증 상태 및 유저 상태에 따른 화면 분기 처리
+    LaunchedEffect(loginResult) {
         if (loginResult is LoginResult.Success) {
-            navigationRoute?.let { route ->
-                navController.navigate(route) {
-                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            Log.d("LoginScreen", "Login success detected")
+
+            if (data.studentCertified) {
+                // 이미 가입 요청한 경우, 로컬 상태 기반으로 네비게이션 분기
+                val destination = when (data.userStatus) {
+                    "가입 완료" -> "main"
+                    "가입 대기 중" -> "wait"
+                    else -> "info"
+                }
+                Log.d("LoginScreen", "Navigating to $destination based on local stored data")
+                navController.navigate(destination) {
+                    popUpTo("login") { inclusive = true }
+                }
+            } else {
+                // 학생 인증이 되어있지 않은 경우 info 화면으로 이동
+                Log.d("LoginScreen", "User not certified, navigating to info")
+                navController.navigate("info") {
+                    popUpTo("login") { inclusive = true }
                 }
             }
         }

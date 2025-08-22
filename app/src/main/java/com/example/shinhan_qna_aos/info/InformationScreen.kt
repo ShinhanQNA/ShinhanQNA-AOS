@@ -75,13 +75,14 @@ fun InformationScreen(infoRepository: InfoRepository, data: Data, navController:
     // 가입 요청 모든 필드 입력시에만 누를 수 있도록
     val isFormValid = remember(uiState) { uiState.name.isNotBlank() && uiState.students != 0 && uiState.year != 0 && uiState.department.isNotBlank() && uiState.imageUri != Uri.EMPTY }
 
-    // 가입 요청 성공 후 -> UserCheck API 조회하고 결과 저장, 화면전환까지
+    // navigationRoute가 변경될 때만 네비게이션 실행 (null 체크 포함)
     LaunchedEffect(navigationRoute) {
-        navigationRoute?.let {
-            // 가입 정보 입력 완료 플래그 갱신
-            Log.d("InformationScreen", "navigateTo changed: $it, userInfoSubmitted=${data.studentCertified}")
-            navController.navigate(it) {
-                popUpTo("info") { inclusive = true }
+        navigationRoute?.let { route ->
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+            if (route.isNotBlank() && currentRoute != route) {
+                navController.navigate(route) {
+                    popUpTo("info") { inclusive = true }
+                }
             }
         }
     }
