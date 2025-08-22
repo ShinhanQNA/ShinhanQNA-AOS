@@ -86,7 +86,21 @@ fun AppNavigation(
             }
         }
     }
-
+    // 서버에서 받은 navigationRoute 값이 변경되면 네비게이션 실행
+    LaunchedEffect(navigationRoute) {
+        navigationRoute?.let { route ->
+            // 현재 화면(route)와 새로 이동할 경로가 다르고, 빈 문자열이 아닐 때 이동
+            if (navController.currentDestination?.route != route && route.isNotBlank()) {
+                Log.d("AppNavigation", "navigationRoute 변동 감지되어 $route 로 이동")
+                navController.navigate(route) {
+                    // 시작 지점까지 쌓인 화면 히스토리를 전부 제거하여 뒤로가기 시 혼란 방지
+                    popUpTo(navController.graph.startDestinationId) {
+                        inclusive = true
+                    }
+                }
+            }
+        }
+    }
     // 초기 라우트가 null 이면 NavHost 렌더링 안 함 (startDestination에 빈값 전달 방지)
     if (initialRoute.isNullOrBlank()) return
 
