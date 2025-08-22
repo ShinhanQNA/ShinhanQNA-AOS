@@ -146,8 +146,6 @@ fun TitleContentLikeButton(
     flagsCount: Int = 0,
     banCount: Int,
     isAdmin: Boolean = false,
-    responseState: String = "응답 상태",
-    onResponseStateChange: (String) -> Unit = {},
     onClick:()->Unit
 ) {
     Row(
@@ -176,9 +174,6 @@ fun TitleContentLikeButton(
                     InfoIconCount(lucide.ban, "차단 표시", banCount, Color(0xffFC4F4F), 16)
                 }
             }
-        }
-        if (isAdmin) {
-            ManagerDropDown(responseState, onResponseStateChange = onResponseStateChange)
         }
     }
 }
