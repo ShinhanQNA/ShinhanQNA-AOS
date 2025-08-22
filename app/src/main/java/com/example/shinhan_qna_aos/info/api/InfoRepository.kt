@@ -11,7 +11,7 @@ import java.io.File
 class InfoRepository(private val apiInterface: APIInterface) {
 
     // 서버로부터 유저 가입 상태 조회 API 호출
-    suspend fun checkUserStatus(accessToken: String): Result<UserCheckResponse> {
+    suspend fun checkUserStatus(accessToken: String): Result<UserResponseWrapper> {
         return try {
             val response = apiInterface.UserCheck("Bearer $accessToken")
             if (response.isSuccessful) {

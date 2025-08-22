@@ -31,32 +31,43 @@ import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.info.api.InfoRepository
+import com.example.shinhan_qna_aos.info.api.InfoViewModel
 import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import kotlinx.coroutines.flow.map
 
 @Composable
-fun LoginScreen(repository: AuthRepository, data: Data, navController: NavController) {
+fun LoginScreen(authrepository: AuthRepository, infoRepository: InfoRepository ,data: Data, navController: NavController) {
     val context = LocalContext.current
-    val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(repository,data) })
+    val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authrepository,data) })
     val loginResult by loginViewModel.loginResult.collectAsState()
+    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository,data) })
+    val navigateTo by infoViewModel.navigationRoute.collectAsState(initial = null)
 
+// 로그인 결과 변화 감시에선 서버 요청과 상태 업데이트만 수행 (navController 직접 호출 제거)
     LaunchedEffect(loginResult) {
         if (loginResult is LoginResult.Success) {
-            if (data.studentCertified) {
-                // 이미 가입요청한 경우에는 서버에 UserCheck 요청해서 state에 따라 화면 분기
-                val navi  = when (data.userStatus) {
-                    "가입 완료" -> "main"
-                    "가입 대기 중" -> "wait"
-                    else -> "info"
-                }
-                navController.navigate(navi) {
-                    popUpTo("login") { inclusive = true }
+            val accessToken = data.accessToken
+            if (!accessToken.isNullOrEmpty()) {
+                val result = infoRepository.checkUserStatus(accessToken)
+                if (result.isSuccess) {
+                    val wrapper = result.getOrNull()
+                    if (wrapper != null) {
+                        infoViewModel.navigateBasedOnUserStatus(wrapper)
+                    }
                 }
             }
-            navController.navigate("info") {
+        }
+    }
+
+// uiState.navigateTo 상태가 바뀔 때 네비게이션 수행
+    LaunchedEffect(navigateTo) {
+        navigateTo?.let { route ->
+            navController.navigate(route) {
                 popUpTo("login") { inclusive = true }
             }
         }

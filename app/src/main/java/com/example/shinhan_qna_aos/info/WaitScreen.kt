@@ -45,24 +45,6 @@ fun WaitScreen(infoRepository: InfoRepository, data: Data, navController: NavCon
         // 이미지 크기 화면 너비의 35%, 최소/최대 크기 제한
         val imageSize = (maxwidth * 0.35f).coerceIn(128.dp, 200.dp)
 
-        // 화면 나타날 때마다 최신 가입 상태 조회
-        LaunchedEffect(Unit) {
-            val accessToken = data.accessToken ?: return@LaunchedEffect
-            val result = infoRepository.checkUserStatus(accessToken)
-            if (result.isSuccess) {
-                val user = result.getOrNull()
-                // 최신 정보 반영
-                data.userStatus = user?.status
-                data.userName = user?.name
-
-                if (user?.status == "가입 완료") {
-                    navController.navigate("main") {
-                        popUpTo("wait") { inclusive = true } // 현재 경로에서 팝업
-                    }
-                }
-            }
-        }
-
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,

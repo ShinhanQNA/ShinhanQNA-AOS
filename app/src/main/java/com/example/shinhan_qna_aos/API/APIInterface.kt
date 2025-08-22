@@ -2,6 +2,7 @@ package com.example.shinhan_qna_aos.API
 
 import com.example.shinhan_qna_aos.info.api.UserCheckResponse
 import com.example.shinhan_qna_aos.info.api.InfoResponse
+import com.example.shinhan_qna_aos.info.api.UserResponseWrapper
 import com.example.shinhan_qna_aos.login.api.AdminRequest
 import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.LogoutData
@@ -73,7 +74,7 @@ interface APIInterface {
     @GET("/users/me")
     suspend fun UserCheck(
         @Header("Authorization") accessToken: String
-    ): Response<UserCheckResponse>
+    ): Response<UserResponseWrapper>
 
     //게시글 조회
     @Headers("Content-Type: application/json")

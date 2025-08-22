@@ -107,8 +107,6 @@ class LoginViewModel(
                     )
                 } else {
                     _loginResult.value = LoginResult.Failure(-1, "재로그인 필요")
-                    // 로그아웃 처리
-                    logout()
                 }
             }
         }

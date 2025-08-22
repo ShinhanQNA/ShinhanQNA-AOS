@@ -67,17 +67,17 @@ fun InformationScreen(infoRepository: InfoRepository, data: Data, navController:
     val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data) })
 
     val uiState by infoViewModel.uiState.collectAsState()
-
+    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
     // 드랍시트 관리
     var expandedGrade by remember { mutableStateOf(false) }
     var expandedMajor by remember { mutableStateOf(false) }
 
     // 가입 요청 모든 필드 입력시에만 누를 수 있도록
-    val isFormValid = remember(uiState.infoData) { uiState.infoData.name.isNotBlank() && uiState.infoData.students != 0 && uiState.infoData.year != 0 && uiState.infoData.department.isNotBlank() && uiState.infoData.imageUri != Uri.EMPTY }
+    val isFormValid = remember(uiState) { uiState.name.isNotBlank() && uiState.students != 0 && uiState.year != 0 && uiState.department.isNotBlank() && uiState.imageUri != Uri.EMPTY }
 
     // 가입 요청 성공 후 -> UserCheck API 조회하고 결과 저장, 화면전환까지
-    LaunchedEffect(uiState.navigateTo) {
-        uiState.navigateTo?.let {
+    LaunchedEffect(navigationRoute) {
+        navigationRoute?.let {
             // 가입 정보 입력 완료 플래그 갱신
             Log.d("InformationScreen", "navigateTo changed: $it, userInfoSubmitted=${data.studentCertified}")
             navController.navigate(it) {
@@ -121,7 +121,7 @@ fun InformationScreen(infoRepository: InfoRepository, data: Data, navController:
                 modifier = Modifier.fillMaxWidth(contentWidthFraction)
             ) {
                 NameField(
-                    value = uiState.infoData.name,
+                    value = uiState.name,
                     onValueChange = infoViewModel::onNameChange,
                     fontSize = 14.sp,
                 )
@@ -130,14 +130,14 @@ fun InformationScreen(infoRepository: InfoRepository, data: Data, navController:
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     StudentIdField(
-                        value = uiState.infoData.students,
+                        value = uiState.students,
                         onValueChange = infoViewModel::onStudentIdChange,
                         fontSize = 14.sp,
                         modifier = Modifier.weight(0.55f)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     GradeDropdown(
-                        selected = uiState.infoData.year,
+                        selected = uiState.year,
                         onSelectedChange = infoViewModel::onGradeChange,
                         options = listOf("1학년", "2학년", "3학년", "4학년"),
                         expanded = expandedGrade,
@@ -147,7 +147,7 @@ fun InformationScreen(infoRepository: InfoRepository, data: Data, navController:
                     )
                 }
                 MajorDropdown(
-                    selected = uiState.infoData.department,
+                    selected = uiState.department,
                     onSelectedChange = infoViewModel::onMajorChange,
                     options = listOf("소프트웨어융합"),
                     expanded = expandedMajor,
@@ -160,7 +160,7 @@ fun InformationScreen(infoRepository: InfoRepository, data: Data, navController:
             Request(
                 fontSize = 14.sp,
                 onClick = {
-                    infoViewModel.submitStudentInfo(context)
+                    infoViewModel.submitStudentInfo(context, navController)
                 },
                 enabled = isFormValid)
         }
@@ -301,7 +301,7 @@ fun MajorDropdown(
 fun ImageInsert(viewModel: InfoViewModel, fontSize: TextUnit) {
 
     val uiState by viewModel.uiState.collectAsState()
-    val imageUri = uiState.infoData.imageUri
+    val imageUri = uiState.imageUri
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->

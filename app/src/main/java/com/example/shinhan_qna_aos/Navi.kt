@@ -1,5 +1,6 @@
 package com.example.shinhan_qna_aos
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,6 +25,7 @@ import com.example.shinhan_qna_aos.etc.api.WriteRepository
 import com.example.shinhan_qna_aos.info.api.InfoRepository
 import com.example.shinhan_qna_aos.info.InformationScreen
 import com.example.shinhan_qna_aos.info.WaitScreen
+import com.example.shinhan_qna_aos.info.api.InfoViewModel
 import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.LoginScreen
@@ -38,12 +40,12 @@ import com.example.shinhan_qna_aos.servepage.MypageScreen
 
 @Composable
 fun AppNavigation(
-    navController : NavHostController = rememberNavController(),
+    navController: NavHostController = rememberNavController(),
     apiInterface: APIInterface
 ) {
     val context = LocalContext.current
 
-    // 데이터 및 리포지토리 초기화
+    // 각종 데이터 및 리포지토리 초기화
     val data = remember { Data(context) }
     val onboardingRepository = remember { OnboardingRepository(context) }
     val authRepository = remember { AuthRepository(apiInterface, data) }
@@ -51,58 +53,38 @@ fun AppNavigation(
     val postRepository = remember { PostRepository(apiInterface, data) }
     val infoRepository = remember { InfoRepository(apiInterface) }
 
-// 뷰모델 초기화
+    // 뷰모델 초기화
     val onboardingViewModel: OnboardingViewModel = viewModel(factory = SimpleViewModelFactory { OnboardingViewModel(onboardingRepository) })
     val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository, data) })
+    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data) })
 
     val showOnboarding by onboardingViewModel.showOnboarding.collectAsState()
     val loginResult by loginViewModel.loginResult.collectAsState()
 
-    // 앱 첫 진입 시 라우팅 목적지 결정용 상태
-    var initialRoute by remember { mutableStateOf<String?>(null) }
-    // 앱 시작 또는 상태 변화 시 분기 처리
+    // 앱 첫 진입시 이동할 목적지를 결정하기 위한 상태
+    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
+
     LaunchedEffect(showOnboarding, loginResult) {
-        if (showOnboarding == true) {
-            initialRoute = "onboarding"
-            return@LaunchedEffect
+        if (showOnboarding != null) {  // null 체크 추가
+            infoViewModel.determineInitialRoute(showOnboarding!!, loginResult)
         }
-        if (loginResult is LoginResult.Success) {
-            if (data.isAdmin) {
-                initialRoute = "main"
-                return@LaunchedEffect
-            }
-            val accessToken = data.accessToken
-            if (accessToken.isNullOrEmpty()) {
-                initialRoute = "login"
-                return@LaunchedEffect
-            }
-            // 최초 가입요청(정보 입력)한 적 없는 경우 → info로 이동
-            val didSubmitInfo = data.studentCertified // (예: sharedPrefs/DB 저장)
-            if (didSubmitInfo) {
-                // 이미 가입요청한 경우에는 서버에 UserCheck 요청해서 state에 따라 화면 분기
-                val userStatus = data.userStatus
-                initialRoute = when (userStatus) {
-                    "가입 완료" -> "main"
-                    "가입 대기 중" -> "wait"
-                    else -> "info"
-                }
-            }
-            else {
-                if(data.isAdmin){
-                    initialRoute = "main"
-                }
-                initialRoute = "info"
-            }
-            return@LaunchedEffect
-        }
-        initialRoute = "login"
     }
-    if (initialRoute == null) return
+
+    LaunchedEffect(navigationRoute) {
+        navigationRoute?.let { route ->
+            navController.navigate(route) {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            }
+        }
+    }
+
+    // navigationRoute가 null인 경우는 화면을 그리지 않음
+    if (navigationRoute == null) return
 
 
     NavHost(
         navController = navController,
-        startDestination = initialRoute!!
+        startDestination = navigationRoute!!
     ) {
         composable("onboarding") {
             OnboardingScreen(
@@ -115,11 +97,11 @@ fun AppNavigation(
             )
         }
 
-        composable("login") { LoginScreen(authRepository, data, navController) }
+        composable("login") { LoginScreen(authRepository, infoRepository, data, navController) }
 
         composable("manager_login") { ManagerLoginScreen(authRepository, navController, data) }
 
-        composable("info") { InformationScreen(infoRepository, data,navController) }
+        composable("info") { InformationScreen(infoRepository, data, navController) }
 
         composable("wait") { WaitScreen(infoRepository, data, navController) }
 
@@ -133,11 +115,13 @@ fun AppNavigation(
             WriteOpenScreen(navController, postRepository, writeRepository, data, postId)
         }
 
-        composable("writeBoard"){
+        composable("writeBoard") {
             WritingScreen(writeRepository, navController)
         }
 
-        composable("myPage"){ MypageScreen(authRepository, data, navController) }
+        composable("myPage") {
+            MypageScreen(authRepository, data, navController)
+        }
     }
 }
 
