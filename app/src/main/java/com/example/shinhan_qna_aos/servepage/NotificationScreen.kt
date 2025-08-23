@@ -30,28 +30,22 @@ package com.example.shinhan_qna_aos.servepage
 //import androidx.compose.ui.tooling.preview.Preview
 //import androidx.compose.ui.unit.dp
 //import androidx.compose.ui.unit.sp
+//import com.example.shinhan_qna_aos.Data
+//import com.example.shinhan_qna_aos.DetailContent
 //import com.example.shinhan_qna_aos.TitleContent
 //import com.example.shinhan_qna_aos.TitleContentButton
 //import com.example.shinhan_qna_aos.TopBar
 //import com.example.shinhan_qna_aos.ui.theme.pretendard
 //import com.jihan.lucide_icons.lucide
-
+//
 //@Composable
-//fun NotificationScreen() {
-//    val dataList = listOf(
-//        TitleContent("제목1", "본문내용1"),
-//        TitleContent("제목2", "본문내용2"),
-//        TitleContent("제목3", "본문내용3"),
-//        TitleContent("제목4", "본문내용4"),
-//        TitleContent("제목5", "본문내용5"),
-//        TitleContent("제목6", "본문내용6"),
-//        TitleContent("제목7", "본문내용7"),
-//        TitleContent("제목8", "본문내용8")
-//    )
+//fun NotificationScreen(data: Data) {
 //    Column {
 //        TopBar("공지", {})
 //        Box(
-//            modifier = Modifier.fillMaxSize().systemBarsPadding()
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .systemBarsPadding()
 //        ) {
 //            LazyColumn(
 //                modifier = Modifier
@@ -67,35 +61,36 @@ package com.example.shinhan_qna_aos.servepage
 //                }
 //            }
 //
-//            // + 새공지 버튼 - 배너 바로 위 공간에 위치하도록 아래 패딩 추가
-//            Button(
-//                onClick = { /* 새공지 클릭 동작 */ },
-//                shape = RoundedCornerShape(6.dp),
-//                colors = ButtonDefaults.buttonColors(Color.Black),
-//                contentPadding = PaddingValues(0.dp),
-//                modifier = Modifier
-//                    .align(Alignment.BottomEnd)
-//                    .padding(bottom = 66.dp, end = 20.dp) // 배너 위 공간 + 여백 확보
-//            ) {
-//                Row(
-//                    verticalAlignment = Alignment.CenterVertically,
-//                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-//                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp)
+//            if(data.isAdmin){// + 새공지 버튼 - 배너 바로 위 공간에 위치하도록 아래 패딩 추가
+//                Button(
+//                    onClick = { /* 새공지 클릭 동작 */ },
+//                    shape = RoundedCornerShape(6.dp),
+//                    colors = ButtonDefaults.buttonColors(Color.Black),
+//                    contentPadding = PaddingValues(0.dp),
+//                    modifier = Modifier
+//                        .align(Alignment.BottomEnd)
+//                        .padding(bottom = 66.dp, end = 20.dp) // 배너 위 공간 + 여백 확보
 //                ) {
-//                    Icon(
-//                        painter = painterResource(lucide.plus),
-//                        contentDescription = "새공지 추가",
-//                        modifier = Modifier.size(20.dp)
-//                    )
-//                    Text(
-//                        "새공지",
-//                        color = Color.White,
-//                        style = TextStyle(
-//                            fontFamily = pretendard,
-//                            fontWeight = FontWeight.Normal,
-//                            fontSize = 14.sp
+//                    Row(
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+//                        modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp)
+//                    ) {
+//                        Icon(
+//                            painter = painterResource(lucide.plus),
+//                            contentDescription = "새공지 추가",
+//                            modifier = Modifier.size(20.dp)
 //                        )
-//                    )
+//                        Text(
+//                            "새공지",
+//                            color = Color.White,
+//                            style = TextStyle(
+//                                fontFamily = pretendard,
+//                                fontWeight = FontWeight.Normal,
+//                                fontSize = 14.sp
+//                            )
+//                        )
+//                    }
 //                }
 //            }
 //
@@ -112,8 +107,37 @@ package com.example.shinhan_qna_aos.servepage
 //    }
 //}
 //
+//@Composable
+//fun NotificationOpenScreen(){
+//    Box(){
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .background(Color.White)
+//                .padding(bottom = 50.dp)
+//        ) {
+//            TopBar(null, {})
+//            DetailContent(title = "ㅇ", content = "ㄴㄴ")
+//        }
+//        Text(
+//            "배너광고",
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(50.dp)
+//                .background(Color.Red)
+//                .align(Alignment.BottomCenter)
+//        )
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun NotificationOpenScreenPreview(){
+//    NotificationOpenScreen()
+//}
+//
 //@Preview(showBackground = true)
 //@Composable
 //fun NotificationPreview(){
-//    NotificationScreen()
+////    NotificationScreen()
 //}
