@@ -7,12 +7,14 @@ import com.example.shinhan_qna_aos.login.api.AdminRequest
 import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.LogoutData
 import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
+import com.example.shinhan_qna_aos.main.api.Answer
 import com.example.shinhan_qna_aos.main.api.Post
 import com.example.shinhan_qna_aos.main.api.PostData
 import com.example.shinhan_qna_aos.main.api.PostDetail
 import com.example.shinhan_qna_aos.main.api.PostFlag
 import com.example.shinhan_qna_aos.main.api.PostLike
 import com.example.shinhan_qna_aos.main.api.ReportReasonBody
+import com.example.shinhan_qna_aos.main.api.TWPostData
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -54,6 +56,12 @@ interface APIInterface {
     suspend fun AdminLoginData(
         @Body adminRequest : AdminRequest
     ):Response<LoginTokensResponse>
+
+    // 로그아웃
+    @POST("/users/logout")
+    suspend fun LogOut(
+        @Header("Authorization") refreshToken: String,
+    ): Response<LogoutData>
 
     // 학생 정보
     @Multipart
@@ -141,10 +149,18 @@ interface APIInterface {
         @Path("postsid") postsid: Int,
     ): Response<Unit>
 
-    // 로그아웃
-    @POST("/users/logout")
-    suspend fun LogOut(
-        @Header("Authorization") refreshToken: String,
-    ): Response<LogoutData>
+    // 3주 조회
+    @GET("/three-week-opinions/group/{groupId}?sort=date|likes")
+    suspend fun ThreeWeekPost(
+        @Header("Authorization") accessToken: String,
+        @Path ("groupId") groupId :Int,
+        @Path ("sort")	sort: String	// date OR likes
+    ): Response<TWPostData>
+
+    //답변 조회
+    @GET("/answers")
+    suspend fun AnswerPost(
+        @Header("Authorization") accessToken: String,
+    ): Response<List<Answer>>
 }
 

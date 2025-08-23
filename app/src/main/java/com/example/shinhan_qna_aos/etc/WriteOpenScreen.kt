@@ -92,7 +92,7 @@ fun WriteOpenScreen(
                     .background(Color.White)
                     .padding(bottom = 50.dp)
             ) {
-                TopBar(if (uiState.isEditMode) "게시글 수정" else null) { navController.popBackStack() }
+                TopBar(if (uiState.isEditMode) "게시글 수정" else null) { navController.navigate("main?selectedTab=0") {popUpTo("writeOpen/$postId"){inclusive=true} }}
 
                 Spacer(modifier = Modifier.height(16.dp))
 

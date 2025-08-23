@@ -71,7 +71,7 @@ fun WritingScreen(writeRepository: WriteRepository, navController: NavController
             .imePadding() // 키보드에 반응
     ) {
         Column {
-            TopBar("게시글 작성", { navController.popBackStack() })
+            TopBar("게시글 작성", { navController.navigate("main?selectedTab=0") {popUpTo("writeBoard"){inclusive=true} }})
 
             LazyColumn(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
@@ -139,7 +139,7 @@ fun WritingScreen(writeRepository: WriteRepository, navController: NavController
                 .clickable {
                     writingViewModel.uploadPost(
                         onSuccess = {
-                            navController.navigate("main") {
+                            navController.navigate("main?selectedTab=0") {
                                 popUpTo("writeBoard") { inclusive = true }
                             }
                         },

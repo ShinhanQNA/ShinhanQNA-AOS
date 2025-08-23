@@ -180,12 +180,13 @@ fun TitleContentLikeButton(
 
 // 일반 게시글 컴포저블
 @Composable
-fun TitleContentButton(title: String, content: String) {
+fun TitleContentButton(title: String, content: String,onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = Color.White)
             .padding(horizontal = 20.dp, vertical = 16.dp)
+            .clickable { onClick() }
     ) {
         Text(title, style = TitleTextStyle)
         Spacer(modifier = Modifier.height(8.dp))
@@ -479,11 +480,12 @@ fun LikeFlagBan(likeCount: Int, flagsCount: Int, banCount: Int, data:Data) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        if(!data.isAdmin) {
+
             InfoIconCount(lucide.thumbs, "좋아요 표시", likeCount, Color.Black, 14)
+        if(data.isAdmin) {
+            InfoIconCount(R.drawable.flag, "신고 표시", flagsCount, Color(0xffFF9F43), 14)
+            InfoIconCount(lucide.ban, "차단 표시", banCount, Color(0xffFC4F4F), 14)
         }
-        InfoIconCount(R.drawable.flag, "신고 표시", flagsCount, Color(0xffFF9F43), 14)
-        InfoIconCount(lucide.ban, "차단 표시", banCount, Color(0xffFC4F4F), 14)
     }
 }
 

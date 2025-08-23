@@ -31,7 +31,10 @@ import com.example.shinhan_qna_aos.login.LoginScreen
 import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.example.shinhan_qna_aos.login.ManagerLoginScreen
 import com.example.shinhan_qna_aos.login.api.LoginResult
+import com.example.shinhan_qna_aos.main.AnsweredOpenScreen
+import com.example.shinhan_qna_aos.main.AnsweredScreen
 import com.example.shinhan_qna_aos.main.MainScreen
+import com.example.shinhan_qna_aos.main.api.AnswerRepository
 import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.servepage.MypageScreen
@@ -51,6 +54,8 @@ fun AppNavigation(
     val writeRepository = remember { WriteRepository(apiInterface, data) }
     val postRepository = remember { PostRepository(apiInterface, data) }
     val infoRepository = remember { InfoRepository(apiInterface) }
+    val answerRepository = remember { AnswerRepository(apiInterface,data) }
+
     val loginViewModel: LoginViewModel =
         viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository, data) })
     val infoViewModel: InfoViewModel =
@@ -99,8 +104,23 @@ fun AppNavigation(
         composable("manager_login") { ManagerLoginScreen(authRepository, navController, data) }
         composable("info") { InformationScreen(infoRepository, data, navController) }
         composable("wait") { WaitScreen(infoRepository, data, navController) }
-        composable("main") { MainScreen(postRepository, data, navController) }
-
+//        composable("main") { MainScreen(postRepository, answerRepository, data, navController) }
+        composable(
+            "main?selectedTab={selectedTab}",
+            arguments = listOf(navArgument("selectedTab") {
+                type = NavType.IntType
+                defaultValue = 0
+            })
+        ) { backStackEntry ->
+            val selectedTab = backStackEntry.arguments?.getInt("selectedTab") ?: 0
+            MainScreen(
+                postRepository = postRepository,
+                answerRepository = answerRepository,
+                data = data,
+                navController = navController,
+                initialSelectedIndex = selectedTab
+            )
+        }
         composable(
             "writeOpen/{postId}",
             arguments = listOf(navArgument("postId") { type = NavType.StringType })
@@ -110,6 +130,16 @@ fun AppNavigation(
         }
 
         composable("writeBoard") { WritingScreen(writeRepository, navController) }
+        composable("answer") { AnsweredScreen(answerRepository, navController)
+        }
+        composable(
+            "answerOpen/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            AnsweredOpenScreen(answerRepository, navController, id,)
+        }
+
         composable("myPage") { MypageScreen(authRepository, data, navController) }
     }
 }

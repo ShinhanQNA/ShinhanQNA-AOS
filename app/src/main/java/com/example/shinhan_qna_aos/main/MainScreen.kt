@@ -38,17 +38,31 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.main.api.AnswerRepository
 import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun MainScreen(postRepository: PostRepository, data: Data, navController: NavController){
-
+fun MainScreen(
+    postRepository: PostRepository,
+    answerRepository: AnswerRepository,
+    data: Data,
+    navController: NavController,
+    initialSelectedIndex: Int = 0
+){
+    var selectedIndex by remember { mutableStateOf(initialSelectedIndex) }
     Box(modifier = Modifier.fillMaxSize()){
         Column{
             MainTopbar(navController)
-            Selectboard(postRepository,data,navController)
+            Selectboard(
+                postRepository = postRepository,
+                answerRepository = answerRepository,
+                data = data,
+                navController = navController,
+                selectedIndex = selectedIndex,
+                onTabSelected = { idx -> selectedIndex = idx }
+            )
         }
         Text(
             "배너광고",
@@ -139,14 +153,20 @@ fun TopIcon(navController: NavController){
 
 //게시판 선택
 @Composable
-fun Selectboard(postRepository: PostRepository, data: Data, navController: NavController) {
+fun Selectboard(
+    postRepository: PostRepository,
+    answerRepository: AnswerRepository,
+    data: Data,
+    navController: NavController,
+    selectedIndex: Int,
+    onTabSelected: (Int) -> Unit
+) {
 
     val tabData = listOf(
         Pair("말해봐요", R.drawable.trumpet),
         Pair("선정된 의견", R.drawable.star),
         Pair("답변 왔어요", R.drawable.check),
     )
-    var selectedIndex by remember { mutableStateOf(0) }
     val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -171,7 +191,7 @@ fun Selectboard(postRepository: PostRepository, data: Data, navController: NavCo
                         .clickable(
                             indication = null,
                             interactionSource = interactionSource,
-                            onClick = { selectedIndex = idx }
+                            onClick = { onTabSelected(idx) }
                         ),
                     contentAlignment = Alignment.Center
                 ) {
@@ -184,7 +204,6 @@ fun Selectboard(postRepository: PostRepository, data: Data, navController: NavCo
             }
         }
 
-        // 선 인디케이터 (기존 코드와 동일)
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -208,11 +227,10 @@ fun Selectboard(postRepository: PostRepository, data: Data, navController: NavCo
             )
         }
 
-        // 페이지별 본문 표시
         when (selectedIndex) {
             0 -> SaySomthingScreen(postRepository, data , navController)
-//            1 -> SelectedOpinionsScreen()
-//            2 -> AnsweredScreen()
+            // 1 -> SelectedOpinionsScreen()
+            2 -> AnsweredScreen(answerRepository, navController)
         }
     }
 }

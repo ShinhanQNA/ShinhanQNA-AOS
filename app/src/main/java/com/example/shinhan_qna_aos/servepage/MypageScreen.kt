@@ -68,7 +68,7 @@ fun MypageScreen(authRepository: AuthRepository, data: Data, navController: NavC
                 .padding(bottom = 50.dp)
                 .background(Color.White)
         ) {
-            TopBar("마이페이지", {navController.popBackStack()})
+            TopBar("마이페이지", { navController.navigate("main?selectedTab=0") {popUpTo("myPage"){inclusive=true} }})
             MypageButton(onLogoutClick = { loginViewModel.logout() })
             Spacer(modifier = Modifier.height(48.dp))
             InApp()

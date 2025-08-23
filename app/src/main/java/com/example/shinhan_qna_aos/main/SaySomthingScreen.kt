@@ -23,15 +23,14 @@ fun SaySomthingScreen(postRepository: PostRepository, data: Data, navController:
     val postViewModel: PostViewModel =
         viewModel(factory = SimpleViewModelFactory { PostViewModel(postRepository) })
 
+    val dataList = postViewModel.postList
+
     LaunchedEffect(Unit) {
         postViewModel.loadPosts()
     }
 
-    val dataList = postViewModel.postList
-
     LazyColumn {
         items(dataList, key = { it.postID }) { board ->
-            var responseState by remember { mutableStateOf(board.responseState) }
             TitleContentLikeButton(
                 title = board.title,
                 content = board.content,
@@ -39,10 +38,6 @@ fun SaySomthingScreen(postRepository: PostRepository, data: Data, navController:
                 isAdmin = data.isAdmin,
                 flagsCount = board.flagsCount,
                 banCount = warningStatusToBanCount(board.banCount).toInt(),
-                responseState = responseState,
-                onResponseStateChange = { newState ->
-                    responseState = newState
-                },
                 onClick = { navController.navigate("writeOpen/${board.postID}") }
             )
             Divider()
