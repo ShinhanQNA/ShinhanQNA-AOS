@@ -169,7 +169,7 @@ fun TitleContentCountButton(
     }
 }
 
-// 일반 게시글 컴포저블
+// 일반 게시글 컴포저블(공지 / 답변)
 @Composable
 fun TitleContentButton(title: String, content: String,onClick: () -> Unit) {
     Column(

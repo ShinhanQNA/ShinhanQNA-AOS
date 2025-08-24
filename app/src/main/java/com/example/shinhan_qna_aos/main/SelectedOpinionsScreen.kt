@@ -204,7 +204,7 @@ fun SelectedDetailScreen(
                 .padding(bottom = 50.dp)
         ) {
             TopBar(null) { navController.popBackStack() }
-            DetailContent(title = selectedPost?.title ?: "", content = selectedPost?.content ?: "")
+            DetailContent(title = selectedPost?.title ?: "", content = selectedPost?.content ?: "", imagePath = selectedPost?.imagePath)
             Box(modifier = Modifier.padding(horizontal = 20.dp)){ InfoIconCount(lucide.thumbs, "좋아요 표시", selectedPost?.likes ?: 0, Color.Black, 16) }
         }
     }
