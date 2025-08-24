@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -367,7 +368,9 @@ fun DetailContent(
     imagePath: String? = null  // 이미지 URL 또는 Uri 문자열 (null 가능)
 ) {
     Column(
-        modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
+        modifier = Modifier.fillMaxSize()
+            .background(Color.White)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         Text(
             title,

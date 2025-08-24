@@ -1,6 +1,5 @@
 package com.example.shinhan_qna_aos.API
 
-import com.example.shinhan_qna_aos.info.api.UserCheckResponse
 import com.example.shinhan_qna_aos.info.api.InfoResponse
 import com.example.shinhan_qna_aos.info.api.UserResponseWrapper
 import com.example.shinhan_qna_aos.login.api.AdminRequest
@@ -16,7 +15,7 @@ import com.example.shinhan_qna_aos.main.api.PostFlag
 import com.example.shinhan_qna_aos.main.api.PostLike
 import com.example.shinhan_qna_aos.main.api.ReportReasonBody
 import com.example.shinhan_qna_aos.main.api.TWPostData
-//import com.example.shinhan_qna_aos.servepage.api.Notification
+import com.example.shinhan_qna_aos.servepage.api.Notices
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -172,10 +171,10 @@ interface APIInterface {
         @Header("Authorization") accessToken: String,
     ): Response<List<Answer>>
 
-//    //공지 조회
-//    @GET("/notices")
-//    suspend fun Notification(
-//        @Header("Authorization") accessToken: String,
-//    ): Response<List<Notification>>
+    //공지 조회
+    @GET("/notices")
+    suspend fun Notification(
+        @Header("Authorization") accessToken: String,
+    ): Response<List<Notices>>
 }
 

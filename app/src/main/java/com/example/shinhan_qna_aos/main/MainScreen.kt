@@ -122,6 +122,7 @@ fun TopIcon(navController: NavController){
             modifier = Modifier
                 .border(1.dp, color = Color(0xffDFDFDF), RoundedCornerShape(10.dp))
                 .padding(6.dp)
+                .clickable { navController.navigate("notices")}
         ) {
             Icon(
                 painter = painterResource(R.drawable.shape),

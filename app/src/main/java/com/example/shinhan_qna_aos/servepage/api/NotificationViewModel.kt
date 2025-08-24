@@ -6,31 +6,28 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-//class NotificationViewModel(private val repository: NotificationRepository) : ViewModel() {
-//
-//    private val _answerList = MutableStateFlow<List<Answer>>(emptyList())
-//    val answerList = _answerList.asStateFlow()
-//
-//    // 현재 선택된 단일 답변 상태
-//    private val _selectedAnswer = MutableStateFlow<Answer?>(null)
-//    val selectedAnswer = _selectedAnswer.asStateFlow()
-//
-//    // 전체 답변 리스트 로드
-//    fun loadAnswers() {
-//        viewModelScope.launch {
-//            val result = repository.getAnswers()
-//            if (result.isSuccess) {
-//                val list = result.getOrDefault(emptyList())
-//                _answerList.value = list
-//            } else {
-//                // 에러 처리 로직 추가 가능
-//            }
-//        }
-//    }
-//
-//    // id 기준 단일 답변을 리스트에서 검색하여 선택 상태에 설정
-//    fun selectAnswerById(id: Int) {
-//        val answer = _answerList.value.find { it.id == id }
-//        _selectedAnswer.value = answer
-//    }
-//}
+class NotificationViewModel(private val repository: NotificationRepository) : ViewModel() {
+
+    private val _noticesList = MutableStateFlow<List<Notices>>(emptyList())
+    val noticesList = _noticesList.asStateFlow()
+
+    // 현재 선택된 단일 답변 상태
+    private val _selectedNotices = MutableStateFlow<Notices?>(null)
+    val selectedNotices = _selectedNotices.asStateFlow()
+
+    // 전체 답변 리스트 로드
+    fun loadNotification(id: Int? = null) {
+        viewModelScope.launch {
+            val result = repository.getNotification()
+            if (result.isSuccess) {
+                val list = result.getOrDefault(emptyList())
+                _noticesList.value = list
+
+                id?.let {
+                    val answer = list.find { it.id == id }
+                    _selectedNotices.value = answer
+                }
+            }
+        }
+    }
+}

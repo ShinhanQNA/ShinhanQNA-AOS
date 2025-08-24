@@ -43,6 +43,9 @@ import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.servepage.MypageScreen
+import com.example.shinhan_qna_aos.servepage.NotificationOpenScreen
+import com.example.shinhan_qna_aos.servepage.NotificationScreen
+import com.example.shinhan_qna_aos.servepage.api.NotificationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -62,6 +65,7 @@ fun AppNavigation(
     val infoRepository = remember { InfoRepository(apiInterface) }
     val answerRepository = remember { AnswerRepository(apiInterface,data) }
     val twPostRepository= remember { TWPostRepository(apiInterface, data) }
+    val notificationRepository = remember { NotificationRepository(apiInterface, data) }
 
     val loginViewModel: LoginViewModel =
         viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository, data) })
@@ -166,6 +170,15 @@ fun AppNavigation(
         }
 
         composable("myPage") { MypageScreen(authRepository, data, navController) }
+        composable("notices") { NotificationScreen(data, notificationRepository, navController) }
+
+        composable(
+            "notices/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            NotificationOpenScreen(id, notificationRepository, navController)
+        }
     }
 }
 
