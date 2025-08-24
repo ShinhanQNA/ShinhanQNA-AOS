@@ -34,6 +34,7 @@ import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.info.api.InfoRepository
 import com.example.shinhan_qna_aos.info.api.InfoViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
+import kotlinx.coroutines.delay
 
 // 대기 화면
 @Composable
@@ -41,7 +42,14 @@ fun WaitScreen(infoRepository: InfoRepository, data: Data, navController: NavCon
     val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data) })
 
     val navigationRoute by infoViewModel.navigationRoute.collectAsState()
-
+    // WaitScreen에 들어오면 주기적으로 상태 체크
+    LaunchedEffect(Unit) {
+        val accessToken = data.accessToken ?: return@LaunchedEffect
+        while (true) {
+            infoViewModel.checkAndNavigateUserStatus(accessToken)
+            delay(10000) // 1분마다 서버 상태 확인
+        }
+    }
     LaunchedEffect(navigationRoute) {
         navigationRoute?.let { route ->
             val currentRoute = navController.currentBackStackEntry?.destination?.route
