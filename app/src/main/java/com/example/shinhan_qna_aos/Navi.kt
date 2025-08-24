@@ -1,6 +1,8 @@
 package com.example.shinhan_qna_aos
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,11 +38,13 @@ import com.example.shinhan_qna_aos.main.AnsweredScreen
 import com.example.shinhan_qna_aos.main.MainScreen
 import com.example.shinhan_qna_aos.main.api.AnswerRepository
 import com.example.shinhan_qna_aos.main.api.PostRepository
+import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.servepage.MypageScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation(
     navController: NavHostController = rememberNavController(),
@@ -55,6 +59,7 @@ fun AppNavigation(
     val postRepository = remember { PostRepository(apiInterface, data) }
     val infoRepository = remember { InfoRepository(apiInterface) }
     val answerRepository = remember { AnswerRepository(apiInterface,data) }
+    val twPostRepository= remember { TWPostRepository(apiInterface, data) }
 
     val loginViewModel: LoginViewModel =
         viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository, data) })
@@ -100,11 +105,11 @@ fun AppNavigation(
         startDestination = initialRoute!!
     ) {
         composable("onboarding") { OnboardingScreen(navController, data) }
-        composable("login") { LoginScreen(authRepository, infoRepository, data, navController) }
+        composable("login") { LoginScreen(authRepository, data, navController) }
         composable("manager_login") { ManagerLoginScreen(authRepository, navController, data) }
         composable("info") { InformationScreen(infoRepository, data, navController) }
         composable("wait") { WaitScreen(infoRepository, data, navController) }
-//        composable("main") { MainScreen(postRepository, answerRepository, data, navController) }
+
         composable(
             "main?selectedTab={selectedTab}",
             arguments = listOf(navArgument("selectedTab") {
@@ -116,6 +121,7 @@ fun AppNavigation(
             MainScreen(
                 postRepository = postRepository,
                 answerRepository = answerRepository,
+                twPostRepository = twPostRepository,
                 data = data,
                 navController = navController,
                 initialSelectedIndex = selectedTab

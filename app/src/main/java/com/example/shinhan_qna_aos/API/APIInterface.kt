@@ -8,6 +8,7 @@ import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.LogoutData
 import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
 import com.example.shinhan_qna_aos.main.api.Answer
+import com.example.shinhan_qna_aos.main.api.GroupID
 import com.example.shinhan_qna_aos.main.api.Post
 import com.example.shinhan_qna_aos.main.api.PostData
 import com.example.shinhan_qna_aos.main.api.PostDetail
@@ -151,12 +152,11 @@ interface APIInterface {
     ): Response<Unit>
 
     // 3주 조회
-    @GET("/three-week-opinions/group/{groupId}?sort=date|likes")
+    @GET("/three-week-opinions/groups/ids")
     suspend fun ThreeWeekPost(
         @Header("Authorization") accessToken: String,
-        @Path ("groupId") groupId :Int,
-        @Path ("sort")	sort: String	// date OR likes
-    ): Response<TWPostData>
+        @Query ("year") year :Int,
+    ): Response<List<GroupID>>
 
     //답변 조회
     @GET("/answers")

@@ -32,7 +32,6 @@ import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.info.api.InfoRepository
-import com.example.shinhan_qna_aos.info.api.InfoViewModel
 import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -41,12 +40,10 @@ import com.google.android.gms.common.api.ApiException
 import kotlinx.coroutines.flow.map
 
 @Composable
-fun LoginScreen(authrepository: AuthRepository, infoRepository: InfoRepository ,data: Data, navController: NavController) {
+fun LoginScreen(authrepository: AuthRepository ,data: Data, navController: NavController) {
     val context = LocalContext.current
     val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authrepository,data) })
     val loginResult by loginViewModel.loginResult.collectAsState()
-    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository,data) })
-    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
 
     // 로그인 성공 시 학생 인증 상태 및 유저 상태에 따른 화면 분기 처리
     LaunchedEffect(loginResult) {

@@ -1,85 +1,60 @@
 package com.example.shinhan_qna_aos.main
 
-//import androidx.compose.foundation.background
-//import androidx.compose.foundation.border
-//import androidx.compose.foundation.clickable
-//import androidx.compose.foundation.layout.Arrangement
-//import androidx.compose.foundation.layout.Box
-//import androidx.compose.foundation.layout.Column
-//import androidx.compose.foundation.layout.Row
-//import androidx.compose.foundation.layout.Spacer
-//import androidx.compose.foundation.layout.fillMaxHeight
-//import androidx.compose.foundation.layout.fillMaxSize
-//import androidx.compose.foundation.layout.fillMaxWidth
-//import androidx.compose.foundation.layout.height
-//import androidx.compose.foundation.layout.padding
-//import androidx.compose.foundation.layout.size
-//import androidx.compose.foundation.layout.width
-//import androidx.compose.foundation.lazy.LazyColumn
-//import androidx.compose.foundation.lazy.LazyRow
-//import androidx.compose.foundation.lazy.items
-//import androidx.compose.foundation.shape.RoundedCornerShape
-//import androidx.compose.material3.Divider
-//import androidx.compose.material3.Icon
-//import androidx.compose.material3.IconButton
-//import androidx.compose.material3.Text
-//import androidx.compose.runtime.Composable
-//import androidx.compose.runtime.getValue
-//import androidx.compose.runtime.mutableStateOf
-//import androidx.compose.runtime.remember
-//import androidx.compose.runtime.setValue
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.draw.clip
-//import androidx.compose.ui.graphics.Brush
-//import androidx.compose.ui.graphics.Color
-//import androidx.compose.ui.res.painterResource
-//import androidx.compose.ui.text.TextStyle
-//import androidx.compose.ui.text.font.FontWeight
-//import androidx.compose.ui.tooling.preview.Preview
-//import androidx.compose.ui.unit.Dp
-//import androidx.compose.ui.unit.dp
-//import androidx.compose.ui.unit.sp
-//import com.example.shinhan_qna_aos.SelectData
-//import com.example.shinhan_qna_aos.SelectDataButton
-//import com.example.shinhan_qna_aos.TitleContentLike
-//import com.example.shinhan_qna_aos.TitleContentLikeButton
-//import com.example.shinhan_qna_aos.TopBar
-//import com.example.shinhan_qna_aos.ui.theme.pretendard
-//import com.jihan.lucide_icons.lucide
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Divider
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.SelectDataButton
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
+import com.example.shinhan_qna_aos.main.api.TWPostRepository
+import com.example.shinhan_qna_aos.main.api.TWPostViewModel
+import java.time.LocalDate
 
-//@Composable
-//fun SelectedOpinionsScreen() {
-//    val dataList = listOf( // 임의 값
-//        SelectData(2003,3,2,9),
-//        SelectData(2003,3,2,9),
-//        SelectData(2003,3,2,9),
-//        SelectData(2003,3,2,9),
-//        SelectData(2003,3,2,9 ),
-//        SelectData(2003,3,2,9 ),
-//        SelectData(2003,3,2,9),
-//        SelectData(2003,3,2,9)
-//    )
-//    val isAdmin = true
-//    val responseOptions = listOf("대기", "응답중", "응답 완료")
-//    LazyColumn(modifier = Modifier
-//        .fillMaxSize()
-//        .padding(bottom = 50.dp)){
-//        items(dataList) { data ->
-//            var responseState by remember { mutableStateOf(data.responseState) }
-//            SelectDataButton(
-//                year = data.year,
-//                month = data.month,
-//                week = data.week,
-//                count = data.count,
-//                isAdmin = isAdmin,
-//                onResponseStateChange = { responseState = it }
-//            )
-//            Divider()
-//        }
-//    }
-//}
-//
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun SelectedOpinionsScreen(twPostRepository: TWPostRepository,data: Data) {
+    val twPostViewModel: TWPostViewModel =
+        viewModel(factory = SimpleViewModelFactory { TWPostViewModel(twPostRepository) })
+
+    val responseOptions = listOf("대기","응답 완료")
+    val opinions by twPostViewModel.opinions.collectAsState()
+
+    LaunchedEffect(Unit) {
+        twPostViewModel.loadOpinions()
+    }
+
+    LazyColumn(modifier = Modifier
+        .fillMaxSize()
+        .padding(bottom = 50.dp)){
+        items(opinions) { opinion ->
+            var responseState by remember { mutableStateOf("대기") }
+            SelectDataButton(
+                year = LocalDate.now().year,  // GroupID 에 year가 없으니 현재 연도 지정
+                month = opinion.selectedMonth,
+                week = 3, // GroupID만으로는 week 데이터가 없으니 필요시 추가 정의 필요
+                isAdmin = data.isAdmin,
+                responseState = responseState,
+                onResponseStateChange = { responseState = it }
+            )
+            Divider()
+        }
+    }
+}
+
 //@Composable
 //fun SelectedDetailScreen() {
 //    val dataList = listOf(

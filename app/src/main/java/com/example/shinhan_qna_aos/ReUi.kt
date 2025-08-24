@@ -1,36 +1,27 @@
 package com.example.shinhan_qna_aos
 
-import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -41,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -49,7 +39,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -193,60 +182,67 @@ fun TitleContentButton(title: String, content: String,onClick: () -> Unit) {
         Text(content, style = ContentTextStyle, maxLines = 2, minLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
-
-//// 주차 선정 의견
-//@Composable
-//fun SelectDataButton(
-//    year: Int,
-//    month: Int,
-//    week: Int,
-//    count: Int,
-//    isAdmin: Boolean = false,
-//    responseState: String = "응답 상태",
-//    onResponseStateChange: (String) -> Unit = {}
-//) {
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .background(Color.White)
-//            .padding(horizontal = 20.dp, vertical = 16.dp),
-//        horizontalArrangement = Arrangement.SpaceBetween,
-//        verticalAlignment = Alignment.CenterVertically
-//    ) {
-//        Column {
-//            Text("${year}년 ${month}월 ${week}주차", style = TitleTextStyle)
-//            Spacer(Modifier.height(8.dp))
-//            Text("의견 $count 개", style = ContentTextStyle, maxLines = 1)
-//            Spacer(Modifier.height(8.dp))
-//            Box(
-//                modifier = Modifier
-//                    .background(Color(0xffFF9F43), RoundedCornerShape(20.dp))
-//                    .padding(horizontal = 12.dp, vertical = 2.dp)
-//            ) {
-//                Row(verticalAlignment = Alignment.CenterVertically) {
-//                    Image(
-//                        painter = painterResource(R.drawable.ellipse),
-//                        contentDescription = "상태 아이콘",
-//                        modifier = Modifier.size(10.dp)
-//                    )
-//                    Spacer(Modifier.width(4.dp))
-//                    Text("대기", style = TextStyle(fontFamily = pretendard, fontWeight = FontWeight.Bold, fontSize = 12.sp, color =  Color.White))
-//                }
-//            }
-//        }
-//        if (isAdmin) {
-//            ManagerDropDown(responseState, onResponseStateChange = onResponseStateChange)
-//        }
-//    }
-//}
+// 주차 선정 의견
+@Composable
+fun SelectDataButton(
+    year: Int,
+    month: Int,
+    week: Int,
+    isAdmin: Boolean = false,
+    responseState: String = "응답 상태",  // 👉 단일 String 으로 수정
+    onResponseStateChange: (String) -> Unit = {}
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text("${year}년 ${month}월 ${week}주차", style = TitleTextStyle)
+            Spacer(Modifier.height(30.dp))
+            Box(
+                modifier = Modifier
+                    .background(Color(0xffFF9F43), RoundedCornerShape(20.dp))
+                    .padding(horizontal = 12.dp, vertical = 2.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(R.drawable.ellipse),
+                        contentDescription = "상태 아이콘",
+                        modifier = Modifier.size(10.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        responseState, // 👉 여기서 선택된 상태 출력
+                        style = TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp,
+                            color = Color.White
+                        )
+                    )
+                }
+            }
+        }
+        if (isAdmin) {
+            ManagerDropDown(
+                responseState = responseState,
+                onResponseStateChange = onResponseStateChange
+            )
+        }
+    }
+}
 
 // 관리자용 응답 상태 드롭다운
 @Composable
 fun ManagerDropDown(
-    responseState: String,
-    responseOptions: List<String> = listOf("대기", "응답중", "응답 완료"),
+    responseState: String,  // 👉 단일 String 으로 변경
+    responseOptions: List<String> = listOf("대기", "응답 완료"),
     onResponseStateChange: (String) -> Unit
-){
+) {
     var expanded by remember { mutableStateOf(false) }  // 드롭다운 확장 상태 내부 관리
     Box {
         Row(
@@ -258,10 +254,10 @@ fun ManagerDropDown(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = if (responseState.isBlank() || responseState == "응답 상태") "응답 상태" else responseState,
+                text = responseState, // 👉 현재 선택된 상태
                 fontSize = 13.sp,
                 fontFamily = pretendard,
-                color =  Color.Black
+                color = Color.Black
             )
             Icon(
                 painter = painterResource(lucide.chevron_down),
@@ -278,7 +274,7 @@ fun ManagerDropDown(
                 DropdownMenuItem(
                     text = { Text(option, fontFamily = pretendard, fontSize = 14.sp) },
                     onClick = {
-                        onResponseStateChange(option)
+                        onResponseStateChange(option) // 👉 선택값 변경
                         expanded = false
                     }
                 )

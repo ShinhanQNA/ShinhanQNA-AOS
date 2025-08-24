@@ -1,5 +1,7 @@
 package com.example.shinhan_qna_aos.main
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -40,24 +43,28 @@ import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.main.api.AnswerRepository
 import com.example.shinhan_qna_aos.main.api.PostRepository
+import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen(
     postRepository: PostRepository,
     answerRepository: AnswerRepository,
+    twPostRepository: TWPostRepository,
     data: Data,
     navController: NavController,
     initialSelectedIndex: Int = 0
 ){
     var selectedIndex by remember { mutableStateOf(initialSelectedIndex) }
-    Box(modifier = Modifier.fillMaxSize()){
+    Box(modifier = Modifier.fillMaxSize().systemBarsPadding()){
         Column{
             MainTopbar(navController)
             Selectboard(
                 postRepository = postRepository,
                 answerRepository = answerRepository,
+                twPostRepository = twPostRepository,
                 data = data,
                 navController = navController,
                 selectedIndex = selectedIndex,
@@ -152,10 +159,12 @@ fun TopIcon(navController: NavController){
 }
 
 //게시판 선택
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Selectboard(
     postRepository: PostRepository,
     answerRepository: AnswerRepository,
+    twPostRepository: TWPostRepository,
     data: Data,
     navController: NavController,
     selectedIndex: Int,
@@ -229,7 +238,7 @@ fun Selectboard(
 
         when (selectedIndex) {
             0 -> SaySomthingScreen(postRepository, data , navController)
-            // 1 -> SelectedOpinionsScreen()
+            1 -> SelectedOpinionsScreen(twPostRepository, data)
             2 -> AnsweredScreen(answerRepository, navController)
         }
     }

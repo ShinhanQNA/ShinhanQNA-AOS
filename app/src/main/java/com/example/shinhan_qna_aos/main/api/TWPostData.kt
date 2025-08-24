@@ -19,3 +19,8 @@ data class GroupList(
     val imagePath: String?,
     val createdAt: String
 )
+
+data class GroupID(
+    val selectedMonth: Int,
+    val groupId : Int
+)
