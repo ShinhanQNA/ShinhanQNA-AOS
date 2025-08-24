@@ -151,12 +151,20 @@ interface APIInterface {
         @Path("postsid") postsid: Int,
     ): Response<Unit>
 
-    // 3주 조회
+    // 3주 그룹 조회
     @GET("/three-week-opinions/groups/ids")
     suspend fun ThreeWeekPost(
         @Header("Authorization") accessToken: String,
         @Query ("year") year :Int,
     ): Response<List<GroupID>>
+
+    // 3주 그룹 데이터로 상세 조회
+    @GET("/three-week-opinions/group/{groupId}")
+    suspend fun ThreeWeekPostDetail(
+        @Header("Authorization") accessToken: String,
+        @Path("groupId") groupId: Int,
+        @Query("sort") sort : String // data, likes
+    ): Response<TWPostData>
 
     //답변 조회
     @GET("/answers")

@@ -38,4 +38,21 @@ class TWPostRepository (
             Result.failure(e)
         }
     }
+
+    suspend fun fetchGroupDetail(groupId: Int, sort: String = "date"): Result<TWPostData> {
+        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
+        return try {
+            val response = apiInterface.ThreeWeekPostDetail("Bearer $accessToken", groupId, sort)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    Result.success(it)
+                } ?: Result.failure(Exception("응답 데이터 없음"))
+            } else {
+                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Log.e("TWPostRepository", "그룹 상세 API 호출 중 예외", e)
+            Result.failure(e)
+        }
+    }
 }

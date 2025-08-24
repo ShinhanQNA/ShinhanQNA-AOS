@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.shinhan_qna_aos.main.api.TitleContentLike
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 //
@@ -128,7 +129,7 @@ fun PlainInputField(
 
 // 게시글 + 좋아요/신고/차단 + 관리자 드롭다운
 @Composable
-fun TitleContentLikeButton(
+fun TitleContentCountButton(
     title: String,
     content: String,
     likeCount: Int,
@@ -190,13 +191,15 @@ fun SelectDataButton(
     week: Int,
     isAdmin: Boolean = false,
     responseState: String = "응답 상태",  // 👉 단일 String 으로 수정
-    onResponseStateChange: (String) -> Unit = {}
+    onResponseStateChange: (String) -> Unit = {},
+    onSelectDataClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .clickable { onSelectDataClick() },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -232,6 +235,37 @@ fun SelectDataButton(
                 responseState = responseState,
                 onResponseStateChange = onResponseStateChange
             )
+        }
+    }
+}
+// 주차별 의견 상세
+@Composable
+fun TitleContentLikeButton(
+    title: String,
+    content: String,
+    likeCount: Int,
+    onClick:()->Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .clickable { onClick() },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(title, style = TitleTextStyle)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                content,
+                style = ContentTextStyle,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoIconCount(lucide.thumbs, "좋아요 표시", likeCount, Color.Black, 16)
         }
     }
 }

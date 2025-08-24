@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName
 
 data class TWPostData(
     val id : Int,
-    val selectedYear: Int,
-    val selectedMonth: Int,
+    @SerializedName("selectedYear") val selectedYear: Int,
+    @SerializedName("selectedMonth") val selectedMonth: Int,
     val responseStatus: String,
     val createdAt:String,
     val opinions: List<GroupList>

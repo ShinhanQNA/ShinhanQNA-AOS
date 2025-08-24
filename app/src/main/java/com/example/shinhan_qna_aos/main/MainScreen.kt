@@ -238,7 +238,7 @@ fun Selectboard(
 
         when (selectedIndex) {
             0 -> SaySomthingScreen(postRepository, data , navController)
-            1 -> SelectedOpinionsScreen(twPostRepository, data)
+            1 -> SelectedOpinionsScreen(twPostRepository, data, navController)
             2 -> AnsweredScreen(answerRepository, navController)
         }
     }
