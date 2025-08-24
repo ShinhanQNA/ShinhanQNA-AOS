@@ -1,5 +1,7 @@
 package com.example.shinhan_qna_aos.main.api
 
+import com.google.gson.annotations.SerializedName
+
 data class TWPostData(
     val id : Int,
     val selectedYear: Int,
@@ -21,6 +23,6 @@ data class GroupList(
 )
 
 data class GroupID(
-    val selectedMonth: Int,
-    val groupId : Int
+    @SerializedName("selectedMonth") val selectedMonth: Int,
+    @SerializedName("groupId") val groupId: Int
 )

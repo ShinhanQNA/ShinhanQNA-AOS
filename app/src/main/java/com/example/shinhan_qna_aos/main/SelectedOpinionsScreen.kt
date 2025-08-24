@@ -30,7 +30,6 @@ fun SelectedOpinionsScreen(twPostRepository: TWPostRepository,data: Data) {
     val twPostViewModel: TWPostViewModel =
         viewModel(factory = SimpleViewModelFactory { TWPostViewModel(twPostRepository) })
 
-    val responseOptions = listOf("대기","응답 완료")
     val opinions by twPostViewModel.opinions.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -42,6 +41,7 @@ fun SelectedOpinionsScreen(twPostRepository: TWPostRepository,data: Data) {
         .padding(bottom = 50.dp)){
         items(opinions) { opinion ->
             var responseState by remember { mutableStateOf("대기") }
+            println("opinion.selectedMonth = ${opinion.selectedMonth}")
             SelectDataButton(
                 year = LocalDate.now().year,  // GroupID 에 year가 없으니 현재 연도 지정
                 month = opinion.selectedMonth,
