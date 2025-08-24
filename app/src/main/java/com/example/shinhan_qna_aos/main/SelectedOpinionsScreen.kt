@@ -1,6 +1,7 @@
 package com.example.shinhan_qna_aos.main
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -49,12 +50,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.DetailContent
+import com.example.shinhan_qna_aos.InfoIconCount
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.SelectDataButton
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TitleContentCountButton
 import com.example.shinhan_qna_aos.TitleContentLikeButton
 import com.example.shinhan_qna_aos.TopBar
+import com.example.shinhan_qna_aos.main.api.AnswerRepository
+import com.example.shinhan_qna_aos.main.api.AnswerViewModel
 import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.main.api.TWPostViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
@@ -150,7 +155,7 @@ fun SelectedOpenScreen(
                         title = opinion.title,
                         content = opinion.content,
                         likeCount = opinion.likes,
-                        onClick = { /* 상세보기 등 클릭 처리 가능 */ }
+                        onClick = { navController.navigate("threeWeekDetail/${groupId}/${opinion.id}") }
                     )
                     Divider()
                 }
@@ -167,6 +172,44 @@ fun SelectedOpenScreen(
         )
     }
 }
+
+@Composable
+fun SelectedDetailScreen(
+    groupId: Int,
+    twPostRepository: TWPostRepository,
+    navController: NavController,
+    id: Int
+) {
+    val twPostViewModel: TWPostViewModel =
+        viewModel(factory = SimpleViewModelFactory { TWPostViewModel(twPostRepository) })
+
+    val selectedSort by twPostViewModel.selectedSort.collectAsState()
+    val groupDetailList by twPostViewModel.groupDetailList.collectAsState()
+    Log.d("SelectedDetailScreen", "groupDetailList: $groupDetailList")
+    Log.d("SelectedDetailScreen", "selectedSort: $selectedSort")
+
+    // 화면 최초 진입 시 groupId, 기본 정렬 'date'로 상세 글 리스트 로드
+    LaunchedEffect(groupId) {
+        twPostViewModel.loadGroupDetailPosts(groupId, selectedSort)
+    }
+
+    // id에 해당하는 글을 리스트에서 찾기 (groupDetailList가 업데이트 될 때마다 재평가)
+    val selectedPost = groupDetailList.firstOrNull { it.id == id }
+
+    Box {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(bottom = 50.dp)
+        ) {
+            TopBar(null) { navController.popBackStack() }
+            DetailContent(title = selectedPost?.title ?: "", content = selectedPost?.content ?: "")
+            Box(modifier = Modifier.padding(horizontal = 20.dp)){ InfoIconCount(lucide.thumbs, "좋아요 표시", selectedPost?.likes ?: 0, Color.Black, 16) }
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class) // ModalBottomSheetState 및 ModalBottomSheet 사용을 위해 필요
 @Composable

@@ -36,6 +36,7 @@ import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.main.AnsweredOpenScreen
 import com.example.shinhan_qna_aos.main.AnsweredScreen
 import com.example.shinhan_qna_aos.main.MainScreen
+import com.example.shinhan_qna_aos.main.SelectedDetailScreen
 import com.example.shinhan_qna_aos.main.SelectedOpenScreen
 import com.example.shinhan_qna_aos.main.api.AnswerRepository
 import com.example.shinhan_qna_aos.main.api.PostRepository
@@ -137,8 +138,8 @@ fun AppNavigation(
         }
 
         composable("writeBoard") { WritingScreen(writeRepository, navController) }
-        composable("answer") { AnsweredScreen(answerRepository, navController)
-        }
+        composable("answer") { AnsweredScreen(answerRepository, navController) }
+
         composable(
             "answerOpen/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
@@ -153,6 +154,15 @@ fun AppNavigation(
         ) { backStackEntry ->
             val groupId = backStackEntry.arguments?.getInt("groupId") ?: -1
             SelectedOpenScreen(groupId, twPostRepository, navController)
+        }
+
+        composable(
+            "threeWeekDetail/{groupId}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType },navArgument("groupId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val groupId = backStackEntry.arguments?.getInt("groupId") ?: -1
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            SelectedDetailScreen(groupId , twPostRepository, navController, id)
         }
 
         composable("myPage") { MypageScreen(authRepository, data, navController) }
