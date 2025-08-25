@@ -83,6 +83,22 @@ class LoginViewModel(
     }
 
     /**
+     * 회원 탈퇴 시도
+     */
+    fun CancleMemeber() {
+        viewModelScope.launch {
+            repository.cancleMember()
+                .onSuccess {
+                    _loginResult.value = LoginResult.Idle
+                }
+                .onFailure { e ->
+                    // 로그아웃 실패처리 예: 로그 출력 또는 UI 알림
+                    Log.e("cancle", "회원탈퇴 실패: ${e.localizedMessage}")
+                }
+        }
+    }
+
+    /**
      * 토큰 재발급 시도: Access Token 유효/재발급 성공 시 로그인 성공 상태로 업데이트,
      * 실패 시 로그인 실패 상태로 변경 (재로그인 필요)
      */

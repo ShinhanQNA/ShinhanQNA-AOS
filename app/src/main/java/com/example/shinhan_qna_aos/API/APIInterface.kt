@@ -176,5 +176,11 @@ interface APIInterface {
     suspend fun Notification(
         @Header("Authorization") accessToken: String,
     ): Response<List<Notices>>
+
+    //회원 탈퇴
+    @DELETE("/users/me")
+    suspend fun CancelMember(
+        @Header("Authorization") accessToken: String,
+    ): Response<LogoutData>
 }
 

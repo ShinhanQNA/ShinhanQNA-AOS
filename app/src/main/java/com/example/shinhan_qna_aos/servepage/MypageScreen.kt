@@ -69,7 +69,7 @@ fun MypageScreen(authRepository: AuthRepository, data: Data, navController: NavC
                 .background(Color.White)
         ) {
             TopBar("마이페이지", { navController.navigate("main?selectedTab=0") {popUpTo("myPage"){inclusive=true} }})
-            MypageButton(onLogoutClick = { loginViewModel.logout() })
+            MypageButton(onLogoutClick = { loginViewModel.logout() }, onCancleMember = { loginViewModel.CancleMemeber() })
             Spacer(modifier = Modifier.height(48.dp))
             InApp()
             Spacer(modifier = Modifier.weight(1f))
@@ -87,7 +87,7 @@ fun MypageScreen(authRepository: AuthRepository, data: Data, navController: NavC
 }
 
 @Composable
-fun MypageButton(onLogoutClick:() -> Unit){
+fun MypageButton(onLogoutClick:() -> Unit, onCancleMember:() -> Unit = {}){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -141,7 +141,7 @@ fun MypageButton(onLogoutClick:() -> Unit){
             modifier = Modifier
                 .fillMaxWidth()
                 .height(24.dp)
-                .clickable { },
+                .clickable { onCancleMember() },
             contentAlignment = Alignment.CenterStart
         ) {
             Text(

@@ -117,4 +117,25 @@ class AuthRepository(
             Result.failure(e)
         }
     }
+
+    /**
+     * 회원 탈퇴
+     */
+    suspend fun cancleMember(): Result<LogoutData> {
+        val accessToken = data.accessToken
+        return try {
+            val response = apiInterface.CancelMember("Bearer $accessToken")
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    data.clearTokens()
+                    Result.success(it)
+                } ?: Result.failure(Exception("서버 응답이 비어있습니다."))
+            } else {
+                val errorBody = response.errorBody()?.string() ?: ""
+                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()} $errorBody"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
