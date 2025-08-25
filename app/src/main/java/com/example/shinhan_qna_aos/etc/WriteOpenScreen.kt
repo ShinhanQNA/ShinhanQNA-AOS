@@ -47,7 +47,6 @@ import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.LikeFlagBan
 import com.example.shinhan_qna_aos.ManagerButton
-import com.example.shinhan_qna_aos.ManagerFunctionButton
 import com.example.shinhan_qna_aos.etc.api.WriteData
 import com.example.shinhan_qna_aos.etc.api.WriteRepository
 import com.example.shinhan_qna_aos.etc.api.WritingViewModel
@@ -120,7 +119,13 @@ fun WriteOpenScreen(
                             LikeFlagBan(detail.likes, detail.reportCount, warningStatusToBanCount(detail.warningStatus).toInt(), data)
                             Spacer(modifier = Modifier.height(36.dp))
                             if (data.isAdmin) {
-                                ManagerFunctionButton()
+                                ManagerFunctionButton(
+                                    onDeleteClick = {
+                                        Log.d("Compose", "삭제 버튼 클릭됨")
+                                        postViewModel.deletePost(postId.toInt())
+                                        navController.popBackStack()
+                                    }
+                                )
                             } else {
                                 if(isOwner){
                                     EditDeleteButton(
@@ -408,7 +413,7 @@ fun EditDeleteButton( // 작성자
 
 // 게시판 관리자 버튼
 @Composable
-fun ManagerFunctionButton() {
+fun ManagerFunctionButton(onDeleteClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -418,7 +423,8 @@ fun ManagerFunctionButton() {
         ManagerButton(
             icon = lucide.trash,
             label = "삭제",
-            background = Color(0xffFC4F4F)
+            background = Color(0xffFC4F4F),
+            onClick = { onDeleteClick()  }
         )
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -426,7 +432,8 @@ fun ManagerFunctionButton() {
         ManagerButton(
             icon = lucide.flag,
             label =  "경고",
-            background = Color(0xffFF9F43)
+            background = Color(0xffFF9F43),
+            onClick = { /* 뒤로가기 버튼 클릭 로직 */ }
         )
     }
 }
