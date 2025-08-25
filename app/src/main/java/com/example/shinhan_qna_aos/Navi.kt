@@ -42,6 +42,7 @@ import com.example.shinhan_qna_aos.main.api.AnswerRepository
 import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
+import com.example.shinhan_qna_aos.servepage.AlarmScreen
 import com.example.shinhan_qna_aos.servepage.MypageScreen
 import com.example.shinhan_qna_aos.servepage.NotificationOpenScreen
 import com.example.shinhan_qna_aos.servepage.NotificationScreen
@@ -171,6 +172,7 @@ fun AppNavigation(
 
         composable("myPage") { MypageScreen(authRepository, data, navController) }
         composable("notices") { NotificationScreen(data, notificationRepository, navController) }
+        composable("alarm") { AlarmScreen(navController) }
 
         composable(
             "notices/{id}",
