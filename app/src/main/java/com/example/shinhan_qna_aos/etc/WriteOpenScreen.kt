@@ -46,6 +46,7 @@ import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.LikeFlagBan
+import com.example.shinhan_qna_aos.ManagerButton
 import com.example.shinhan_qna_aos.ManagerFunctionButton
 import com.example.shinhan_qna_aos.etc.api.WriteData
 import com.example.shinhan_qna_aos.etc.api.WriteRepository
@@ -119,7 +120,7 @@ fun WriteOpenScreen(
                             LikeFlagBan(detail.likes, detail.reportCount, warningStatusToBanCount(detail.warningStatus).toInt(), data)
                             Spacer(modifier = Modifier.height(36.dp))
                             if (data.isAdmin) {
-                                ManagerFunctionButton(data.isNotice)
+                                ManagerFunctionButton()
                             } else {
                                 if(isOwner){
                                     EditDeleteButton(
@@ -388,7 +389,7 @@ fun EditDeleteButton( // 작성자
         ) {
             Icon(
                 painter = painterResource( lucide.trash ),
-                contentDescription = "삭제/추천",
+                contentDescription = "삭제",
                 modifier = Modifier.size(20.dp),
                 tint = Color.White
             )
@@ -402,6 +403,31 @@ fun EditDeleteButton( // 작성자
                 ),
             )
         }
+    }
+}
+
+// 게시판 관리자 버튼
+@Composable
+fun ManagerFunctionButton() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.End
+    ) {
+        ManagerButton(
+            icon = lucide.trash,
+            label = "삭제",
+            background = Color(0xffFC4F4F)
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        ManagerButton(
+            icon = lucide.flag,
+            label =  "경고",
+            background = Color(0xffFF9F43)
+        )
     }
 }
 

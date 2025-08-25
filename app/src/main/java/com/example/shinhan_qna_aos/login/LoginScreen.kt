@@ -49,7 +49,11 @@ fun LoginScreen(authrepository: AuthRepository ,data: Data, navController: NavCo
     LaunchedEffect(loginResult) {
         if (loginResult is LoginResult.Success) {
             Log.d("LoginScreen", "Login success detected")
-
+            if (data.isAdmin){
+                navController.navigate("main"){
+                    popUpTo("login") { inclusive = true }
+                }
+            }
             if (data.studentCertified) {
                 // 이미 가입 요청한 경우, 로컬 상태 기반으로 네비게이션 분기
                 val destination = when (data.userStatus) {

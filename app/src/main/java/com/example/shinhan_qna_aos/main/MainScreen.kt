@@ -88,10 +88,12 @@ fun MainScreen(
 
     // 매번 MainScreen 진입 혹은 navigationRoute 변경 시 상태 점검
     LaunchedEffect(Unit) {
-        val accessToken = data.accessToken
-        if (!accessToken.isNullOrBlank()) {
-            infoViewModel.checkAndNavigateUserStatus(accessToken)
-            delay(30000)
+        if(!data.isAdmin) {
+            val accessToken = data.accessToken
+            if (!accessToken.isNullOrBlank()) {
+                infoViewModel.checkAndNavigateUserStatus(accessToken)
+                delay(30000)
+            }
         }
     }
 
@@ -106,7 +108,10 @@ fun MainScreen(
     }
 
     var selectedIndex by remember { mutableStateOf(initialSelectedIndex) }
-    Box(modifier = Modifier.fillMaxSize().systemBarsPadding()){
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .systemBarsPadding()){
         Column{
             MainTopbar(navController)
             Selectboard(
@@ -157,7 +162,7 @@ fun TopIcon(navController: NavController){
             modifier = Modifier
                 .border(1.dp, color = Color(0xffDFDFDF), RoundedCornerShape(10.dp))
                 .padding(6.dp)
-                .clickable { navController.navigate("writeBoard")}
+                .clickable { navController.navigate("writeBoard") }
         ) {
             Icon(
                 painter = painterResource(lucide.plus),
@@ -170,7 +175,7 @@ fun TopIcon(navController: NavController){
             modifier = Modifier
                 .border(1.dp, color = Color(0xffDFDFDF), RoundedCornerShape(10.dp))
                 .padding(6.dp)
-                .clickable { navController.navigate("notices")}
+                .clickable { navController.navigate("notices") }
         ) {
             Icon(
                 painter = painterResource(R.drawable.shape),
@@ -196,7 +201,7 @@ fun TopIcon(navController: NavController){
             modifier = Modifier
                 .border(1.dp, color = Color(0xffDFDFDF), RoundedCornerShape(10.dp))
                 .padding(6.dp)
-                .clickable { navController.navigate("mypage")}
+                .clickable { navController.navigate("mypage") }
         ){
             Icon(
                 painter = painterResource(R.drawable.shield_user),

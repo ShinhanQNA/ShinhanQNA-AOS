@@ -87,10 +87,15 @@ fun AppNavigation(
         if (data.onboarding) {
             initialRoute = "onboarding"
         } else if (loginResult is LoginResult.Success) {
-            Log.d("AppNavigation", "로그인 성공 감지, 서버 상태 조회 시작")
-            infoViewModel.checkAndNavigateUserStatus(data.accessToken ?: "")
-            // 초기 화면은 navigationRoute가 정해질 때까지 null로 둔다
-            initialRoute = null
+            if (data.isAdmin){
+                initialRoute= "main"
+            }
+            else {
+                Log.d("AppNavigation", "로그인 성공 감지, 서버 상태 조회 시작")
+                infoViewModel.checkAndNavigateUserStatus(data.accessToken ?: "")
+                // 초기 화면은 navigationRoute가 정해질 때까지 null로 둔다
+                initialRoute = null
+            }
         } else {
             initialRoute = "login"
         }
