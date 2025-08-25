@@ -91,8 +91,9 @@ private val data: Data
 
         // 화면 분기 결정
         val destination = when {
-            hasBlock -> "block"          // 차단 화면 (구현 필요)
-            !data.studentCertified -> "info" // 학생 인증 안 된 경우 인증 화면
+            hasBlock && !data.isAppealCompleted -> "appeal1"   // 처음 차단, 이의 접수 전
+            hasBlock && data.isAppealCompleted -> "appeal3"    // 이미 이의 접수 완료된 경우
+            !data.studentCertified -> "info"
             user.status == "가입 완료" -> "main"
             user.status == "가입 대기 중" -> "wait"
             else -> "info"

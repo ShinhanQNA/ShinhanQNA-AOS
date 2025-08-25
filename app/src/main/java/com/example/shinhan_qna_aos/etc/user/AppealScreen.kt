@@ -1,7 +1,9 @@
 package com.example.shinhan_qna_aos.etc.user
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,246 +30,281 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
+import com.example.shinhan_qna_aos.info.api.InfoRepository
+import com.example.shinhan_qna_aos.info.api.InfoViewModel
+import com.example.shinhan_qna_aos.login.api.LoginResult
+import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
+import kotlinx.coroutines.delay
 
-//@Composable
-//fun AppealScreen1(userName: String = "사용자") {
-//    Column(
-//        modifier = Modifier.fillMaxSize()
-//        .padding(horizontal = 20.dp)
-//        .systemBarsPadding()  // 상태바+내비게이션 영역 침범 방지
-//        .background(Color.White),
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        Image(
-//            painter = painterResource(R.drawable.biglogo),
-//            contentDescription = null,
-//            modifier = Modifier.size(128.dp)
-//        )
-//        Spacer(modifier = Modifier.height(36.dp))
-//
-//        Text(
-//            text = "서비스 이용 제한 안내",
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Bold,
-//                fontSize = 20.sp
-//            ),
-//            lineHeight = 28.sp
-//        )
-//        Spacer(modifier = Modifier.height(36.dp))
-//
-//        Text(
-//            text = "[${userName}]님의 계정에서 이용 약관을 심각하게 위반하는 활동이 감지되어, 서비스 이용이 영구적으로 정지되었음을 알려드립니다.",
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Normal,
-//                fontSize = 14.sp
-//            ),
-//            lineHeight = 20.sp,
-//            textAlign = TextAlign.Center,
-//        )
-//        Spacer(modifier = Modifier.height(20.dp))
-//
-//        Text(
-//            text = "관이 결정에 따라 회원님은 더 이상 본 계정으로 로그인하거나 서비스를 이용할 수 없습니다.",
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Normal,
-//                fontSize = 14.sp
-//            ),
-//            lineHeight = 20.sp,
-//            textAlign = TextAlign.Center,
-//        )
-//        Spacer(modifier = Modifier.height(36.dp))
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.spacedBy(6.dp),
-//            modifier = Modifier
-//                .background(Color(0xffFC4F4F), RoundedCornerShape(12.dp))
-//                .padding(horizontal = 12.dp, vertical = 8.dp),
-//        ) {
-//            Icon(
-//                painter = painterResource(lucide.user),
-//                contentDescription = "이의 신청하기",
-//                modifier = Modifier.size(20.dp),
-//                tint = Color.White
-//            )
-//            Text(
-//                text = "이의 신청하기",
-//                color = Color.White,
-//                style = TextStyle(
-//                    fontFamily = pretendard,
-//                    fontWeight = FontWeight.Normal,
-//                    fontSize = 14.sp
-//                ),
-//            )
-//        }
-//    }
-//}
-//
-//@Composable
-//fun AppealScreen2() {
-//    Column(
-//        modifier = Modifier.fillMaxSize()
-//            .padding(horizontal = 20.dp)
-//            .systemBarsPadding()  // 상태바+내비게이션 영역 침범 방지
-//            .background(Color.White),
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        Image(
-//            painter = painterResource(R.drawable.biglogo),
-//            contentDescription = null,
-//            modifier = Modifier.size(128.dp)
-//        )
-//        Spacer(modifier = Modifier.height(36.dp))
-//
-//        Text(
-//            text = "⚠ 중요 안내",
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Bold,
-//                fontSize = 20.sp
-//            ),
-//            lineHeight = 28.sp
-//        )
-//        Spacer(modifier = Modifier.height(36.dp))
-//
-//        Text(
-//            text = "이의 제기 신청은 마지막 기회입니다. 제출 이후에는 내용 수정이나 재신청이 절대 불가능합니다.",
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Normal,
-//                fontSize = 13.5.sp
-//            ),
-//            lineHeight = 20.sp,
-//            textAlign = TextAlign.Center,
-//        )
-//        Spacer(modifier = Modifier.height(20.dp))
-//
-//        Text(
-//            text = "저희는 제출된 내용을 바탕으로 신중하게 재검토할 것이며, 이 과정에서 내려진 결정은 번복되지 않는 최종 조치임을 알려드립니다.",
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Normal,
-//                fontSize = 13.5.sp
-//            ),
-//            lineHeight = 20.sp,
-//            textAlign = TextAlign.Center,
-//        )
-//        Spacer(modifier = Modifier.height(36.dp))
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.spacedBy(6.dp),
-//            modifier = Modifier
-//                .background(Color.Black, RoundedCornerShape(12.dp))
-//                .padding(horizontal = 12.dp, vertical = 8.dp),
-//        ) {
-//            Icon(
-//                painter = painterResource(lucide.plus),
-//                contentDescription = "이의 접수하기",
-//                modifier = Modifier.size(20.dp),
-//                tint = Color.White
-//            )
-//            Text(
-//                text = "이의 접수하기",
-//                color = Color.White,
-//                style = TextStyle(
-//                    fontFamily = pretendard,
-//                    fontWeight = FontWeight.Normal,
-//                    fontSize = 14.sp
-//                ),
-//            )
-//        }
-//    }
-//}
-//
-//@Composable
-//fun AppealScreen3(userName: String = "사용자") {
-//    Column(
-//        modifier = Modifier.fillMaxSize()
-//            .padding(horizontal = 20.dp)
-//            .systemBarsPadding()  // 상태바+내비게이션 영역 침범 방지
-//            .background(Color.White),
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        Image(
-//            painter = painterResource(R.drawable.biglogo),
-//            contentDescription = null,
-//            modifier = Modifier.size(128.dp)
-//        )
-//        Spacer(modifier = Modifier.height(36.dp))
-//
-//        Text(
-//            text = "이의 접수 완료",
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Bold,
-//                fontSize = 20.sp
-//            ),
-//            lineHeight = 28.sp
-//        )
-//        Spacer(modifier = Modifier.height(36.dp))
-//
-//        Text(
-//            text = "[${userName}]님의 이의 제기 신청이 완료되었습니다.",
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Normal,
-//                fontSize = 14.sp
-//            ),
-//            lineHeight = 20.sp,
-//            textAlign = TextAlign.Center,
-//        )
-//        Spacer(modifier = Modifier.height(20.dp))
-//
-//        Text(
-//            text = "운영팀에서 신속하게 검토를 진행할 수 있도록 하겠습니다.",
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Normal,
-//                fontSize = 14.sp
-//            ),
-//            lineHeight = 20.sp,
-//            textAlign = TextAlign.Center,
-//        )
-//        Spacer(modifier = Modifier.height(20.dp))
-//
-//        Text(
-//            text = "검토가 진행되는 동안에는 서비스 이용이 불가능하며, 이번 검토를 통해 내려진 결정은 최종적인 효력을 가집니다.",
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Normal,
-//                fontSize = 14.sp
-//            ),
-//            lineHeight = 20.sp,
-//            textAlign = TextAlign.Center,
-//        )
-//        Spacer(modifier = Modifier.height(20.dp))
-//
-//        Text(
-//            text = "기다려 주셔서 감사합니다",
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Normal,
-//                fontSize = 14.sp
-//            ),
-//            lineHeight = 20.sp,
-//            textAlign = TextAlign.Center,
-//        )
-//    }
-//}
-//
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun AppealPreview(){
-////    AppealScreen1()
-////    AppealScreen2()
+@Composable
+fun AppealScreen1(data: Data, navController: NavController) {
+    Column(
+        modifier = Modifier.fillMaxSize()
+        .padding(horizontal = 20.dp)
+        .systemBarsPadding()  // 상태바+내비게이션 영역 침범 방지
+        .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(R.drawable.biglogo),
+            contentDescription = null,
+            modifier = Modifier.size(128.dp)
+        )
+        Spacer(modifier = Modifier.height(36.dp))
+
+        Text(
+            text = "서비스 이용 제한 안내",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            ),
+            lineHeight = 28.sp
+        )
+        Spacer(modifier = Modifier.height(36.dp))
+
+        Text(
+            text = "[${data.userName}]님의 계정에서 이용 약관을 심각하게 위반하는 활동이 감지되어, 서비스 이용이 영구적으로 정지되었음을 알려드립니다.",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
+            ),
+            lineHeight = 20.sp,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "관이 결정에 따라 회원님은 더 이상 본 계정으로 로그인하거나 서비스를 이용할 수 없습니다.",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
+            ),
+            lineHeight = 20.sp,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(36.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier
+                .background(Color(0xffFC4F4F), RoundedCornerShape(12.dp))
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .clickable { navController.navigate("appeal2") },
+        ) {
+            Icon(
+                painter = painterResource(lucide.user),
+                contentDescription = "이의 신청하기",
+                modifier = Modifier.size(20.dp),
+                tint = Color.White
+            )
+            Text(
+                text = "이의 신청하기",
+                color = Color.White,
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+fun AppealScreen2(data: Data, navController: NavController) {
+    Column(
+        modifier = Modifier.fillMaxSize()
+            .padding(horizontal = 20.dp)
+            .systemBarsPadding()  // 상태바+내비게이션 영역 침범 방지
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(R.drawable.biglogo),
+            contentDescription = null,
+            modifier = Modifier.size(128.dp)
+        )
+        Spacer(modifier = Modifier.height(36.dp))
+
+        Text(
+            text = "⚠ 중요 안내",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            ),
+            lineHeight = 28.sp
+        )
+        Spacer(modifier = Modifier.height(36.dp))
+
+        Text(
+            text = "이의 제기 신청은 마지막 기회입니다. 제출 이후에는 내용 수정이나 재신청이 절대 불가능합니다.",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 13.5.sp
+            ),
+            lineHeight = 20.sp,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "저희는 제출된 내용을 바탕으로 신중하게 재검토할 것이며, 이 과정에서 내려진 결정은 번복되지 않는 최종 조치임을 알려드립니다.",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 13.5.sp
+            ),
+            lineHeight = 20.sp,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(36.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier
+                .background(Color.Black, RoundedCornerShape(12.dp))
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .clickable {
+                    navController.navigate("appeal3")
+                    data.isAppealCompleted = true
+                   },
+        ) {
+            Icon(
+                painter = painterResource(lucide.plus),
+                contentDescription = "이의 접수하기",
+                modifier = Modifier.size(20.dp),
+                tint = Color.White
+            )
+            Text(
+                text = "이의 접수하기",
+                color = Color.White,
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+fun AppealScreen3(infoRepository: InfoRepository, data: Data, navController: NavController) {
+    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data) })
+
+    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
+
+    // 매번 MainScreen 진입 혹은 navigationRoute 변경 시 상태 점검
+    LaunchedEffect(Unit) {
+        val accessToken = data.accessToken
+        if (!accessToken.isNullOrBlank()) {
+            infoViewModel.checkAndNavigateUserStatus(accessToken)
+            delay(30000)
+        }
+    }
+
+    // navigationRoute가 "appeal1" (차단)이면 페이지 이동 처리
+    LaunchedEffect(navigationRoute) {
+            navController.navigate(navigationRoute!!) {
+                popUpTo("appeal3") { inclusive = true }
+                launchSingleTop = true
+            }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize()
+            .padding(horizontal = 20.dp)
+            .systemBarsPadding()  // 상태바+내비게이션 영역 침범 방지
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(R.drawable.biglogo),
+            contentDescription = null,
+            modifier = Modifier.size(128.dp)
+        )
+        Spacer(modifier = Modifier.height(36.dp))
+
+        Text(
+            text = "이의 접수 완료",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            ),
+            lineHeight = 28.sp
+        )
+        Spacer(modifier = Modifier.height(36.dp))
+
+        Text(
+            text = "[${data.userName}]님의 이의 제기 신청이 완료되었습니다.",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
+            ),
+            lineHeight = 20.sp,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "운영팀에서 신속하게 검토를 진행할 수 있도록 하겠습니다.",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
+            ),
+            lineHeight = 20.sp,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "검토가 진행되는 동안에는 서비스 이용이 불가능하며, 이번 검토를 통해 내려진 결정은 최종적인 효력을 가집니다.",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
+            ),
+            lineHeight = 20.sp,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            text = "기다려 주셔서 감사합니다",
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
+            ),
+            lineHeight = 20.sp,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun AppealPreview(){
+//    AppealScreen1()
+//    AppealScreen2()
 //    AppealScreen3()
-//}
+}

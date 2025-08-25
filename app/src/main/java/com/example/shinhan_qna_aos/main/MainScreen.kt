@@ -46,6 +46,8 @@ import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
+import com.example.shinhan_qna_aos.info.api.InfoRepository
+import com.example.shinhan_qna_aos.info.api.InfoViewModel
 import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.api.LoginViewModel
@@ -54,6 +56,7 @@ import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
+import kotlinx.coroutines.delay
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -62,13 +65,16 @@ fun MainScreen(
     answerRepository: AnswerRepository,
     twPostRepository: TWPostRepository,
     authRepository: AuthRepository,
+    infoRepository: InfoRepository,
     data: Data,
     navController: NavController,
     initialSelectedIndex: Int = 0
 ){
     val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository,data) })
+    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data)})
 
     val loginResult by loginViewModel.loginResult.collectAsState()
+    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
 
     LaunchedEffect(loginResult) {
         Log.d("main","로그인 검사")
@@ -76,6 +82,25 @@ fun MainScreen(
             // 토큰 만료 또는 인증 실패시 로그인 화면으로 이동
             navController.navigate("login") {
                 popUpTo("main") { inclusive = true }
+            }
+        }
+    }
+
+    // 매번 MainScreen 진입 혹은 navigationRoute 변경 시 상태 점검
+    LaunchedEffect(Unit) {
+        val accessToken = data.accessToken
+        if (!accessToken.isNullOrBlank()) {
+            infoViewModel.checkAndNavigateUserStatus(accessToken)
+            delay(30000)
+        }
+    }
+
+    // navigationRoute가 "appeal1" (차단)이면 페이지 이동 처리
+    LaunchedEffect(navigationRoute) {
+        if (navigationRoute == "appeal1") {
+            navController.navigate("appeal1") {
+                popUpTo("main") { inclusive = true }
+                launchSingleTop = true
             }
         }
     }

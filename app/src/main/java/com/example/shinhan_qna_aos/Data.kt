@@ -63,6 +63,10 @@ class Data(private val context: Context) {
         get() = prefs.getBoolean(KEY_IS_NOTICE, false)
         set(value) = prefs.edit().putBoolean(KEY_IS_NOTICE, value).apply()
 
+    var isAppealCompleted: Boolean
+        get() = prefs.getBoolean("appeal_completed", false)
+        set(value) = prefs.edit().putBoolean("appeal_completed", value).apply()
+
     // 토큰 저장
     fun saveTokens(
         accessToken: String,

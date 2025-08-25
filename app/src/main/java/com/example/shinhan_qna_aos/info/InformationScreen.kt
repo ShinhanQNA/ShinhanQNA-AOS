@@ -60,6 +60,7 @@ import com.example.shinhan_qna_aos.info.api.InfoRepository
 import com.example.shinhan_qna_aos.info.api.InfoViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
+import kotlinx.coroutines.delay
 
 @Composable
 fun InformationScreen(infoRepository: InfoRepository, data: Data, navController: NavController) {

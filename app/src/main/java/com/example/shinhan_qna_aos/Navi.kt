@@ -24,6 +24,9 @@ import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.etc.WriteOpenScreen
 import com.example.shinhan_qna_aos.etc.WritingScreen
 import com.example.shinhan_qna_aos.etc.api.WriteRepository
+import com.example.shinhan_qna_aos.etc.user.AppealScreen1
+import com.example.shinhan_qna_aos.etc.user.AppealScreen2
+import com.example.shinhan_qna_aos.etc.user.AppealScreen3
 import com.example.shinhan_qna_aos.info.api.InfoRepository
 import com.example.shinhan_qna_aos.info.InformationScreen
 import com.example.shinhan_qna_aos.info.WaitScreen
@@ -128,6 +131,7 @@ fun AppNavigation(
                 answerRepository = answerRepository,
                 twPostRepository = twPostRepository,
                 authRepository = authRepository,
+                infoRepository = infoRepository,
                 data = data,
                 navController = navController,
                 initialSelectedIndex = selectedTab
@@ -180,6 +184,10 @@ fun AppNavigation(
             val id = backStackEntry.arguments?.getInt("id") ?: -1
             NotificationOpenScreen(id, notificationRepository, navController)
         }
+
+        composable("appeal1"){ AppealScreen1(data, navController) }
+        composable("appeal2"){ AppealScreen2(data, navController) }
+        composable("appeal3"){ AppealScreen3(infoRepository, data, navController) }
     }
 }
 
