@@ -1,6 +1,7 @@
 package com.example.shinhan_qna_aos.main
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,6 +25,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,9 +41,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
+import com.example.shinhan_qna_aos.login.api.AuthRepository
+import com.example.shinhan_qna_aos.login.api.LoginResult
+import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.example.shinhan_qna_aos.main.api.AnswerRepository
 import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.TWPostRepository
@@ -53,10 +61,25 @@ fun MainScreen(
     postRepository: PostRepository,
     answerRepository: AnswerRepository,
     twPostRepository: TWPostRepository,
+    authRepository: AuthRepository,
     data: Data,
     navController: NavController,
     initialSelectedIndex: Int = 0
 ){
+    val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository,data) })
+
+    val loginResult by loginViewModel.loginResult.collectAsState()
+
+    LaunchedEffect(loginResult) {
+        Log.d("main","로그인 검사")
+        if (loginResult is LoginResult.Failure) {
+            // 토큰 만료 또는 인증 실패시 로그인 화면으로 이동
+            navController.navigate("login") {
+                popUpTo("main") { inclusive = true }
+            }
+        }
+    }
+
     var selectedIndex by remember { mutableStateOf(initialSelectedIndex) }
     Box(modifier = Modifier.fillMaxSize().systemBarsPadding()){
         Column{

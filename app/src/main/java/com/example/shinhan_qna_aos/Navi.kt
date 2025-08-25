@@ -47,8 +47,6 @@ import com.example.shinhan_qna_aos.servepage.MypageScreen
 import com.example.shinhan_qna_aos.servepage.NotificationOpenScreen
 import com.example.shinhan_qna_aos.servepage.NotificationScreen
 import com.example.shinhan_qna_aos.servepage.api.NotificationRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -129,6 +127,7 @@ fun AppNavigation(
                 postRepository = postRepository,
                 answerRepository = answerRepository,
                 twPostRepository = twPostRepository,
+                authRepository = authRepository,
                 data = data,
                 navController = navController,
                 initialSelectedIndex = selectedTab
