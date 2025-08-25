@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,6 +22,9 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,72 +34,82 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.shinhan_qna_aos.TitleContent
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.DetailContent
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TitleContentButton
 import com.example.shinhan_qna_aos.TopBar
+import com.example.shinhan_qna_aos.servepage.api.NotificationRepository
+import com.example.shinhan_qna_aos.servepage.api.NotificationViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun NotificationScreen() {
-    val dataList = listOf(
-        TitleContent("제목1", "본문내용1"),
-        TitleContent("제목2", "본문내용2"),
-        TitleContent("제목3", "본문내용3"),
-        TitleContent("제목4", "본문내용4"),
-        TitleContent("제목5", "본문내용5"),
-        TitleContent("제목6", "본문내용6"),
-        TitleContent("제목7", "본문내용7"),
-        TitleContent("제목8", "본문내용8")
-    )
-    Column {
-        TopBar("공지", {})
-        Box(
-            modifier = Modifier.fillMaxSize().systemBarsPadding()
-        ) {
+fun NotificationScreen(data: Data, notificationRepository: NotificationRepository, navController: NavController) {
+
+    val notificationViewModel:NotificationViewModel =
+        viewModel(factory = SimpleViewModelFactory { NotificationViewModel(notificationRepository) })
+
+    LaunchedEffect (Unit){
+        notificationViewModel.loadNotification()
+    }
+
+    val noticesList by notificationViewModel.noticesList.collectAsState()
+
+    Column(
+        modifier = Modifier.fillMaxSize()
+            .systemBarsPadding()
+            .background(Color.White)
+    ) {
+        TopBar("공지", { navController.navigate("main?selectedTab=0") {popUpTo("notices"){inclusive=true} }})
+        Box {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
                     .padding(bottom = 50.dp)
-            ) {
-                items(dataList) { data ->
+                    .background(Color.White)
+            ){
+                items(noticesList) { noticeslist ->
                     TitleContentButton(
-                        title = data.title,
-                        content = data.content,
+                        title = noticeslist.title,
+                        content = noticeslist.content,
+                        onClick = { navController.navigate("notices/${noticeslist.id}")}
                     )
                     Divider()
                 }
             }
 
-            // + 새공지 버튼 - 배너 바로 위 공간에 위치하도록 아래 패딩 추가
-            Button(
-                onClick = { /* 새공지 클릭 동작 */ },
-                shape = RoundedCornerShape(6.dp),
-                colors = ButtonDefaults.buttonColors(Color.Black),
-                contentPadding = PaddingValues(0.dp),
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = 66.dp, end = 20.dp) // 배너 위 공간 + 여백 확보
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp)
+            if(data.isAdmin){// + 새공지 버튼 - 배너 바로 위 공간에 위치하도록 아래 패딩 추가
+                Button(
+                    onClick = { /* 새공지 클릭 동작 */ },
+                    shape = RoundedCornerShape(6.dp),
+                    colors = ButtonDefaults.buttonColors(Color.Black),
+                    contentPadding = PaddingValues(0.dp),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 66.dp, end = 20.dp) // 배너 위 공간 + 여백 확보
                 ) {
-                    Icon(
-                        painter = painterResource(lucide.plus),
-                        contentDescription = "새공지 추가",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        "새공지",
-                        color = Color.White,
-                        style = TextStyle(
-                            fontFamily = pretendard,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 14.sp
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(lucide.plus),
+                            contentDescription = "새공지 추가",
+                            modifier = Modifier.size(20.dp)
                         )
-                    )
+                        Text(
+                            "새공지",
+                            color = Color.White,
+                            style = TextStyle(
+                                fontFamily = pretendard,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 14.sp
+                            )
+                        )
+                    }
                 }
             }
 
@@ -112,8 +126,35 @@ fun NotificationScreen() {
     }
 }
 
+@Composable
+fun NotificationOpenScreen(id:Int, notificationRepository: NotificationRepository, navController: NavController) {
+    val notificationViewModel: NotificationViewModel =
+        viewModel(factory = SimpleViewModelFactory { NotificationViewModel(notificationRepository) })
+
+    // 공지 리스트가 로드될 때 id와 함께 선택하도록 변경
+    LaunchedEffect(Unit) {
+        notificationViewModel.loadNotification(id)
+    }
+
+    val selectedNotices by notificationViewModel.selectedNotices.collectAsState()
+
+        Column(modifier = Modifier.systemBarsPadding().fillMaxSize()) {
+            TopBar(null, { navController.popBackStack() })
+            DetailContent(
+                title = selectedNotices?.title ?: "",
+                content = selectedNotices?.content ?: ""
+            )
+        }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun NotificationOpenScreenPreview(){
+//    NotificationOpenScreen()
+}
+
 @Preview(showBackground = true)
 @Composable
 fun NotificationPreview(){
-    NotificationScreen()
+//    NotificationScreen()
 }

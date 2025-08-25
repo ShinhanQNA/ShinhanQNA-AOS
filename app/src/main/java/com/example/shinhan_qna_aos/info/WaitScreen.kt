@@ -13,23 +13,53 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
+import com.example.shinhan_qna_aos.info.api.InfoRepository
+import com.example.shinhan_qna_aos.info.api.InfoViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
+import kotlinx.coroutines.delay
 
 // 대기 화면
 @Composable
-fun WaitScreen(userName: String = "사용자") {
+fun WaitScreen(infoRepository: InfoRepository, data: Data, navController: NavController) {
+    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data) })
+
+    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
+    // WaitScreen에 들어오면 주기적으로 상태 체크
+    LaunchedEffect(Unit) {
+        val accessToken = data.accessToken ?: return@LaunchedEffect
+        while (true) {
+            infoViewModel.checkAndNavigateUserStatus(accessToken)
+            delay(10000) // 1분마다 서버 상태 확인
+        }
+    }
+    LaunchedEffect(navigationRoute) {
+        navigationRoute?.let { route ->
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+            if (route.isNotBlank() && currentRoute != route) {
+                navController.navigate(route) {
+                    popUpTo("wait") { inclusive = true }
+                }
+            }
+        }
+    }
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -41,7 +71,6 @@ fun WaitScreen(userName: String = "사용자") {
 
         // 이미지 크기 화면 너비의 35%, 최소/최대 크기 제한
         val imageSize = (maxwidth * 0.35f).coerceIn(128.dp, 200.dp)
-
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -67,7 +96,7 @@ fun WaitScreen(userName: String = "사용자") {
             Spacer(modifier = Modifier.height(36.dp))
 
             Text(
-                text = "[$userName]님의 가입 신청 내용을 안전하게 전달했어요.",
+                text = "[${data.userName}]님의 가입 신청 내용을 안전하게 전달했어요.",
                 style = TextStyle(
                     fontFamily = pretendard,
                     fontWeight = FontWeight.Normal,
@@ -97,5 +126,5 @@ fun WaitScreen(userName: String = "사용자") {
 @Composable
 @Preview(showBackground = true)
 fun WaitPreview(){
-    WaitScreen()
+//    WaitScreen()
 }

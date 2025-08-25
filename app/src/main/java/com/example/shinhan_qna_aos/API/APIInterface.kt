@@ -1,27 +1,32 @@
 package com.example.shinhan_qna_aos.API
 
-import com.example.shinhan_qna_aos.etc.Write
-import com.example.shinhan_qna_aos.info.InfoData
-import com.example.shinhan_qna_aos.info.UserCheckResponse
-import com.example.shinhan_qna_aos.login.AdminRequest
-import com.example.shinhan_qna_aos.login.LoginResult
-import com.example.shinhan_qna_aos.login.LoginTokensResponse
-import com.example.shinhan_qna_aos.login.ManagerLoginData
-import com.example.shinhan_qna_aos.login.ReToken
-import com.example.shinhan_qna_aos.login.RefreshTokenRequest
-import com.example.shinhan_qna_aos.main.Post
-import com.example.shinhan_qna_aos.main.PostDetail
-import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param
+import com.example.shinhan_qna_aos.info.api.InfoResponse
+import com.example.shinhan_qna_aos.info.api.UserResponseWrapper
+import com.example.shinhan_qna_aos.login.api.AdminRequest
+import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
+import com.example.shinhan_qna_aos.login.api.LogoutData
+import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
+import com.example.shinhan_qna_aos.main.api.Answer
+import com.example.shinhan_qna_aos.main.api.GroupID
+import com.example.shinhan_qna_aos.main.api.Post
+import com.example.shinhan_qna_aos.main.api.PostData
+import com.example.shinhan_qna_aos.main.api.PostDetail
+import com.example.shinhan_qna_aos.main.api.PostFlag
+import com.example.shinhan_qna_aos.main.api.PostLike
+import com.example.shinhan_qna_aos.main.api.ReportReasonBody
+import com.example.shinhan_qna_aos.main.api.TWPostData
+import com.example.shinhan_qna_aos.servepage.api.Notices
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -45,13 +50,19 @@ interface APIInterface {
     @POST("/token/reissue")
     suspend fun ReToken(
         @Body refreshTokenRequest: RefreshTokenRequest
-    ): Response<ReToken>
+    ): Response<LoginTokensResponse>
 
     // 관리자 로그인
     @POST("/admin/login")
     suspend fun AdminLoginData(
         @Body adminRequest : AdminRequest
     ):Response<LoginTokensResponse>
+
+    // 로그아웃
+    @POST("/users/logout")
+    suspend fun LogOut(
+        @Header("Authorization") refreshToken: String,
+    ): Response<LogoutData>
 
     // 학생 정보
     @Multipart
@@ -63,42 +74,113 @@ interface APIInterface {
         @Part("department") department: RequestBody,
         @Part("year") year: RequestBody,
         @Part("role") role: RequestBody,
+        @Part("studentCertified") studentCertified : RequestBody,
         @Part image: MultipartBody.Part
-    ): Response<InfoData>
+    ): Response<InfoResponse>
 
     //유저 정보 조회
     @Headers("Content-Type: application/json")
     @GET("/users/me")
     suspend fun UserCheck(
         @Header("Authorization") accessToken: String
-    ): Response<UserCheckResponse>
+    ): Response<UserResponseWrapper>
 
     //게시글 조회
     @Headers("Content-Type: application/json")
-    @GET("/boards/search")
+    @GET("/boards")
     suspend fun getPosts(
-        @Header("Authorization") code : String,
-        @Query("size") size: Int,                        // 아이템 요청 개수
-        @Query("sort") sort: String
-    ):Response<List<Post>>
+        @Header("Authorization") code : String
+    ):Response<List<PostData>>
 
     //게시글 상세조회
     @Headers("Content-Type: application/json")
-    @GET("/boards/{postId}")
+    @GET("/boards/{postsid}")
     suspend fun getPostsDetail(
-        @Header("Authorization") code : String,
-        @Path("postId") postId: Int
+        @Header("Authorization") accessToken: String,
+        @Path("postsid") postsid: String?
     ):Response<PostDetail>
 
-    // 게시글 쓰기
+    // 게시글 작성
     @Multipart
-    @POST
-    suspend fun writeBoards(
-        @Header("Authorization") code: String,
+    @POST("/boards")
+    suspend fun uploadPost(
+        @Header("Authorization") accessToken: String,
         @Part("title") title: RequestBody,
         @Part("content") content: RequestBody,
-        @Part("category") category: RequestBody,
         @Part image: MultipartBody.Part?
-    ):Response<Write>
+    ):Response<Post>
+
+    // 게시글 수정
+    @Multipart
+    @PUT("/boards/{postsid}")
+    suspend fun updatePost(
+        @Header("Authorization") accessToken: String,
+        @Path("postsid") postsid: Int,
+        @Part("title") title: RequestBody,
+        @Part("content") content: RequestBody,
+        @Part image: MultipartBody.Part?
+    ): Response<Post>
+
+    // 게시글 공감
+    @POST("/boards/{postId}/like")
+    suspend fun PostLike(
+        @Header("Authorization") accessToken: String,
+        @Path("postId") postId: Int,  // postId로 수정 (URL 변수명과 같아야 함)
+    ): Response<PostLike>
+
+    // 게시글 공감 취소
+    @POST("/boards/{postId}/unlike")
+    suspend fun PostUnlike(
+        @Header("Authorization") accessToken: String,
+        @Path("postId") postId: Int,
+    ): Response<PostLike>
+
+    // 게시글 신고
+    @POST("/boards/{postId}/report")
+    suspend fun PostFlag(
+        @Header("Authorization") accessToken: String,
+        @Path("postId") postId: Int,
+        @Body reportReasonBody: ReportReasonBody   // 신고 이유 -> 없어도 됨
+    ): Response<PostFlag>
+
+    // 게시글 삭제
+    @DELETE("/boards/{postsid}")
+    suspend fun PostDelete(
+        @Header("Authorization") accessToken: String,
+        @Path("postsid") postsid: Int,
+    ): Response<Unit>
+
+    // 3주 그룹 조회
+    @GET("/three-week-opinions/groups/ids")
+    suspend fun ThreeWeekPost(
+        @Header("Authorization") accessToken: String,
+        @Query ("year") year :Int,
+    ): Response<List<GroupID>>
+
+    // 3주 그룹 데이터로 상세 조회
+    @GET("/three-week-opinions/group/{groupId}")
+    suspend fun ThreeWeekPostDetail(
+        @Header("Authorization") accessToken: String,
+        @Path("groupId") groupId: Int,
+        @Query("sort") sort : String // data, likes
+    ): Response<TWPostData>
+
+    //답변 조회
+    @GET("/answers")
+    suspend fun AnswerPost(
+        @Header("Authorization") accessToken: String,
+    ): Response<List<Answer>>
+
+    //공지 조회
+    @GET("/notices")
+    suspend fun Notification(
+        @Header("Authorization") accessToken: String,
+    ): Response<List<Notices>>
+
+    //회원 탈퇴
+    @DELETE("/users/me")
+    suspend fun CancelMember(
+        @Header("Authorization") accessToken: String,
+    ): Response<LogoutData>
 }
 

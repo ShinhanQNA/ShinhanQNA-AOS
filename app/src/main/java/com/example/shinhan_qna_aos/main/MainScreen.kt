@@ -1,5 +1,8 @@
 package com.example.shinhan_qna_aos.main
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,11 +19,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,17 +41,83 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
+import com.example.shinhan_qna_aos.info.api.InfoRepository
+import com.example.shinhan_qna_aos.info.api.InfoViewModel
+import com.example.shinhan_qna_aos.login.api.AuthRepository
+import com.example.shinhan_qna_aos.login.api.LoginResult
+import com.example.shinhan_qna_aos.login.api.LoginViewModel
+import com.example.shinhan_qna_aos.main.api.AnswerRepository
+import com.example.shinhan_qna_aos.main.api.PostRepository
+import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
+import kotlinx.coroutines.delay
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainScreen(saySomtingViewModel: PostViewModel, navController: NavController){
-    Box(modifier = Modifier.fillMaxSize()){
+fun MainScreen(
+    postRepository: PostRepository,
+    answerRepository: AnswerRepository,
+    twPostRepository: TWPostRepository,
+    authRepository: AuthRepository,
+    infoRepository: InfoRepository,
+    data: Data,
+    navController: NavController,
+    initialSelectedIndex: Int = 0
+){
+    val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository,data) })
+    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data)})
+
+    val loginResult by loginViewModel.loginResult.collectAsState()
+    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
+
+    LaunchedEffect(loginResult) {
+        Log.d("main","로그인 검사")
+        if (loginResult is LoginResult.Failure) {
+            // 토큰 만료 또는 인증 실패시 로그인 화면으로 이동
+            navController.navigate("login") {
+                popUpTo("main") { inclusive = true }
+            }
+        }
+    }
+
+    // 매번 MainScreen 진입 혹은 navigationRoute 변경 시 상태 점검
+    LaunchedEffect(Unit) {
+        val accessToken = data.accessToken
+        if (!accessToken.isNullOrBlank()) {
+            infoViewModel.checkAndNavigateUserStatus(accessToken)
+            delay(30000)
+        }
+    }
+
+    // navigationRoute가 "appeal1" (차단)이면 페이지 이동 처리
+    LaunchedEffect(navigationRoute) {
+        if (navigationRoute == "appeal1") {
+            navController.navigate("appeal1") {
+                popUpTo("main") { inclusive = true }
+                launchSingleTop = true
+            }
+        }
+    }
+
+    var selectedIndex by remember { mutableStateOf(initialSelectedIndex) }
+    Box(modifier = Modifier.fillMaxSize().systemBarsPadding()){
         Column{
             MainTopbar(navController)
-            Selectboard(saySomtingViewModel,navController)
+            Selectboard(
+                postRepository = postRepository,
+                answerRepository = answerRepository,
+                twPostRepository = twPostRepository,
+                data = data,
+                navController = navController,
+                selectedIndex = selectedIndex,
+                onTabSelected = { idx -> selectedIndex = idx }
+            )
         }
         Text(
             "배너광고",
@@ -85,7 +157,7 @@ fun TopIcon(navController: NavController){
             modifier = Modifier
                 .border(1.dp, color = Color(0xffDFDFDF), RoundedCornerShape(10.dp))
                 .padding(6.dp)
-                .clickable { navController.navigate("writeboard")}
+                .clickable { navController.navigate("writeBoard")}
         ) {
             Icon(
                 painter = painterResource(lucide.plus),
@@ -98,6 +170,7 @@ fun TopIcon(navController: NavController){
             modifier = Modifier
                 .border(1.dp, color = Color(0xffDFDFDF), RoundedCornerShape(10.dp))
                 .padding(6.dp)
+                .clickable { navController.navigate("notices")}
         ) {
             Icon(
                 painter = painterResource(R.drawable.shape),
@@ -110,6 +183,7 @@ fun TopIcon(navController: NavController){
             modifier = Modifier
                 .border(1.dp, color = Color(0xffDFDFDF), RoundedCornerShape(10.dp))
                 .padding(6.dp)
+                .clickable { navController.navigate("alarm") }
         ) {
             Icon(
                 painter = painterResource(lucide.bell_ring),
@@ -122,6 +196,7 @@ fun TopIcon(navController: NavController){
             modifier = Modifier
                 .border(1.dp, color = Color(0xffDFDFDF), RoundedCornerShape(10.dp))
                 .padding(6.dp)
+                .clickable { navController.navigate("mypage")}
         ){
             Icon(
                 painter = painterResource(R.drawable.shield_user),
@@ -134,15 +209,23 @@ fun TopIcon(navController: NavController){
 }
 
 //게시판 선택
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Selectboard(saySomtingViewModel: PostViewModel, navController: NavController) {
+fun Selectboard(
+    postRepository: PostRepository,
+    answerRepository: AnswerRepository,
+    twPostRepository: TWPostRepository,
+    data: Data,
+    navController: NavController,
+    selectedIndex: Int,
+    onTabSelected: (Int) -> Unit
+) {
 
     val tabData = listOf(
         Pair("말해봐요", R.drawable.trumpet),
         Pair("선정된 의견", R.drawable.star),
         Pair("답변 왔어요", R.drawable.check),
     )
-    var selectedIndex by remember { mutableStateOf(0) }
     val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -167,7 +250,7 @@ fun Selectboard(saySomtingViewModel: PostViewModel, navController: NavController
                         .clickable(
                             indication = null,
                             interactionSource = interactionSource,
-                            onClick = { selectedIndex = idx }
+                            onClick = { onTabSelected(idx) }
                         ),
                     contentAlignment = Alignment.Center
                 ) {
@@ -180,7 +263,6 @@ fun Selectboard(saySomtingViewModel: PostViewModel, navController: NavController
             }
         }
 
-        // 선 인디케이터 (기존 코드와 동일)
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -204,11 +286,10 @@ fun Selectboard(saySomtingViewModel: PostViewModel, navController: NavController
             )
         }
 
-        // 페이지별 본문 표시
         when (selectedIndex) {
-            0 -> SaySomthingScreen(saySomtingViewModel = saySomtingViewModel , navController =  navController)
-            1 -> SelectedOpinionsScreen()
-            2 -> AnsweredScreen()
+            0 -> SaySomthingScreen(postRepository, data , navController)
+            1 -> SelectedOpinionsScreen(twPostRepository, data, navController)
+            2 -> AnsweredScreen(answerRepository, navController)
         }
     }
 }

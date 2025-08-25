@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,39 +13,49 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.shinhan_qna_aos.info.LabeledField
-import com.example.shinhan_qna_aos.info.PlainInputField
+import androidx.navigation.NavController
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
+import com.example.shinhan_qna_aos.login.api.AuthRepository
+import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.LabeledField
+import com.example.shinhan_qna_aos.PlainInputField
+import com.example.shinhan_qna_aos.login.api.LoginResult
+import com.example.shinhan_qna_aos.login.api.ManagerLoginViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 
 @Composable
-fun ManagerLogin(
-    viewModel: ManagerLoginViewModel,
-    onLoginSuccess: () -> Unit = {}
+fun ManagerLoginScreen(
+    authRepository: AuthRepository,
+    navController: NavController,         // 네비게이션 컨트롤러 추가
+    data: Data                    // 로그인 관리자 상태 저장소 추가
 ) {
-    val isLoginSuccess = viewModel.isLoginSuccess
+    val viewModel: ManagerLoginViewModel = viewModel(factory = SimpleViewModelFactory { ManagerLoginViewModel(authRepository) })
+    val loginResult by viewModel.loginResult.collectAsState()
 
-    // 로그인 성공 시 후처리
-    LaunchedEffect(isLoginSuccess) {
-        if (isLoginSuccess) {
-            onLoginSuccess()
+    // 로그인 성공 시 즉시 화면 전환 처리 (관리자이므로 main 화면으로 이동)
+    LaunchedEffect(loginResult) {
+        if (loginResult is LoginResult.Success) {
+           if( data.isAdmin ) {
+               navController.navigate("main") {
+                   popUpTo("manager_login") { inclusive = true }
+               }
+           }
         }
     }
 
@@ -106,7 +115,7 @@ fun ManagerLogin(modifier: Modifier = Modifier, onClick:() -> Unit){
             .background(color = Color.Black, shape = RoundedCornerShape(6.dp))
             .padding(horizontal = 18.dp, vertical = 12.dp)
             .clickable { onClick() } // ✅ 클릭 이벤트 연결
-         ){
+        ){
             Text(
                 text = "로그인",
                 color = Color.White,
@@ -123,6 +132,6 @@ fun ManagerLogin(modifier: Modifier = Modifier, onClick:() -> Unit){
 @Composable
 @Preview(showBackground = true)
 fun Managerpreview(){
-    val viewModel : ManagerLoginViewModel = viewModel()
-    ManagerLogin(viewModel)
+//    val viewModel : ManagerLoginViewModel = viewModel()
+//    ManagerLogin(viewModel)
 }

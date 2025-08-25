@@ -95,4 +95,8 @@ dependencies {
     //API
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    //uri
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    //바텀시트 의존성
+    implementation("androidx.compose.material:material:1.9.0")
 }

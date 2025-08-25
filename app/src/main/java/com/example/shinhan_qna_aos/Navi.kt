@@ -1,5 +1,8 @@
 package com.example.shinhan_qna_aos
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -7,153 +10,190 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.etc.WriteOpenScreen
 import com.example.shinhan_qna_aos.etc.WritingScreen
-import com.example.shinhan_qna_aos.etc.WritingViewModel
-import com.example.shinhan_qna_aos.etc.manager.ManagerWriteOpenScreen
-import com.example.shinhan_qna_aos.info.InfoViewModel
+import com.example.shinhan_qna_aos.etc.api.WriteRepository
+import com.example.shinhan_qna_aos.etc.user.AppealScreen1
+import com.example.shinhan_qna_aos.etc.user.AppealScreen2
+import com.example.shinhan_qna_aos.etc.user.AppealScreen3
+import com.example.shinhan_qna_aos.info.api.InfoRepository
 import com.example.shinhan_qna_aos.info.InformationScreen
 import com.example.shinhan_qna_aos.info.WaitScreen
-import com.example.shinhan_qna_aos.login.LoginResult
+import com.example.shinhan_qna_aos.info.api.InfoViewModel
+import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.login.LoginScreen
-import com.example.shinhan_qna_aos.login.LoginViewModel
-import com.example.shinhan_qna_aos.login.ManagerLogin
-import com.example.shinhan_qna_aos.login.ManagerLoginViewModel
-import com.example.shinhan_qna_aos.login.LoginManager
+import com.example.shinhan_qna_aos.login.api.LoginViewModel
+import com.example.shinhan_qna_aos.login.ManagerLoginScreen
+import com.example.shinhan_qna_aos.login.api.LoginResult
+import com.example.shinhan_qna_aos.main.AnsweredOpenScreen
+import com.example.shinhan_qna_aos.main.AnsweredScreen
 import com.example.shinhan_qna_aos.main.MainScreen
-import com.example.shinhan_qna_aos.main.PostViewModel
+import com.example.shinhan_qna_aos.main.SelectedDetailScreen
+import com.example.shinhan_qna_aos.main.SelectedOpenScreen
+import com.example.shinhan_qna_aos.main.api.AnswerRepository
+import com.example.shinhan_qna_aos.main.api.PostRepository
+import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
-import com.example.shinhan_qna_aos.onboarding.OnboardingViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.example.shinhan_qna_aos.servepage.AlarmScreen
+import com.example.shinhan_qna_aos.servepage.MypageScreen
+import com.example.shinhan_qna_aos.servepage.NotificationOpenScreen
+import com.example.shinhan_qna_aos.servepage.NotificationScreen
+import com.example.shinhan_qna_aos.servepage.api.NotificationRepository
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation(
-    loginViewModel: LoginViewModel,
-    infoViewModel: InfoViewModel,
-    onboardingViewModel: OnboardingViewModel,
-    managerLoginViewModel:ManagerLoginViewModel,
-    postViewModel : PostViewModel,
-    writingViewModel: WritingViewModel,
-    loginmanager: LoginManager
+    navController: NavHostController = rememberNavController(),
+    apiInterface: APIInterface
 ) {
-    val navController = rememberNavController()
+    val context = LocalContext.current
+
+    // Data & Repository
+    val data = remember { Data(context) }
+    val authRepository = remember { AuthRepository(apiInterface, data) }
+    val writeRepository = remember { WriteRepository(apiInterface, data) }
+    val postRepository = remember { PostRepository(apiInterface, data) }
+    val infoRepository = remember { InfoRepository(apiInterface) }
+    val answerRepository = remember { AnswerRepository(apiInterface,data) }
+    val twPostRepository= remember { TWPostRepository(apiInterface, data) }
+    val notificationRepository = remember { NotificationRepository(apiInterface, data) }
+
+    val loginViewModel: LoginViewModel =
+        viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository, data) })
+    val infoViewModel: InfoViewModel =
+        viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data) })
 
     val loginResult by loginViewModel.loginResult.collectAsState()
-    val showOnboarding by onboardingViewModel.showOnboarding.collectAsState()
 
-    // 처음 진입 시 결정될 시작 경로
+    // 라우트 변경 감시 → 네비게이션 처리 (여기서만!)
+    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
+
+    // 앱 최초 진입 시 빠르게 보여줄 초기 화면 결정용 상태
     var initialRoute by remember { mutableStateOf<String?>(null) }
 
-    // 앱 첫 진입 시 라우팅 목적지 미리 결정
-    LaunchedEffect(showOnboarding, loginResult) {
-        when {
-            // 온보딩 필요
-            showOnboarding == true -> {
-                initialRoute = "onboarding"
-            }
-            // 로그인 성공 → 가입 상태 먼저 체크
-            loginResult is LoginResult.Success -> {
-                // 관리자인 경우 바로 메인으로
-                if (loginmanager.isAdmin()) {
-                    initialRoute = "main"
-                    return@LaunchedEffect
-                }
+    // 로그인 결과 바뀔 때 초기화 및 서버 상태 요청
+    LaunchedEffect(loginResult) {
+        if (data.onboarding) {
+            initialRoute = "onboarding"
+        } else if (loginResult is LoginResult.Success) {
+            Log.d("AppNavigation", "로그인 성공 감지, 서버 상태 조회 시작")
+            infoViewModel.checkAndNavigateUserStatus(data.accessToken ?: "")
+            // 초기 화면은 navigationRoute가 정해질 때까지 null로 둔다
+            initialRoute = null
+        } else {
+            initialRoute = "login"
+        }
+    }
 
-                val route = withContext(Dispatchers.IO) {
-                    // 가입 상태 바로 조회 (서버 호출, UI 출력 전 경로 결정)
-                    val accessToken = loginmanager.accessToken
-                    if (accessToken.isNullOrEmpty()) { "login" }
-                    else {
-                        try {
-                            val response = infoViewModel.api.UserCheck("Bearer $accessToken")
-                            if (response.isSuccessful) {
-                                val user = response.body()
-                                when (user?.status) {
-//                                    "가입 대기 중" -> "wait/${user.name}"
-//                                    "가입 완료" -> "main"
-                                    "가입 대기 중" -> "main" // API 연결로 인한 로직 변경
-                                    "가입 완료" -> "main"
-                                    else -> "info"
-                                }
-                            } else {
-                                "info"
-                            }
-                        } catch (e: Exception) {
-                            "info"
-                        }
-                    }
-                }
-                initialRoute = route
-            }
-            // 로그인 안 됨
-            else -> {
-                initialRoute = "login"
+    // navigationRoute가 바뀌면 초기 라우트로 고정
+    LaunchedEffect(navigationRoute) {
+        navigationRoute?.let {
+            if (initialRoute != it && it.isNotBlank()) {
+                Log.d("AppNavigation", "navigationRoute 확정: $it")
+                initialRoute = it
             }
         }
     }
-    if (initialRoute == null) {
-        // 빈 화면 또는 로딩 화면
-        return
-    }
+    // 초기 라우트가 null 이면 NavHost 렌더링 안 함 (startDestination에 빈값 전달 방지)
+    if (initialRoute.isNullOrBlank()) return
 
-
-    // NavHost 시작
     NavHost(
         navController = navController,
         startDestination = initialRoute!!
     ) {
-        composable("onboarding") {
-            OnboardingScreen(
-                viewModel = onboardingViewModel,
-                onFinish = {
-                    onboardingViewModel.setOnboarded()
-                    navController.navigate("login") {
-                        popUpTo("onboarding") { inclusive = true }
-                    }
-                }
+        composable("onboarding") { OnboardingScreen(navController, data) }
+        composable("login") { LoginScreen(authRepository, data, navController) }
+        composable("manager_login") { ManagerLoginScreen(authRepository, navController, data) }
+        composable("info") { InformationScreen(infoRepository, data, navController) }
+        composable("wait") { WaitScreen(infoRepository, data, navController) }
+
+        composable(
+            "main?selectedTab={selectedTab}",
+            arguments = listOf(navArgument("selectedTab") {
+                type = NavType.IntType
+                defaultValue = 0
+            })
+        ) { backStackEntry ->
+            val selectedTab = backStackEntry.arguments?.getInt("selectedTab") ?: 0
+            MainScreen(
+                postRepository = postRepository,
+                answerRepository = answerRepository,
+                twPostRepository = twPostRepository,
+                authRepository = authRepository,
+                infoRepository = infoRepository,
+                data = data,
+                navController = navController,
+                initialSelectedIndex = selectedTab
             )
         }
-        composable("login") { LoginScreen(viewModel = loginViewModel, navController) }
-        composable("manager login") {
-            ManagerLogin(
-                viewModel = managerLoginViewModel,
-                onLoginSuccess = {
-                    navController.navigate("main") {
-                        popUpTo("managerLogin") { inclusive = true }
-                    }
-                }
-            )
-        }
-        composable("info") { InformationScreen(viewModel = infoViewModel) }
-        composable("wait/{userName}") {
-            val userName = it.arguments?.getString("userName") ?: "학생"
-            WaitScreen(userName = userName)
-        }
-        composable("main") { MainScreen(postViewModel, navController) }
-        // 학생용 상세 게시글
         composable(
-            "postDetail/{postId}",
-            arguments = listOf(navArgument("postId") { type = NavType.IntType })
+            "writeOpen/{postId}",
+            arguments = listOf(navArgument("postId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-            WriteOpenScreen(navController, postId, postViewModel, loginmanager)
+            val postId = backStackEntry.arguments?.getString("postId") ?: ""
+            WriteOpenScreen(navController, postRepository, writeRepository, data, postId)
         }
-        // 관리자용 상세 게시글
+
+        composable("writeBoard") { WritingScreen(writeRepository, navController) }
+        composable("answer") { AnsweredScreen(answerRepository, navController) }
+
         composable(
-            "managerPostDetail/{postId}",
-            arguments = listOf(navArgument("postId") { type = NavType.IntType })
+            "answerOpen/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) { backStackEntry ->
-            val postId = backStackEntry.arguments?.getInt("postId") ?: 0
-            ManagerWriteOpenScreen(isNotice = false, viewModel = postViewModel, navController = navController, postId = postId)
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            AnsweredOpenScreen(answerRepository, navController, id,)
         }
-        composable("writeboard"){
-            WritingScreen(writingViewModel,navController)
+
+        composable(
+            "threeWeekOpen/{groupId}",
+            arguments = listOf(navArgument("groupId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val groupId = backStackEntry.arguments?.getInt("groupId") ?: -1
+            SelectedOpenScreen(groupId, twPostRepository, navController)
         }
+
+        composable(
+            "threeWeekDetail/{groupId}/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType },navArgument("groupId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val groupId = backStackEntry.arguments?.getInt("groupId") ?: -1
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            SelectedDetailScreen(groupId , twPostRepository, navController, id)
+        }
+
+        composable("myPage") { MypageScreen(authRepository, data, navController) }
+        composable("notices") { NotificationScreen(data, notificationRepository, navController) }
+        composable("alarm") { AlarmScreen(navController) }
+
+        composable(
+            "notices/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            NotificationOpenScreen(id, notificationRepository, navController)
+        }
+
+        composable("appeal1"){ AppealScreen1(data, navController) }
+        composable("appeal2"){ AppealScreen2(data, navController) }
+        composable("appeal3"){ AppealScreen3(infoRepository, data, navController) }
     }
+}
+
+// 공통 ViewModelFactory 구현
+class SimpleViewModelFactory<T: ViewModel>(
+    private val creator: () -> T
+): ViewModelProvider.Factory {
+    override fun <VM : ViewModel> create(modelClass: Class<VM>): VM = creator() as VM
 }

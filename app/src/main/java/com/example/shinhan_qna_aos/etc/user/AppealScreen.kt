@@ -1,9 +1,10 @@
-package com.example.shinhan_qna_aos.etc
+package com.example.shinhan_qna_aos.etc.user
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,12 +30,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
+import com.example.shinhan_qna_aos.info.api.InfoRepository
+import com.example.shinhan_qna_aos.info.api.InfoViewModel
+import com.example.shinhan_qna_aos.login.api.LoginResult
+import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
+import kotlinx.coroutines.delay
 
 @Composable
-fun AppealScreen1(userName: String = "사용자") {
+fun AppealScreen1(data: Data, navController: NavController) {
     Column(
         modifier = Modifier.fillMaxSize()
         .padding(horizontal = 20.dp)
@@ -59,7 +72,7 @@ fun AppealScreen1(userName: String = "사용자") {
         Spacer(modifier = Modifier.height(36.dp))
 
         Text(
-            text = "[${userName}]님의 계정에서 이용 약관을 심각하게 위반하는 활동이 감지되어, 서비스 이용이 영구적으로 정지되었음을 알려드립니다.",
+            text = "[${data.userName}]님의 계정에서 이용 약관을 심각하게 위반하는 활동이 감지되어, 서비스 이용이 영구적으로 정지되었음을 알려드립니다.",
             style = TextStyle(
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,
@@ -86,7 +99,8 @@ fun AppealScreen1(userName: String = "사용자") {
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier
                 .background(Color(0xffFC4F4F), RoundedCornerShape(12.dp))
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .clickable { navController.navigate("appeal2") },
         ) {
             Icon(
                 painter = painterResource(lucide.user),
@@ -108,7 +122,7 @@ fun AppealScreen1(userName: String = "사용자") {
 }
 
 @Composable
-fun AppealScreen2() {
+fun AppealScreen2(data: Data, navController: NavController) {
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(horizontal = 20.dp)
@@ -163,7 +177,11 @@ fun AppealScreen2() {
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier
                 .background(Color.Black, RoundedCornerShape(12.dp))
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .clickable {
+                    navController.navigate("appeal3")
+                    data.isAppealCompleted = true
+                   },
         ) {
             Icon(
                 painter = painterResource(lucide.plus),
@@ -185,7 +203,28 @@ fun AppealScreen2() {
 }
 
 @Composable
-fun AppealScreen3(userName: String = "사용자") {
+fun AppealScreen3(infoRepository: InfoRepository, data: Data, navController: NavController) {
+    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data) })
+
+    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
+
+    // 매번 MainScreen 진입 혹은 navigationRoute 변경 시 상태 점검
+    LaunchedEffect(Unit) {
+        val accessToken = data.accessToken
+        if (!accessToken.isNullOrBlank()) {
+            infoViewModel.checkAndNavigateUserStatus(accessToken)
+            delay(30000)
+        }
+    }
+
+    // navigationRoute가 "appeal1" (차단)이면 페이지 이동 처리
+    LaunchedEffect(navigationRoute) {
+            navController.navigate(navigationRoute!!) {
+                popUpTo("appeal3") { inclusive = true }
+                launchSingleTop = true
+            }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(horizontal = 20.dp)
@@ -213,7 +252,7 @@ fun AppealScreen3(userName: String = "사용자") {
         Spacer(modifier = Modifier.height(36.dp))
 
         Text(
-            text = "[${userName}]님의 이의 제기 신청이 완료되었습니다.",
+            text = "[${data.userName}]님의 이의 제기 신청이 완료되었습니다.",
             style = TextStyle(
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,
@@ -267,5 +306,5 @@ fun AppealScreen3(userName: String = "사용자") {
 fun AppealPreview(){
 //    AppealScreen1()
 //    AppealScreen2()
-    AppealScreen3()
+//    AppealScreen3()
 }

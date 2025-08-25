@@ -1,6 +1,7 @@
 package com.example.shinhan_qna_aos.info
 
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -24,8 +25,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -33,6 +32,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,29 +46,54 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.R
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
+import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.LabeledField
+import com.example.shinhan_qna_aos.PlainInputField
+import com.example.shinhan_qna_aos.info.api.InfoRepository
+import com.example.shinhan_qna_aos.info.api.InfoViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
+import kotlinx.coroutines.delay
 
 @Composable
-fun InformationScreen(
-    viewModel: InfoViewModel,
-) {
-    val state = viewModel.state
+fun InformationScreen(infoRepository: InfoRepository, data: Data, navController: NavController) {
+    val context = LocalContext.current
+    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data) })
+
+    val uiState by infoViewModel.uiState.collectAsState()
+    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
+    // 드랍시트 관리
     var expandedGrade by remember { mutableStateOf(false) }
     var expandedMajor by remember { mutableStateOf(false) }
 
-    val isFormValid = remember(state) {
-        state.name.isNotBlank()
-                && state.students != 0
-                && state.year != 0
-                && state.department.isNotBlank()
-                && state.imageUri != Uri.EMPTY
+    // 가입 요청 모든 필드 입력시에만 누를 수 있도록
+    val isFormValid = remember(uiState) { uiState.name.isNotBlank() && uiState.students != 0 && uiState.year != 0 && uiState.department.isNotBlank() && uiState.imageUri != Uri.EMPTY }
+
+    LaunchedEffect(Unit) {
+        val accessToken = data.accessToken ?: return@LaunchedEffect
+        while (true) {
+            infoViewModel.checkAndNavigateUserStatus(accessToken)
+            delay(10000) // 1분마다 서버 상태 확인
+        }
+    }
+
+    // navigationRoute가 변경될 때만 네비게이션 실행 (null 체크 포함)
+    LaunchedEffect(navigationRoute) {
+        navigationRoute?.let { route ->
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+            if (route.isNotBlank() && currentRoute != route) {
+                navController.navigate(route) {
+                    popUpTo("info") { inclusive = true }
+                }
+            }
+        }
     }
 
     BoxWithConstraints(
@@ -105,8 +131,8 @@ fun InformationScreen(
                 modifier = Modifier.fillMaxWidth(contentWidthFraction)
             ) {
                 NameField(
-                    value = state.name,
-                    onValueChange = viewModel::onNameChange,
+                    value = uiState.name,
+                    onValueChange = infoViewModel::onNameChange,
                     fontSize = 14.sp,
                 )
                 Row(
@@ -114,16 +140,16 @@ fun InformationScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     StudentIdField(
-                        value = state.students,
-                        onValueChange = viewModel::onStudentIdChange,
+                        value = uiState.students,
+                        onValueChange = infoViewModel::onStudentIdChange,
                         fontSize = 14.sp,
                         modifier = Modifier.weight(0.55f)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     GradeDropdown(
-                        selected = state.year,
-                        onSelectedChange = viewModel::onGradeChange,
-                        options = viewModel.gradeOptions,
+                        selected = uiState.year,
+                        onSelectedChange = infoViewModel::onGradeChange,
+                        options = listOf("1학년", "2학년", "3학년", "4학년"),
                         expanded = expandedGrade,
                         onExpandedChange = { expandedGrade = it },
                         fontSize = 14.sp,
@@ -131,69 +157,24 @@ fun InformationScreen(
                     )
                 }
                 MajorDropdown(
-                    selected = state.department,
-                    onSelectedChange = viewModel::onMajorChange,
-                    options = viewModel.majorOptions,
+                    selected = uiState.department,
+                    onSelectedChange = infoViewModel::onMajorChange,
+                    options = listOf("소프트웨어융합"),
                     expanded = expandedMajor,
-                    onExpandedChange = { expandedMajor = it },
+                    onExpandedChange = {expandedMajor=it},
                     fontSize = 14.sp,
                 )
-                ImageInsert(viewModel = viewModel, fontSize = 14.sp)
+                ImageInsert(viewModel = infoViewModel, fontSize = 14.sp)
             }
             Spacer(modifier = Modifier.height(36.dp))
-            Request(fontSize = 14.sp, viewModel = viewModel, enabled = isFormValid)
+            Request(
+                fontSize = 14.sp,
+                onClick = {
+                    infoViewModel.submitStudentInfo(context)
+                },
+                enabled = isFormValid)
         }
     }
-}
-
-// 공통 레이블 + 필드
-@Composable
-fun LabeledField(
-    label: String,
-    fontSize: TextUnit,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Column(modifier = modifier) {
-        Text(
-            text = label,
-            style = TextStyle(
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Normal,
-                fontSize = fontSize
-            ),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        content()
-    }
-}
-
-// 일반 입력 필드
-@Composable
-fun PlainInputField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    fontSize: TextUnit,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    modifier: Modifier = Modifier
-) {
-    BasicTextField(
-        value = value,
-        onValueChange = onValueChange,
-        singleLine = true,
-        textStyle = TextStyle(
-            color = Color.Black,
-            fontSize = fontSize,
-            fontFamily = pretendard,
-            lineHeight = fontSize
-        ),
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        modifier = modifier
-            .fillMaxWidth()
-            .defaultMinSize(minHeight = 36.dp)
-            .border(1.dp, Color(0xFFdfdfdf), RoundedCornerShape(10.dp))
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-    )
 }
 
 // 드롭다운 필드 (공통)
@@ -328,12 +309,13 @@ fun MajorDropdown(
 // 이미지 첨부 영역
 @Composable
 fun ImageInsert(viewModel: InfoViewModel, fontSize: TextUnit) {
-    val context = LocalContext.current
-    val imageUri = viewModel.state.imageUri
+
+    val uiState by viewModel.uiState.collectAsState()
+    val imageUri = uiState.imageUri
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let { viewModel.onImageChange(context, it) }
+            uri?.let { viewModel.onImageChange(it) }
         }
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -382,10 +364,9 @@ fun ImageInsert(viewModel: InfoViewModel, fontSize: TextUnit) {
 @Composable
 fun Request(
     fontSize: TextUnit,
-    viewModel: InfoViewModel,
+    onClick: ()-> Unit,
     enabled: Boolean
 ) {
-
     Box(
         modifier = Modifier
             .background(
@@ -393,9 +374,7 @@ fun Request(
                 shape = RoundedCornerShape(6.dp)
             )
             .padding(horizontal = 18.dp, vertical = 12.dp)
-            .clickable(enabled = enabled) {
-                viewModel.submitStudentInfo()
-            }
+            .clickable(enabled = enabled) { onClick() }
     ) {
         Text(
             text = "가입요청",
@@ -409,10 +388,10 @@ fun Request(
     }
 }
 
-
-@Composable
-@Preview(showBackground = true)
-fun Informationpreview(){
-    val viewModel : InfoViewModel = viewModel()
-    InformationScreen(viewModel)
-}
+//
+//@Composable
+//@Preview(showBackground = true)
+//fun Informationpreview(){
+////    val viewModel : InfoViewModel = viewModel()
+////    InformationScreen(viewModel)
+//}

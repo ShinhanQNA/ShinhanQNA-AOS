@@ -36,7 +36,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.SimpleViewModelFactory
+import com.example.shinhan_qna_aos.info.api.InfoViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -46,10 +51,9 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun OnboardingScreen(
-    viewModel: OnboardingViewModel,
-    onFinish: () -> Unit
+    navController: NavController,
+    data: Data
 ) {
-    val pages = viewModel.pages
     val pagerState = rememberPagerState(initialPage = 0)
 
     BoxWithConstraints(
@@ -70,7 +74,7 @@ fun OnboardingScreen(
         Column(modifier = Modifier.fillMaxSize()) {
 
             HorizontalPager(
-                count = pages.size,
+                count = 2,
                 state = pagerState,
                 modifier = Modifier
                     .weight(1f)
@@ -84,7 +88,12 @@ fun OnboardingScreen(
                     1 -> OnboardingPage2(
                         maxW = maxW,
                         maxH = maxH,
-                        onFinish = onFinish
+                        onFinish = {
+                            data.onboarding = false
+                            navController.navigate("login") {
+                                popUpTo("onboarding") { inclusive = true }
+                            }
+                        }
                     )
                 }
             }
@@ -432,18 +441,5 @@ fun OnboardingPage2(
 @Composable
 @Preview(showBackground = true)
 fun preview(){
-    val viewModel : OnboardingViewModel = viewModel()
-    OnboardingScreen(onFinish = {}, viewModel = viewModel)
-////    DotIndicator(2,1)
-//    BoxWithConstraints(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(Color.White)
-//            .systemBarsPadding()
-//    ) {
-//        val maxW = maxWidth
-//        val maxH = maxHeight
-////        OnboardingPage1(0,2,maxW)
-//        OnboardingPage2(1,2,maxW,maxH,{})
-//    }
+//    OnboardingScreen(onFinish = {}, )
 }
