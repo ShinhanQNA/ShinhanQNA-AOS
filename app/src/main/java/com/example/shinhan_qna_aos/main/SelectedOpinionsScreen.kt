@@ -17,12 +17,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -30,7 +29,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -52,14 +50,10 @@ import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.DetailContent
 import com.example.shinhan_qna_aos.InfoIconCount
-import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.SelectDataButton
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
-import com.example.shinhan_qna_aos.TitleContentCountButton
 import com.example.shinhan_qna_aos.TitleContentLikeButton
 import com.example.shinhan_qna_aos.TopBar
-import com.example.shinhan_qna_aos.main.api.AnswerRepository
-import com.example.shinhan_qna_aos.main.api.AnswerViewModel
 import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.main.api.TWPostViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
@@ -119,7 +113,9 @@ fun SelectedOpenScreen(
         twPostViewModel.loadGroupDetailPosts(groupId, selectedSort)
     }
 
-    Box {
+    Box(
+        modifier = Modifier.fillMaxWidth().systemBarsPadding()
+    ){
         Column {
             TopBar(
                 title = "${selectedYear}년 ${selectedMonth}월 3주차",
@@ -196,7 +192,9 @@ fun SelectedDetailScreen(
     // id에 해당하는 글을 리스트에서 찾기 (groupDetailList가 업데이트 될 때마다 재평가)
     val selectedPost = groupDetailList.firstOrNull { it.id == id }
 
-    Box {
+    Box(
+        modifier = Modifier.systemBarsPadding().fillMaxSize()
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

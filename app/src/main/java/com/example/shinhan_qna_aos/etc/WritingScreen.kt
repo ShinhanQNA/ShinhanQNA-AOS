@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -67,6 +68,7 @@ fun WritingScreen(writeRepository: WriteRepository, navController: NavController
 
     Box(
         modifier = Modifier.fillMaxSize()
+            .systemBarsPadding()
             .background(Color.White)
             .imePadding() // 키보드에 반응
     ) {

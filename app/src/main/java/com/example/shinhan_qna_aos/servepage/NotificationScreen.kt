@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -137,7 +138,7 @@ fun NotificationOpenScreen(id:Int, notificationRepository: NotificationRepositor
 
     val selectedNotices by notificationViewModel.selectedNotices.collectAsState()
 
-        Column() {
+        Column(modifier = Modifier.systemBarsPadding().fillMaxSize()) {
             TopBar(null, { navController.popBackStack() })
             DetailContent(
                 title = selectedNotices?.title ?: "",

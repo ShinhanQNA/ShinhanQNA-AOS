@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Divider
@@ -37,10 +38,9 @@ import com.jihan.lucide_icons.lucide
 fun AlarmScreen (navController: NavController){
     Column(modifier = Modifier.background(Color.White)) {
         TopBar("알림",{ navController.navigate("main?selectedTab=0") {popUpTo("alarm"){inclusive=true} }})
-        Box(){
-            LazyColumn(modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 50.dp)) {
+        Box(modifier = Modifier.systemBarsPadding()){
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(bottom = 50.dp)) {
                 items(6) { data ->
                     AlarmButton()
                     Divider()

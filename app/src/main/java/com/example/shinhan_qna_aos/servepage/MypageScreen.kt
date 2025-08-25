@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,7 +62,7 @@ fun MypageScreen(authRepository: AuthRepository, data: Data, navController: NavC
             else -> { /* 로그인 상태일 때는 그냥 유지 */ }
         }
     }
-    Box(){
+    Box(modifier = Modifier.fillMaxSize().systemBarsPadding()){
         Column(
             modifier = Modifier
                 .fillMaxSize()
