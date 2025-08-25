@@ -76,7 +76,8 @@ fun AnsweredOpenScreen(
         answerViewModel.selectAnswerById(id)
     }
 
-    Box {
+    Box(
+        modifier = Modifier.fillMaxSize().systemBarsPadding()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

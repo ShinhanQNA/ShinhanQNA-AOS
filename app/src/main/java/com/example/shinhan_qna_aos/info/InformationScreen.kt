@@ -76,6 +76,14 @@ fun InformationScreen(infoRepository: InfoRepository, data: Data, navController:
     // 가입 요청 모든 필드 입력시에만 누를 수 있도록
     val isFormValid = remember(uiState) { uiState.name.isNotBlank() && uiState.students != 0 && uiState.year != 0 && uiState.department.isNotBlank() && uiState.imageUri != Uri.EMPTY }
 
+    LaunchedEffect(Unit) {
+        val accessToken = data.accessToken ?: return@LaunchedEffect
+        while (true) {
+            infoViewModel.checkAndNavigateUserStatus(accessToken)
+            delay(10000) // 1분마다 서버 상태 확인
+        }
+    }
+
     // navigationRoute가 변경될 때만 네비게이션 실행 (null 체크 포함)
     LaunchedEffect(navigationRoute) {
         navigationRoute?.let { route ->

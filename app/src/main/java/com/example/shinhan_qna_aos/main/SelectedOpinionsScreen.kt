@@ -114,7 +114,7 @@ fun SelectedOpenScreen(
     }
 
     Box(
-        modifier = Modifier.fillMaxWidth().systemBarsPadding()
+        modifier = Modifier.fillMaxSize().systemBarsPadding()
     ){
         Column {
             TopBar(

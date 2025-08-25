@@ -36,10 +36,11 @@ import com.jihan.lucide_icons.lucide
 
 @Composable
 fun AlarmScreen (navController: NavController){
-    Column(modifier = Modifier.background(Color.White)) {
+    Column(modifier = Modifier.systemBarsPadding().fillMaxSize().background(Color.White)) {
         TopBar("알림",{ navController.navigate("main?selectedTab=0") {popUpTo("alarm"){inclusive=true} }})
-        Box(modifier = Modifier.systemBarsPadding()){
+        Box(){
             LazyColumn(
+                verticalArrangement = Arrangement.Top,
                 modifier = Modifier.fillMaxSize().padding(bottom = 50.dp)) {
                 items(6) { data ->
                     AlarmButton()
