@@ -15,6 +15,8 @@ import com.example.shinhan_qna_aos.main.api.PostFlag
 import com.example.shinhan_qna_aos.main.api.PostLike
 import com.example.shinhan_qna_aos.main.api.ReportReasonBody
 import com.example.shinhan_qna_aos.main.api.TWPostData
+import com.example.shinhan_qna_aos.main.api.Warning
+import com.example.shinhan_qna_aos.main.api.WarningRequest
 import com.example.shinhan_qna_aos.servepage.api.Notices
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -182,5 +184,12 @@ interface APIInterface {
     suspend fun CancelMember(
         @Header("Authorization") accessToken: String,
     ): Response<LogoutData>
+
+    //관리자 게시글 경고/차단 권한
+    @POST("/admin/users/warning")
+    suspend fun UserWarning(
+        @Header("Authorization") accessToken: String,
+        @Body warningRequest: WarningRequest
+    ): Response<Warning>
 }
 

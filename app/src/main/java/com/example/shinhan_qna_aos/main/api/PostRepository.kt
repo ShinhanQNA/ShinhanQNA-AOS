@@ -149,4 +149,24 @@ class PostRepository(
             Result.failure(e)
         }
     }
+
+    /**
+     * 관리자 게시글 사용자 신고 및 차단
+     */
+    suspend fun PostWarning(email: String, status: String, reason: String): Result<Warning> {
+        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다"))
+
+        val request = WarningRequest(email, status, reason)
+        return try {
+            val response = apiInterface.UserWarning("Bearer $accessToken", request)
+            if (response.isSuccessful) {
+                response.body()?.let { Result.success(it) }
+                    ?: Result.failure(Exception("응답이 비었습니다"))
+            } else {
+                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
