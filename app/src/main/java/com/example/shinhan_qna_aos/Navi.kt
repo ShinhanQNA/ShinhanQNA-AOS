@@ -51,6 +51,7 @@ import com.example.shinhan_qna_aos.servepage.NotificationOpenScreen
 import com.example.shinhan_qna_aos.servepage.NotificationScreen
 import com.example.shinhan_qna_aos.servepage.api.NotificationRepository
 import com.example.shinhan_qna_aos.servepage.manager.ManagerScreen
+import com.example.shinhan_qna_aos.servepage.manager.NotificationWriteScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -118,13 +119,13 @@ fun AppNavigation(
         navController = navController,
         startDestination = initialRoute!!
     ) {
-        composable("onboarding") { OnboardingScreen(navController, data) }
-        composable("login") { LoginScreen(authRepository, data, navController) }
-        composable("manager_login") { ManagerLoginScreen(authRepository, navController, data) }
-        composable("info") { InformationScreen(infoRepository, data, navController) }
-        composable("wait") { WaitScreen(infoRepository, data, navController) }
+        composable("onboarding") { OnboardingScreen(navController, data) }  // 온보딩
+        composable("login") { LoginScreen(authRepository, data, navController) } //로그인
+        composable("manager_login") { ManagerLoginScreen(authRepository, navController, data) } // 관리자 로그인 화면
+        composable("info") { InformationScreen(infoRepository, data, navController) } // 학생 정보 입력 화면
+        composable("wait") { WaitScreen(infoRepository, data, navController) } // 가입 대기 화면
 
-        composable(
+        composable( // 메인 화면 선택 사항이 많아서 selectedTab으로 원하는 화면으로 조정 가능
             "main?selectedTab={selectedTab}",
             arguments = listOf(navArgument("selectedTab") {
                 type = NavType.IntType
@@ -143,7 +144,7 @@ fun AppNavigation(
                 initialSelectedIndex = selectedTab
             )
         }
-        composable(
+        composable( // 게시글 상세 화면
             "writeOpen/{postId}",
             arguments = listOf(navArgument("postId") { type = NavType.StringType })
         ) { backStackEntry ->
@@ -151,10 +152,10 @@ fun AppNavigation(
             WriteOpenScreen(navController, postRepository, writeRepository, authRepository, data, postId)
         }
 
-        composable("writeBoard") { WritingScreen(writeRepository,answerRepository ,navController, data) }
-        composable("answer") { AnsweredScreen(answerRepository, navController) }
+        composable("writeBoard") { WritingScreen(writeRepository,answerRepository ,navController, data) } // 게시글 작성 화면
+        composable("answer") { AnsweredScreen(answerRepository, navController) } // 답변 화면
 
-        composable(
+        composable( // 답변 상세 화면
             "answerOpen/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) { backStackEntry ->
@@ -162,7 +163,7 @@ fun AppNavigation(
             AnsweredOpenScreen(answerRepository, navController,data, id)
         }
 
-        composable(
+        composable( // 3주차 게시판 리스트로 있음
             "threeWeekOpen/{groupId}",
             arguments = listOf(navArgument("groupId") { type = NavType.IntType })
         ) { backStackEntry ->
@@ -170,7 +171,7 @@ fun AppNavigation(
             SelectedOpenScreen(groupId, twPostRepository, navController)
         }
 
-        composable(
+        composable( // 3주차 게시판 상세화면
             "threeWeekDetail/{groupId}/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType },navArgument("groupId") { type = NavType.IntType })
         ) { backStackEntry ->
@@ -179,24 +180,26 @@ fun AppNavigation(
             SelectedDetailScreen(groupId , twPostRepository, navController, id)
         }
 
-        composable("myPage") { MypageScreen(authRepository, data, navController) }
-        composable("notices") { NotificationScreen(data, notificationRepository, navController) }
-        composable("alarm") { AlarmScreen(navController) }
+        composable("myPage") { MypageScreen(authRepository, data, navController) } // 마이페이지
+        composable("manager_myPage"){ ManagerScreen(navController, authRepository, data) } // 관리자 마이페이지
 
-        composable(
+        composable("notices") { NotificationScreen(data, notificationRepository, navController) } // 공지 화면
+        composable( // 공지 상세 화면
             "notices/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("id") ?: -1
-            NotificationOpenScreen(id, notificationRepository, navController)
+            NotificationOpenScreen(id,data ,notificationRepository, navController)
         }
+        composable("notices_write"){ NotificationWriteScreen(notificationRepository, navController) } // 관리자 공지 작성 화면
 
-        composable("appeal1"){ AppealScreen1(data, navController) }
+        composable("alarm") { AlarmScreen(navController) } // 알림 화면 나중에 firebase
+
+        composable("appeal1"){ AppealScreen1(data, navController) } // 차단 당했을 경우 사용자 제한 화면으로 appeal3까지 세트
         composable("appeal2"){ AppealScreen2(data, navController) }
         composable("appeal3"){ AppealScreen3(infoRepository, data, navController) }
 
-        // 관리자
-        composable("manager_myPage"){ ManagerScreen(navController, authRepository, data) }
+
     }
 }
 

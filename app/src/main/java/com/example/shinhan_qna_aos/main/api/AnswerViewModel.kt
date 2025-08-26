@@ -55,6 +55,7 @@ class AnswerViewModel(private val repository: AnswerRepository) : ViewModel() {
         _selectedAnswer.value = answer
     }
 
+    // 답변 작성
     fun writeAnswer(onSusscess: () -> Unit) {
         viewModelScope.launch {
             val result = repository.AnswerWrite(
@@ -71,15 +72,15 @@ class AnswerViewModel(private val repository: AnswerRepository) : ViewModel() {
         }
     }
 
-    // ✅ 수정 모드 진입
-    fun AnsverEditMode(answerRequest: Answer?) {
+    // 수정 모드 진입
+    fun AnswerEditMode(answerRequest: Answer?) {
         answerstate = answerstate.copy(
             title = answerRequest?.title ?: "",
             content = answerRequest?.content ?: "",
             editMode = true
         )
     }
-
+    // 수정 사항 카피
     fun answerEditMode() {
         answerstate = answerstate.copy(editMode = false)
     }
@@ -115,5 +116,4 @@ class AnswerViewModel(private val repository: AnswerRepository) : ViewModel() {
             }
         }
     }
-
 }

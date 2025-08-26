@@ -580,33 +580,34 @@ fun ManagerButton(icon: Int, label: String, onClick: () -> Unit, background: Col
 }
 
 @Composable
-fun EditDeleteButton( // 작성자(관리자/사용자)
+fun ManagerEditDeleteButton( // 관리자
     onDeleteClick: () -> Unit,
     onEditClick: () -> Unit
 ) {
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp),
         horizontalArrangement = Arrangement.End,
     ) {
-        // 첫 번째 버튼: 수정
+        // 첫 번째 버튼: 삭제
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier
-                .background(Color(0xffFF9F43), RoundedCornerShape(12.dp))
+                .background(Color(0xffFC4F4F), RoundedCornerShape(12.dp))
                 .padding(horizontal = 12.dp, vertical = 8.dp)
-                .clickable { onEditClick() }  // 수정 버튼 눌리면 콜백 호출
+                .clickable { onDeleteClick() }
         ) {
             Icon(
-                painter = painterResource( R.drawable.square_pen ),
-                contentDescription = "수정",
+                painter = painterResource(lucide.trash),
+                contentDescription = "삭제",
                 modifier = Modifier.size(20.dp),
                 tint = Color.White
             )
             Text(
-                text = "수정",
+                text = "삭제",
                 color = Color.White,
                 style = TextStyle(
                     fontFamily = pretendard,
@@ -618,23 +619,23 @@ fun EditDeleteButton( // 작성자(관리자/사용자)
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        // 두 번째 버튼: 삭제
+        // 두 번째 버튼: 수정
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier
-                .background(Color(0xffFC4F4F), RoundedCornerShape(12.dp))
+                .background(Color(0xff111111), RoundedCornerShape(12.dp))
                 .padding(horizontal = 12.dp, vertical = 8.dp)
-                .clickable { onDeleteClick() }
+                .clickable { onEditClick() }  // 수정 버튼 눌리면 콜백 호출
         ) {
             Icon(
-                painter = painterResource( lucide.trash ),
-                contentDescription = "삭제",
+                painter = painterResource(R.drawable.square_pen),
+                contentDescription = "수정",
                 modifier = Modifier.size(20.dp),
                 tint = Color.White
             )
             Text(
-                text = "삭제",
+                text = "수정",
                 color = Color.White,
                 style = TextStyle(
                     fontFamily = pretendard,

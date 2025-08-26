@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,11 +37,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.DetailContent
+import com.example.shinhan_qna_aos.ManagerEditDeleteButton
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TitleContentButton
 import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.servepage.api.NotificationRepository
 import com.example.shinhan_qna_aos.servepage.api.NotificationViewModel
+import com.example.shinhan_qna_aos.servepage.manager.NoticesEditPostContent
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
@@ -82,7 +83,7 @@ fun NotificationScreen(data: Data, notificationRepository: NotificationRepositor
 
             if(data.isAdmin){// + 새공지 버튼 - 배너 바로 위 공간에 위치하도록 아래 패딩 추가
                 Button(
-                    onClick = { /* 새공지 클릭 동작 */ },
+                    onClick = { navController.navigate("notices_write") },
                     shape = RoundedCornerShape(6.dp),
                     colors = ButtonDefaults.buttonColors(Color.Black),
                     contentPadding = PaddingValues(0.dp),
@@ -127,7 +128,7 @@ fun NotificationScreen(data: Data, notificationRepository: NotificationRepositor
 }
 
 @Composable
-fun NotificationOpenScreen(id:Int, notificationRepository: NotificationRepository, navController: NavController) {
+fun NotificationOpenScreen(id:Int,data: Data ,notificationRepository: NotificationRepository, navController: NavController) {
     val notificationViewModel: NotificationViewModel =
         viewModel(factory = SimpleViewModelFactory { NotificationViewModel(notificationRepository) })
 
@@ -137,14 +138,47 @@ fun NotificationOpenScreen(id:Int, notificationRepository: NotificationRepositor
     }
 
     val selectedNotices by notificationViewModel.selectedNotices.collectAsState()
+    val uiState = notificationViewModel.noticesState
 
-        Column(modifier = Modifier.systemBarsPadding().fillMaxSize()) {
-            TopBar(null, { navController.popBackStack() })
-            DetailContent(
-                title = selectedNotices?.title ?: "",
-                content = selectedNotices?.content ?: ""
-            )
+    Column(modifier = Modifier.systemBarsPadding().fillMaxSize()) {
+        TopBar(if (uiState.editMode) "게시글 수정" else null) {
+            if (uiState.editMode) {
+                navController.navigate("notices/${id}")
+            } else {
+                navController.navigate("notices") {
+                    popUpTo("notices/${id}") { inclusive = true }
+                }
+            }
         }
+        if (uiState.editMode) {
+            NoticesEditPostContent(
+                uiState = uiState,
+                notificationViewModel = notificationViewModel,
+                id = id.toString(),
+                navController = navController
+            )
+        } else {
+            LazyColumn() {
+                item {
+                    DetailContent(
+                        title = selectedNotices?.title ?: "",
+                        content = selectedNotices?.content ?: ""
+                    )
+                    if (data.isAdmin) {
+                        ManagerEditDeleteButton(
+                            onDeleteClick = {
+                                notificationViewModel.deleteNotices(id)
+                                navController.popBackStack()
+                            },
+                            onEditClick = {
+                                    notificationViewModel.NoticesEditMode(selectedNotices)
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)

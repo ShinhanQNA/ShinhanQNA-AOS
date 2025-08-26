@@ -19,6 +19,7 @@ import com.example.shinhan_qna_aos.main.api.TWPostData
 import com.example.shinhan_qna_aos.main.api.Warning
 import com.example.shinhan_qna_aos.main.api.WarningRequest
 import com.example.shinhan_qna_aos.servepage.api.Notices
+import com.example.shinhan_qna_aos.servepage.api.NoticesRequest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -211,6 +212,28 @@ interface APIInterface {
     // 답변 삭제
     @DELETE("/answers/{id}")
     suspend fun DeleteAnswerPost(
+        @Header("Authorization") accessToken: String,
+        @Path("id") id: Int
+    ): Response<Unit>
+
+    // 공지 작성
+    @POST("/notices")
+    suspend fun NoticesWritePost(
+        @Header("Authorization") accessToken: String,
+        @Body noticesRequest: NoticesRequest
+    ): Response<Notices>
+
+    // 공지 수정
+    @PUT("/notices/{id}")
+    suspend fun UpdateNoticesPost(
+        @Header("Authorization") accessToken: String,
+        @Body noticesRequest: NoticesRequest,
+        @Path("id") id: Int // 확실하지 않음 명세서랑 다름
+    ): Response<Notices>
+
+    // 공지 삭제
+    @DELETE("/notices/{id}")
+    suspend fun DeleteNoticesPost(
         @Header("Authorization") accessToken: String,
         @Path("id") id: Int
     ): Response<Unit>

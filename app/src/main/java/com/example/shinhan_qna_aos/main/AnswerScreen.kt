@@ -38,7 +38,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.DetailContent
-import com.example.shinhan_qna_aos.EditDeleteButton
+import com.example.shinhan_qna_aos.ManagerEditDeleteButton
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TitleContentButton
 import com.example.shinhan_qna_aos.TopBar
@@ -125,7 +125,6 @@ fun AnsweredOpenScreen(
                     AnswerEditPostContent(
                         uiState = uiState,
                         answerViewModel = answerViewModel,
-                        context = navController.context,
                         id = id.toString(),
                         navController = navController
                     )
@@ -135,14 +134,14 @@ fun AnsweredOpenScreen(
                             DetailContent(title = answer.title, content = answer.content)
 
                             if (data.isAdmin) {
-                                EditDeleteButton(
+                                ManagerEditDeleteButton(
                                     onDeleteClick = {
                                         Log.d("Compose", "삭제 버튼 클릭됨")
                                         answerViewModel.deleteAnswerPost(id)
                                         navController.popBackStack()
                                     },
                                     onEditClick = {
-                                        answerViewModel.AnsverEditMode(
+                                        answerViewModel.AnswerEditMode(
                                             selectedAnswer
                                         )
                                     }
@@ -160,7 +159,6 @@ fun AnsweredOpenScreen(
 fun AnswerEditPostContent(
     uiState: UiAnswerRequest,
     answerViewModel: AnswerViewModel,
-    context: Context,
     id: String,
     navController: NavController,
 ) {
@@ -216,7 +214,7 @@ fun AnswerEditPostContent(
                             navController.navigate("answerOpen/$id")
                         },
                         onError = {
-                            Toast.makeText(context, "답변 게시글 수정 실패", Toast.LENGTH_SHORT).show()
+//                            Toast.makeText(context, "답변 게시글 수정 실패", Toast.LENGTH_SHORT).show()
                         }
                     )
                 }

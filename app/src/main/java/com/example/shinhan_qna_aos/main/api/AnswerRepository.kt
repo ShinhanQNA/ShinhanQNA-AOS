@@ -71,6 +71,7 @@ class AnswerRepository(
         }
     }
 
+    // 답변 삭제
     suspend fun AnswerDelete(id: Int): Result<Unit> {
         val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다"))
 
@@ -86,5 +87,4 @@ class AnswerRepository(
             Result.failure(e)
         }
     }
-
 }
