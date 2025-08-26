@@ -50,8 +50,11 @@ import com.example.shinhan_qna_aos.servepage.user.MypageScreen
 import com.example.shinhan_qna_aos.servepage.NotificationOpenScreen
 import com.example.shinhan_qna_aos.servepage.NotificationScreen
 import com.example.shinhan_qna_aos.servepage.api.NotificationRepository
+import com.example.shinhan_qna_aos.servepage.manager.DeclarationOpenScreen
+import com.example.shinhan_qna_aos.servepage.manager.DeclarationScreen
 import com.example.shinhan_qna_aos.servepage.manager.ManagerScreen
 import com.example.shinhan_qna_aos.servepage.manager.NotificationWriteScreen
+import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationRepository
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -70,6 +73,7 @@ fun AppNavigation(
     val answerRepository = remember { AnswerRepository(apiInterface,data) }
     val twPostRepository= remember { TWPostRepository(apiInterface, data) }
     val notificationRepository = remember { NotificationRepository(apiInterface, data) }
+    val declarationRepository = remember { DeclarationRepository(data, apiInterface) }
 
     val loginViewModel: LoginViewModel =
         viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository, data) })
@@ -199,7 +203,12 @@ fun AppNavigation(
         composable("appeal2"){ AppealScreen2(data, navController) }
         composable("appeal3"){ AppealScreen3(infoRepository, data, navController) }
 
-
+        composable("declaration") { DeclarationScreen(declarationRepository,postRepository,data,navController) }
+        composable("declaration/{postId}" ,arguments = listOf(navArgument("postId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getString("postId") ?: ""
+            DeclarationOpenScreen(postId,navController, postRepository)
+        }
     }
 }
 

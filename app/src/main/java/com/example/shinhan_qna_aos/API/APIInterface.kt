@@ -22,6 +22,7 @@ import com.example.shinhan_qna_aos.main.api.Warning
 import com.example.shinhan_qna_aos.main.api.WarningRequest
 import com.example.shinhan_qna_aos.servepage.api.Notices
 import com.example.shinhan_qna_aos.servepage.api.NoticesRequest
+import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationData
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -247,5 +248,11 @@ interface APIInterface {
         @Header("Authorization") accessToken: String,
         @Path("id") id: Int
     ): Response<Unit>
+
+    // 신고 검토
+    @GET("/admin/boards/reports")
+    suspend fun Declaration(
+        @Header("Authorization") accessToken: String,
+    ):Response<List<DeclarationData>>
 }
 

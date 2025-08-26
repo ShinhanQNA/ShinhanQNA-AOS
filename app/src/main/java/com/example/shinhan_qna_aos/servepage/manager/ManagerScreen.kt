@@ -66,7 +66,8 @@ fun ManagerScreen(navController: NavController, authRepository: AuthRepository, 
         ) {
             TopBar("관리자", {navController.popBackStack()})
             ManagerMypageButton(
-                onLogoutClick = { loginViewModel.logout() }
+                onLogoutClick = { loginViewModel.logout() },
+                onDeclarationClick = { navController.navigate("declaration") }
             )
             Spacer(modifier = Modifier.height(16.dp))
             Caution()
@@ -83,7 +84,7 @@ fun ManagerScreen(navController: NavController, authRepository: AuthRepository, 
 }
 
 @Composable
-fun ManagerMypageButton(onLogoutClick:() -> Unit){
+fun ManagerMypageButton(onLogoutClick:() -> Unit, onDeclarationClick:() -> Unit){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -118,7 +119,8 @@ fun ManagerMypageButton(onLogoutClick:() -> Unit){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(24.dp),
+                .height(24.dp)
+                .clickable { onDeclarationClick() },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
