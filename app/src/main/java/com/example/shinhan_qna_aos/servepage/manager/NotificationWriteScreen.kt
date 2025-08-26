@@ -1,4 +1,4 @@
-//package com.example.shinhan_qna_aos.etc.manager
+package com.example.shinhan_qna_aos.servepage.manager//package com.example.shinhan_qna_aos.etc.manager
 //
 //import androidx.compose.foundation.background
 //import androidx.compose.foundation.layout.Arrangement
@@ -127,6 +127,54 @@
 //    }
 //}
 //
+//@Composable
+//fun ManagerNotificationOpenScreen(
+//    postRepository:PostRepository,
+//    data: Data,
+//    navController: NavController,
+//) {
+//    val postViewModel: PostViewModel = viewModel(factory = SimpleViewModelFactory { PostViewModel(postRepository) })
+//    val postDetail = postViewModel.selectedPost
+//
+//    // 처음 진입 시 API 호출
+//    LaunchedEffect(Unit) {
+//        postViewModel.loadPostDetail()
+//    }
+//
+//    Box {
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .background(Color.White)
+//                .padding(bottom = 50.dp)
+//        ) {
+//            TopBar(null,  { navController.popBackStack() })
+//
+//            // API에서 가져온 데이터로 표시
+//            postDetail?.let { DetailContent(title = it.title, content = postDetail.content) }
+//
+//            Spacer(modifier = Modifier.height(32.dp))
+//            ManagerFunctionButton(data.isNotice)
+//
+//        }
+//        // 배너광고는 항상 하단 고정
+//        Text(
+//            "배너광고",
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(50.dp)
+//                .background(Color.Red)
+//                .align(Alignment.BottomCenter)
+//        )
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun WriteOpenScreenPreview(){
+////    ManagerWriteOpenScreen()
+////    FunctionButton()
+//}
 //@Preview(showBackground = true)
 //@Composable
 //fun NotificationWritePreview(){

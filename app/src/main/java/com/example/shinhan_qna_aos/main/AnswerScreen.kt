@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -43,9 +42,9 @@ import com.example.shinhan_qna_aos.EditDeleteButton
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TitleContentButton
 import com.example.shinhan_qna_aos.TopBar
-import com.example.shinhan_qna_aos.etc.WriteInfo
-import com.example.shinhan_qna_aos.etc.WritingContentField
-import com.example.shinhan_qna_aos.etc.WritingTitleField
+import com.example.shinhan_qna_aos.servepage.WriteInfo
+import com.example.shinhan_qna_aos.servepage.WritingContentField
+import com.example.shinhan_qna_aos.servepage.WritingTitleField
 import com.example.shinhan_qna_aos.main.api.AnswerRepository
 import com.example.shinhan_qna_aos.main.api.AnswerViewModel
 import com.example.shinhan_qna_aos.main.api.UiAnswerRequest

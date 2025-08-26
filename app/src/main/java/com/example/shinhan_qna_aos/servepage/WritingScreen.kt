@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.etc
+package com.example.shinhan_qna_aos.servepage
 
 import android.net.Uri
 import android.widget.Toast
@@ -47,15 +47,15 @@ import androidx.navigation.compose.rememberNavController
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
-import com.example.shinhan_qna_aos.etc.api.WriteRepository
-import com.example.shinhan_qna_aos.etc.api.WritingViewModel
+import com.example.shinhan_qna_aos.servepage.api.WriteRepository
+import com.example.shinhan_qna_aos.servepage.api.WritingViewModel
 import com.example.shinhan_qna_aos.main.api.AnswerRepository
 import com.example.shinhan_qna_aos.main.api.AnswerViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun WritingScreen(writeRepository: WriteRepository,answerRepository: AnswerRepository ,navController: NavController, data: Data) {
+fun WritingScreen(writeRepository: WriteRepository, answerRepository: AnswerRepository, navController: NavController, data: Data) {
     val context = LocalContext.current
     val writingViewModel: WritingViewModel =
         viewModel(factory = SimpleViewModelFactory { WritingViewModel(writeRepository) })

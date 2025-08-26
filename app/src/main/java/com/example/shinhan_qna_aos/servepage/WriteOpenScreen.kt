@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.etc
+package com.example.shinhan_qna_aos.servepage
 
 import android.content.Context
 import android.net.Uri
@@ -56,9 +56,9 @@ import com.example.shinhan_qna_aos.EditDeleteButton
 import com.example.shinhan_qna_aos.LikeFlagBan
 import com.example.shinhan_qna_aos.ManagerButton
 import com.example.shinhan_qna_aos.PlainInputField
-import com.example.shinhan_qna_aos.etc.api.WriteData
-import com.example.shinhan_qna_aos.etc.api.WriteRepository
-import com.example.shinhan_qna_aos.etc.api.WritingViewModel
+import com.example.shinhan_qna_aos.servepage.api.WriteData
+import com.example.shinhan_qna_aos.servepage.api.WriteRepository
+import com.example.shinhan_qna_aos.servepage.api.WritingViewModel
 import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.api.LoginViewModel

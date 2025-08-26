@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.etc.api
+package com.example.shinhan_qna_aos.servepage.api
 
 import android.net.Uri
 

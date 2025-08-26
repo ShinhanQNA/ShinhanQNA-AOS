@@ -30,4 +30,21 @@ class NotificationViewModel(private val repository: NotificationRepository) : Vi
             }
         }
     }
+
+    //class NotificationWritingViewModel:ViewModel() {
+//    var state by mutableStateOf(
+//        NotificationWriteData(
+//            title = null,
+//            content = null
+//        )
+//    )
+//
+//    fun onTitleChange(newTitle: String) {
+//        state = state.copy(title = newTitle)
+//    }
+//
+//    fun onContentChange(newContent: String) {
+//        state = state.copy(content = newContent)
+//    }
+//}
 }

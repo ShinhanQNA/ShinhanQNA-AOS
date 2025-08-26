@@ -21,12 +21,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.shinhan_qna_aos.API.APIInterface
-import com.example.shinhan_qna_aos.etc.WriteOpenScreen
-import com.example.shinhan_qna_aos.etc.WritingScreen
-import com.example.shinhan_qna_aos.etc.api.WriteRepository
-import com.example.shinhan_qna_aos.etc.user.AppealScreen1
-import com.example.shinhan_qna_aos.etc.user.AppealScreen2
-import com.example.shinhan_qna_aos.etc.user.AppealScreen3
+import com.example.shinhan_qna_aos.servepage.WriteOpenScreen
+import com.example.shinhan_qna_aos.servepage.WritingScreen
+import com.example.shinhan_qna_aos.servepage.api.WriteRepository
+import com.example.shinhan_qna_aos.servepage.user.AppealScreen1
+import com.example.shinhan_qna_aos.servepage.user.AppealScreen2
+import com.example.shinhan_qna_aos.servepage.user.AppealScreen3
 import com.example.shinhan_qna_aos.info.api.InfoRepository
 import com.example.shinhan_qna_aos.info.InformationScreen
 import com.example.shinhan_qna_aos.info.WaitScreen
@@ -46,7 +46,7 @@ import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.servepage.AlarmScreen
-import com.example.shinhan_qna_aos.servepage.MypageScreen
+import com.example.shinhan_qna_aos.servepage.user.MypageScreen
 import com.example.shinhan_qna_aos.servepage.NotificationOpenScreen
 import com.example.shinhan_qna_aos.servepage.NotificationScreen
 import com.example.shinhan_qna_aos.servepage.api.NotificationRepository
