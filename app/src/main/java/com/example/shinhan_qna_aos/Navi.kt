@@ -159,7 +159,7 @@ fun AppNavigation(
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("id") ?: -1
-            AnsweredOpenScreen(answerRepository, navController, id,)
+            AnsweredOpenScreen(answerRepository, navController,data, id)
         }
 
         composable(

@@ -12,3 +12,9 @@ data class AnswerRequest(
     val title: String,
     val content: String
 )
+
+data class UiAnswerRequest(
+    val title: String,
+    val content: String,
+    val editMode: Boolean
+)

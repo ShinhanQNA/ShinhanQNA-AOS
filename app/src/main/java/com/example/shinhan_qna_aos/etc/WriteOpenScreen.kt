@@ -52,6 +52,7 @@ import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.EditDeleteButton
 import com.example.shinhan_qna_aos.LikeFlagBan
 import com.example.shinhan_qna_aos.ManagerButton
 import com.example.shinhan_qna_aos.PlainInputField
@@ -368,73 +369,6 @@ fun FlagLikeButton( // 작성자가 아닐때
             )
             Text(
                 text =  "추천" ,
-                color = Color.White,
-                style = TextStyle(
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp
-                ),
-            )
-        }
-    }
-}
-
-@Composable
-fun EditDeleteButton( // 작성자
-    onDeleteClick: () -> Unit,
-    onEditClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.End,
-    ) {
-        // 첫 번째 버튼: 수정
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier
-                .background(Color(0xffFF9F43), RoundedCornerShape(12.dp))
-                .padding(horizontal = 12.dp, vertical = 8.dp)
-                .clickable { onEditClick() }  // 수정 버튼 눌리면 콜백 호출
-        ) {
-            Icon(
-                painter = painterResource( R.drawable.square_pen ),
-                contentDescription = "수정",
-                modifier = Modifier.size(20.dp),
-                tint = Color.White
-            )
-            Text(
-                text = "수정",
-                color = Color.White,
-                style = TextStyle(
-                    fontFamily = pretendard,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp
-                ),
-            )
-        }
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        // 두 번째 버튼: 삭제
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier
-                .background(Color(0xffFC4F4F), RoundedCornerShape(12.dp))
-                .padding(horizontal = 12.dp, vertical = 8.dp)
-                .clickable { onDeleteClick() }
-        ) {
-            Icon(
-                painter = painterResource( lucide.trash ),
-                contentDescription = "삭제",
-                modifier = Modifier.size(20.dp),
-                tint = Color.White
-            )
-            Text(
-                text = "삭제",
                 color = Color.White,
                 style = TextStyle(
                     fontFamily = pretendard,

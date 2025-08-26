@@ -19,9 +19,10 @@ class AnswerViewModel(private val repository: AnswerRepository) : ViewModel() {
     private val _selectedAnswer = MutableStateFlow<Answer?>(null)
     val selectedAnswer = _selectedAnswer.asStateFlow()
 
-    var answerstate by mutableStateOf(AnswerRequest(
+    var answerstate by mutableStateOf(UiAnswerRequest(
         title = "",
-        content = ""
+        content = "",
+        editMode = false
         )
     )
 
@@ -69,4 +70,50 @@ class AnswerViewModel(private val repository: AnswerRepository) : ViewModel() {
                 .onFailure { Log.d("AnswerViewModel", "답변 작성 실패") }
         }
     }
+
+    // ✅ 수정 모드 진입
+    fun AnsverEditMode(answerRequest: Answer?) {
+        answerstate = answerstate.copy(
+            title = answerRequest?.title ?: "",
+            content = answerRequest?.content ?: "",
+            editMode = true
+        )
+    }
+
+    fun answerEditMode() {
+        answerstate = answerstate.copy(editMode = false)
+    }
+
+    // 게시글 수정
+    fun updateAnswerPost(
+        id: String,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
+    ) {
+        viewModelScope.launch {
+            val result = repository.updateAnswerPost(
+                id = id,
+                title = answerstate.title,
+                content = answerstate.content,
+            )
+            result
+                .onSuccess {
+                    answerEditMode()
+                    onSuccess()
+                }
+                .onFailure { onError() }
+        }
+    }
+    // 삭제
+    fun deleteAnswerPost(id: Int) {
+        viewModelScope.launch {
+            val result = repository.AnswerDelete(id)
+            if (result.isSuccess) {
+                Log.d("PostViewModel", "삭제 성공")
+            } else {
+                Log.e("PostViewModel", "삭제 실패: ${result.exceptionOrNull()?.message}")
+            }
+        }
+    }
+
 }

@@ -199,5 +199,20 @@ interface APIInterface {
         @Header("Authorization") accessToken: String,
         @Body answerRequest: AnswerRequest
     ): Response<Answer>
+
+    // 답변 수정
+    @PUT("/answers/{id}")
+    suspend fun UpdateAnswerPost(
+        @Header("Authorization") accessToken: String,
+        @Body answerRequest: AnswerRequest,
+        @Path("id") id: Int // 확실하지 않음 명세서랑 다름
+    ): Response<Answer>
+
+    // 답변 삭제
+    @DELETE("/answers/{id}")
+    suspend fun DeleteAnswerPost(
+        @Header("Authorization") accessToken: String,
+        @Path("id") id: Int
+    ): Response<Unit>
 }
 
