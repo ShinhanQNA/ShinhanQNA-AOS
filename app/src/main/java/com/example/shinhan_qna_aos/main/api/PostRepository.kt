@@ -3,6 +3,7 @@ package com.example.shinhan_qna_aos.main.api
 import androidx.compose.runtime.State
 import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.Data
+import com.example.shinhan_qna_aos.main.warningStatusToBanCount
 
 class PostRepository(
     private val apiInterface: APIInterface,
@@ -21,19 +22,13 @@ class PostRepository(
             val response = apiInterface.getPosts("Bearer $accessToken")
             if (response.isSuccessful) {
                 val body = response.body()?.map {
-                    val banCountInt = when (it.warningStatus) {
-                        "없음" -> "0"
-                        "경고" -> "1"
-                        "차단" -> "2"
-                        else -> "0" // 기본값
-                    }
                     TitleContentLike(
                         postID = it.postID,
                         title = it.title,
                         content = it.content,
                         likeCount = it.likes,
                         flagsCount = it.reportCount,
-                        banCount = banCountInt,
+                        banCount = warningStatusToBanCount(it.warningStatus),
                         responseState = it.status
                     )
                 } ?: emptyList()
