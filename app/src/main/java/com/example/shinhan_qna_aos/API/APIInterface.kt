@@ -9,6 +9,8 @@ import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
 import com.example.shinhan_qna_aos.main.api.Answer
 import com.example.shinhan_qna_aos.main.api.AnswerRequest
 import com.example.shinhan_qna_aos.main.api.GroupID
+import com.example.shinhan_qna_aos.main.api.GroupStatus
+import com.example.shinhan_qna_aos.main.api.GroupStatusRequest
 import com.example.shinhan_qna_aos.main.api.Post
 import com.example.shinhan_qna_aos.main.api.PostData
 import com.example.shinhan_qna_aos.main.api.PostDetail
@@ -168,6 +170,14 @@ interface APIInterface {
         @Path("groupId") groupId: Int,
         @Query("sort") sort : String // data, likes
     ): Response<TWPostData>
+
+    // 게시글 상태 변경 (3주 조회 대기/응답)
+    @PUT("/three-week-opinions/group/{groupId}/status")
+    suspend fun ThreeWeekStatus(
+        @Header("Authorization") accessToken: String,
+        @Path("groupId") groupId: Int,
+        @Body groupStatusRequest: GroupStatusRequest,
+    ): Response<GroupStatus>
 
     //답변 조회
     @GET("/answers")

@@ -191,7 +191,7 @@ fun SelectDataButton(
     month: Int,
     week: Int,
     isAdmin: Boolean = false,
-    responseState: String = "응답 상태",  // 👉 단일 String 으로 수정
+    responseState: String = "응답 상태",  //  단일 String 으로 수정
     onResponseStateChange: (String) -> Unit = {},
     onSelectDataClick: () -> Unit
 ) {
@@ -209,7 +209,7 @@ fun SelectDataButton(
             Spacer(Modifier.height(30.dp))
             Box(
                 modifier = Modifier
-                    .background(Color(0xffFF9F43), RoundedCornerShape(20.dp))
+                    .background(if(responseState=="완료")Color(0xff4AD871) else Color(0xffFF9F43), RoundedCornerShape(20.dp))
                     .padding(horizontal = 12.dp, vertical = 2.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -220,7 +220,7 @@ fun SelectDataButton(
                     )
                     Spacer(Modifier.width(4.dp))
                     Text(
-                        responseState, // 👉 여기서 선택된 상태 출력
+                        responseState,
                         style = TextStyle(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.Bold,
@@ -274,11 +274,11 @@ fun TitleContentLikeButton(
 // 관리자용 응답 상태 드롭다운
 @Composable
 fun ManagerDropDown(
-    responseState: String,  // 👉 단일 String 으로 변경
-    responseOptions: List<String> = listOf("대기", "응답 완료"),
+    responseState: String,  // 현재 선택된 상태
+    responseOptions: List<String> = listOf("대기", "완료"),
     onResponseStateChange: (String) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }  // 드롭다운 확장 상태 내부 관리
+    var expanded by remember { mutableStateOf(false) }
     Box {
         Row(
             modifier = Modifier
@@ -289,7 +289,7 @@ fun ManagerDropDown(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = responseState, // 👉 현재 선택된 상태
+                text = responseState,
                 fontSize = 13.sp,
                 fontFamily = pretendard,
                 color = Color.Black
@@ -303,13 +303,14 @@ fun ManagerDropDown(
         }
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(Color.White)  // 배경을 하얀색으로 지정
         ) {
             responseOptions.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option, fontFamily = pretendard, fontSize = 14.sp) },
                     onClick = {
-                        onResponseStateChange(option) // 👉 선택값 변경
+                        onResponseStateChange(option)
                         expanded = false
                     }
                 )
