@@ -113,7 +113,7 @@ fun MainScreen(
         .fillMaxSize()
         .systemBarsPadding()){
         Column{
-            MainTopbar(navController)
+            MainTopbar(navController, data)
             Selectboard(
                 postRepository = postRepository,
                 answerRepository = answerRepository,
@@ -137,7 +137,7 @@ fun MainScreen(
 
 // 서브 선택
 @Composable
-fun MainTopbar(navController: NavController){
+fun MainTopbar(navController: NavController,data: Data){
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
@@ -150,13 +150,13 @@ fun MainTopbar(navController: NavController){
             modifier = Modifier.size(28.dp),
             contentDescription = null
         )
-        TopIcon(navController)
+        TopIcon(navController, data)
     }
 }
 
 // 서브 선택
 @Composable
-fun TopIcon(navController: NavController){
+fun TopIcon(navController: NavController, data: Data){
     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)){
         Box(
             modifier = Modifier
@@ -201,7 +201,13 @@ fun TopIcon(navController: NavController){
             modifier = Modifier
                 .border(1.dp, color = Color(0xffDFDFDF), RoundedCornerShape(10.dp))
                 .padding(6.dp)
-                .clickable { navController.navigate("mypage") }
+                .clickable {
+                    if(data.isAdmin){
+                        navController.navigate("manager_myPage")
+                    }else {
+                        navController.navigate("mypage")
+                    }
+                }
         ){
             Icon(
                 painter = painterResource(R.drawable.shield_user),

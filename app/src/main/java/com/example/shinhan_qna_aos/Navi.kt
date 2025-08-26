@@ -50,6 +50,7 @@ import com.example.shinhan_qna_aos.servepage.MypageScreen
 import com.example.shinhan_qna_aos.servepage.NotificationOpenScreen
 import com.example.shinhan_qna_aos.servepage.NotificationScreen
 import com.example.shinhan_qna_aos.servepage.api.NotificationRepository
+import com.example.shinhan_qna_aos.servepage.manager.ManagerScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -147,7 +148,7 @@ fun AppNavigation(
             arguments = listOf(navArgument("postId") { type = NavType.StringType })
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getString("postId") ?: ""
-            WriteOpenScreen(navController, postRepository, writeRepository, data, postId)
+            WriteOpenScreen(navController, postRepository, writeRepository, authRepository, data, postId)
         }
 
         composable("writeBoard") { WritingScreen(writeRepository, navController) }
@@ -193,6 +194,9 @@ fun AppNavigation(
         composable("appeal1"){ AppealScreen1(data, navController) }
         composable("appeal2"){ AppealScreen2(data, navController) }
         composable("appeal3"){ AppealScreen3(infoRepository, data, navController) }
+
+        // 관리자
+        composable("manager_myPage"){ ManagerScreen(navController, authRepository, data) }
     }
 }
 
