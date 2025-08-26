@@ -148,7 +148,7 @@ fun ManagerButton(onLogoutClick:() -> Unit){
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "차단 해제 검토",
+                "이의 제기 검토",
                 color = Color.Black,
                 style = TextStyle(
                     fontFamily = pretendard,
