@@ -65,7 +65,7 @@ fun ManagerScreen(navController: NavController, authRepository: AuthRepository, 
                 .background(Color.White)
         ) {
             TopBar("관리자", {navController.popBackStack()})
-            ManagerButton(
+            ManagerMypageButton(
                 onLogoutClick = { loginViewModel.logout() }
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -83,7 +83,7 @@ fun ManagerScreen(navController: NavController, authRepository: AuthRepository, 
 }
 
 @Composable
-fun ManagerButton(onLogoutClick:() -> Unit){
+fun ManagerMypageButton(onLogoutClick:() -> Unit){
     Column(
         modifier = Modifier
             .fillMaxWidth()
