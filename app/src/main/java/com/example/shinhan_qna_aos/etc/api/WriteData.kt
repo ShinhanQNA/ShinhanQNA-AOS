@@ -9,9 +9,3 @@ data class WriteData(
     val imageUri: Uri?,
     val isEditMode: Boolean
 )
-
-
-//data class NotificationWriteData (
-//    val title: String? ="",
-//    val content: String? =""
-//)

@@ -7,7 +7,7 @@ class NotificationRepository(
     private val apiInterface: APIInterface,
     private val data: Data
 ) {
-    // 답변 리스트 받아오기 API 호출
+    // 공지 리스트 받아오기 API 호출
     suspend fun getNotification(): Result<List<Notices>> {
         val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
         return try {

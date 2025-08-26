@@ -11,11 +11,11 @@ class NotificationViewModel(private val repository: NotificationRepository) : Vi
     private val _noticesList = MutableStateFlow<List<Notices>>(emptyList())
     val noticesList = _noticesList.asStateFlow()
 
-    // 현재 선택된 단일 답변 상태
+    // 현재 선택된 단일 공지 상태
     private val _selectedNotices = MutableStateFlow<Notices?>(null)
     val selectedNotices = _selectedNotices.asStateFlow()
 
-    // 전체 답변 리스트 로드
+    // 전체 공지 리스트 로드
     fun loadNotification(id: Int? = null) {
         viewModelScope.launch {
             val result = repository.getNotification()
