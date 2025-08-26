@@ -478,6 +478,7 @@ fun ManagerFunctionButton( onDeleteClick: () -> Unit, onWarningClick: (String) -
                             .clickable {
                                 onWarningClick(reason)
                                 reason = ""
+                                showSheet = false
                             }
                     ) {
                         Icon(
