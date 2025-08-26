@@ -23,4 +23,21 @@ class AnswerRepository(
             Result.failure(e)
         }
     }
+    // 답변 작성하기 api
+    suspend fun AnswerWrite(title: String, content: String): Result<Answer> {
+        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
+        val request = AnswerRequest(title, content)
+        return try {
+            val response = apiInterface.AnswerWritePost("Bearer $accessToken",request)
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    Result.success(it)
+                } ?: Result.failure(Exception("응답 데이터가 없습니다."))
+            } else {
+                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

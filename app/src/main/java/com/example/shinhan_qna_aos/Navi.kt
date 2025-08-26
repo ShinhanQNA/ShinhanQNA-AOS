@@ -151,7 +151,7 @@ fun AppNavigation(
             WriteOpenScreen(navController, postRepository, writeRepository, authRepository, data, postId)
         }
 
-        composable("writeBoard") { WritingScreen(writeRepository, navController) }
+        composable("writeBoard") { WritingScreen(writeRepository,answerRepository ,navController, data) }
         composable("answer") { AnsweredScreen(answerRepository, navController) }
 
         composable(

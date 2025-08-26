@@ -7,6 +7,7 @@ import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.LogoutData
 import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
 import com.example.shinhan_qna_aos.main.api.Answer
+import com.example.shinhan_qna_aos.main.api.AnswerRequest
 import com.example.shinhan_qna_aos.main.api.GroupID
 import com.example.shinhan_qna_aos.main.api.Post
 import com.example.shinhan_qna_aos.main.api.PostData
@@ -191,5 +192,12 @@ interface APIInterface {
         @Header("Authorization") accessToken: String,
         @Body warningRequest: WarningRequest
     ): Response<Warning>
+
+    // 답변 작성
+    @POST("/answers")
+    suspend fun AnswerWritePost(
+        @Header("Authorization") accessToken: String,
+        @Body answerRequest: AnswerRequest
+    ): Response<Answer>
 }
 

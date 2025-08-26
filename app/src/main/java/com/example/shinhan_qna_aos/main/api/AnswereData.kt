@@ -7,3 +7,8 @@ data class Answer(
     val createdAt: String,
     val updatedAt: String
 )
+
+data class AnswerRequest(
+    val title: String,
+    val content: String
+)

@@ -44,21 +44,26 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.etc.api.WriteRepository
 import com.example.shinhan_qna_aos.etc.api.WritingViewModel
+import com.example.shinhan_qna_aos.main.api.AnswerRepository
+import com.example.shinhan_qna_aos.main.api.AnswerViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
 @Composable
-fun WritingScreen(writeRepository: WriteRepository, navController: NavController) {
+fun WritingScreen(writeRepository: WriteRepository,answerRepository: AnswerRepository ,navController: NavController, data: Data) {
     val context = LocalContext.current
     val writingViewModel: WritingViewModel =
         viewModel(factory = SimpleViewModelFactory { WritingViewModel(writeRepository) })
+    val answerViewModel: AnswerViewModel =
+        viewModel(factory = SimpleViewModelFactory { AnswerViewModel(answerRepository) })
 
     val state = writingViewModel.state
-
+    val answerstae = answerViewModel.answerstate
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
@@ -67,7 +72,8 @@ fun WritingScreen(writeRepository: WriteRepository, navController: NavController
         }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .systemBarsPadding()
             .background(Color.White)
             .imePadding() // 키보드에 반응
@@ -81,49 +87,51 @@ fun WritingScreen(writeRepository: WriteRepository, navController: NavController
             ) {
                 item {
                     WritingTitleField(
-                        value = state.title,
-                        onValueChange = writingViewModel::onTitleChange,
+                        value = if (data.isAdmin) answerstae.title else state.title,
+                        onValueChange = if(data.isAdmin) answerViewModel::onTitleChange else writingViewModel::onTitleChange,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
                 item {
                     WritingContentField(
-                        value = state.content,
-                        onValueChange = writingViewModel::onContentChange,
+                        value = if (data.isAdmin) answerstae.content else state.content,
+                        onValueChange = if(data.isAdmin) answerViewModel::onContentChange else writingViewModel::onContentChange,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Normal
                     )
                 }
                 item {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
+                    if (!data.isAdmin) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            modifier = Modifier
-                                .background(Color.Black, RoundedCornerShape(12.dp))
-                                .padding(horizontal = 12.dp, vertical = 8.dp)
-                                .clickable { launcher.launch("image/*") },
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            Icon(
-                                painter = painterResource(lucide.images),
-                                contentDescription = "사진 첨부",
-                                modifier = Modifier.size(20.dp),
-                                tint = Color.White
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                modifier = Modifier
+                                    .background(Color.Black, RoundedCornerShape(12.dp))
+                                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                                    .clickable { launcher.launch("image/*") },
+                            ) {
+                                Icon(
+                                    painter = painterResource(lucide.images),
+                                    contentDescription = "사진 첨부",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = Color.White
+                                )
+                                Text("사진 첨부", color = Color.White, fontSize = 14.sp)
+                            }
+                            Text(
+                                state.imageUri?.lastPathSegment ?: "",
+                                maxLines = 1,
+                                modifier = Modifier.weight(1f)
                             )
-                            Text("사진 첨부", color = Color.White, fontSize = 14.sp)
                         }
-                        Text(
-                            state.imageUri?.lastPathSegment ?: "",
-                            maxLines = 1,
-                            modifier = Modifier.weight(1f)
-                        )
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
                     WriteInfo()
                     Spacer(modifier = Modifier.height(50.dp))
                 }
@@ -139,17 +147,27 @@ fun WritingScreen(writeRepository: WriteRepository, navController: NavController
                 .background(Color.Black, RoundedCornerShape(12.dp))
                 .padding(horizontal = 18.dp, vertical = 12.dp)
                 .clickable {
-                    writingViewModel.uploadPost(
-                        onSuccess = {
-                            navController.navigate("main?selectedTab=0") {
-                                popUpTo("writeBoard") { inclusive = true }
+                    if (data.isAdmin) {
+                        answerViewModel.writeAnswer(
+                            onSusscess = {
+                                navController.navigate("main?selectedTab=2") {
+                                    popUpTo("writeBoard") { inclusive = true }
+                                }
                             }
-                        },
-                        onError = {
-                            Toast.makeText(context, "게시글 작성이 실패하였습니다", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    )
+                        )
+                    } else {
+                        writingViewModel.uploadPost(
+                            onSuccess = {
+                                navController.navigate("main?selectedTab=0") {
+                                    popUpTo("writeBoard") { inclusive = true }
+                                }
+                            },
+                            onError = {
+                                Toast.makeText(context, "게시글 작성이 실패하였습니다", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        )
+                    }
                 }
         ) {
             Icon(
