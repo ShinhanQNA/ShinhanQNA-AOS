@@ -21,8 +21,11 @@ import com.example.shinhan_qna_aos.main.api.ReportReasonBody
 import com.example.shinhan_qna_aos.main.api.TWPostData
 import com.example.shinhan_qna_aos.main.api.Warning
 import com.example.shinhan_qna_aos.main.api.WarningRequest
+import com.example.shinhan_qna_aos.servepage.api.AppealData
+import com.example.shinhan_qna_aos.servepage.api.BlockReasonData
 import com.example.shinhan_qna_aos.servepage.api.Notices
 import com.example.shinhan_qna_aos.servepage.api.NoticesRequest
+import com.example.shinhan_qna_aos.servepage.api.ReasonRequest
 import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationData
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -204,6 +207,22 @@ interface APIInterface {
     suspend fun CancelMember(
         @Header("Authorization") accessToken: String,
     ): Response<LogoutData>
+
+    // 이의 제기
+    @POST("/appeals")
+    suspend fun Appeal(
+        @Header("Authorization") accessToken: String,
+    ): Response<List<AppealData>>
+
+    // 사용자 차단 이유 조회
+    @POST("admin/users/block-reasons")
+    suspend fun BlockReason(
+        @Header("Authorization") accessToken: String,
+        @Body reasonRequest: ReasonRequest
+    ): Response<List<BlockReasonData>>
+    /**
+     * 관리자 관련
+     */
 
     //관리자 게시글 경고/차단 권한
     @POST("/admin/users/warning")

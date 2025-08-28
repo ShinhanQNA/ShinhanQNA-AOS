@@ -50,6 +50,7 @@ import com.example.shinhan_qna_aos.servepage.AlarmScreen
 import com.example.shinhan_qna_aos.servepage.user.MypageScreen
 import com.example.shinhan_qna_aos.servepage.NotificationOpenScreen
 import com.example.shinhan_qna_aos.servepage.NotificationScreen
+import com.example.shinhan_qna_aos.servepage.api.AppealRepository
 import com.example.shinhan_qna_aos.servepage.api.NotificationRepository
 import com.example.shinhan_qna_aos.servepage.manager.DeclarationOpenScreen
 import com.example.shinhan_qna_aos.servepage.manager.DeclarationScreen
@@ -75,6 +76,7 @@ fun AppNavigation(
     val twPostRepository= remember { TWPostRepository(apiInterface, data) }
     val notificationRepository = remember { NotificationRepository(apiInterface, data) }
     val declarationRepository = remember { DeclarationRepository(data, apiInterface) }
+    val appealRepository = remember { AppealRepository(apiInterface, data) }
 
     val loginViewModel: LoginViewModel =
         viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository, data) })
@@ -202,8 +204,8 @@ fun AppNavigation(
 
         composable("alarm") { AlarmScreen(navController) } // 알림 화면 나중에 firebase
 
-        composable("appeal1"){ AppealScreen1(data, navController) } // 차단 당했을 경우 사용자 제한 화면으로 appeal3까지 세트
-        composable("appeal2"){ AppealScreen2(data, navController) }
+        composable("appeal1"){ AppealScreen1(appealRepository, data, navController) } // 차단 당했을 경우 사용자 제한 화면으로 appeal3까지 세트
+        composable("appeal2"){ AppealScreen2(appealRepository, data, navController) }
         composable("appeal3"){ AppealScreen3(infoRepository, data, navController) }
 
         composable("declaration") { DeclarationScreen(declarationRepository,postRepository,data,navController) } // 신고된 게시글

@@ -39,12 +39,31 @@ import com.example.shinhan_qna_aos.info.api.InfoRepository
 import com.example.shinhan_qna_aos.info.api.InfoViewModel
 import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.api.LoginViewModel
+import com.example.shinhan_qna_aos.servepage.api.AppealRepository
+import com.example.shinhan_qna_aos.servepage.api.AppealViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 import kotlinx.coroutines.delay
 
 @Composable
-fun AppealScreen1(data: Data, navController: NavController) {
+fun AppealScreen1(appealRepository: AppealRepository,data: Data, navController: NavController) {
+    val appealViewModel: AppealViewModel = viewModel(factory = SimpleViewModelFactory { AppealViewModel(appealRepository) })
+
+    // userEmail 안전하게 가져오기 (기본값 or 안내 메시지 할당)
+    val userEmail = data.userEmail ?: ""
+
+    // email이 빈 문자열이면 호출 안함 → 기본값, 에러 처리 등 옵션 선택
+    LaunchedEffect(userEmail) {
+        if (userEmail.isNotBlank()) {
+            appealViewModel.loadBlockReason(userEmail)
+        }
+    }
+
+    val reasonText = appealViewModel.blockReasonDataList.flatMap { it.blockReasons }
+        .distinct()
+        .joinToString(", ")
+        .ifEmpty { "알 수 없음" }
+
     Column(
         modifier = Modifier.fillMaxSize()
         .padding(horizontal = 20.dp)
@@ -72,7 +91,7 @@ fun AppealScreen1(data: Data, navController: NavController) {
         Spacer(modifier = Modifier.height(36.dp))
 
         Text(
-            text = "[${data.userName}]님의 계정에서 이용 약관을 심각하게 위반하는 활동이 감지되어, 서비스 이용이 영구적으로 정지되었음을 알려드립니다.",
+            text = "[${data.userName}]님은 [${reasonText}]로 인해 서비스 이용이 영구적으로 정지되었음을 알려드립니다.",
             style = TextStyle(
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,
@@ -84,7 +103,7 @@ fun AppealScreen1(data: Data, navController: NavController) {
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "관이 결정에 따라 회원님은 더 이상 본 계정으로 로그인하거나 서비스를 이용할 수 없습니다.",
+            text = "이 결정에 따라 회원님은 더 이상 본 계정으로 로그인하거나 서비스를 이용할 수 없습니다.",
             style = TextStyle(
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,
@@ -122,7 +141,10 @@ fun AppealScreen1(data: Data, navController: NavController) {
 }
 
 @Composable
-fun AppealScreen2(data: Data, navController: NavController) {
+fun AppealScreen2(appealRepository: AppealRepository, data: Data, navController: NavController) {
+
+    val appealViewModel: AppealViewModel = viewModel(factory = SimpleViewModelFactory { AppealViewModel(appealRepository) })
+
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(horizontal = 20.dp)
@@ -179,6 +201,7 @@ fun AppealScreen2(data: Data, navController: NavController) {
                 .background(Color.Black, RoundedCornerShape(12.dp))
                 .padding(horizontal = 12.dp, vertical = 8.dp)
                 .clickable {
+                    appealViewModel.loadAppeals()
                     navController.navigate("appeal3")
                     data.isAppealCompleted = true
                    },
