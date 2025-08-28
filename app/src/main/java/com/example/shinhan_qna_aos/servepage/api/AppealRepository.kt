@@ -23,25 +23,25 @@ class AppealRepository(
         }
     }
 
-    // 차단 이유 조회
-    suspend fun blockReason(email: String): Result<List<BlockReasonData>> {
-        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
-        val request = ReasonRequest(email)
-        return try {
-            val response = apiInterface.BlockReason("Bearer $accessToken", request)
-            if (response.isSuccessful) {
-                val body = response.body()
-                if (body != null) {
-                    Result.success(body)
-                } else {
-                    Result.failure(Exception("차단 이유 데이터 없음"))
-                }
-            } else {
-                val errorBody = response.errorBody()?.string() ?: ""
-                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()} $errorBody"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+//    // 차단 이유 조회
+//    suspend fun blockReason(email: String): Result<List<BlockReasonData>> {
+//        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
+//        val request = ReasonRequest(email)
+//        return try {
+//            val response = apiInterface.BlockReason("Bearer $accessToken", request)
+//            if (response.isSuccessful) {
+//                val body = response.body()
+//                if (body != null) {
+//                    Result.success(body)
+//                } else {
+//                    Result.failure(Exception("차단 이유 데이터 없음"))
+//                }
+//            } else {
+//                val errorBody = response.errorBody()?.string() ?: ""
+//                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()} $errorBody"))
+//            }
+//        } catch (e: Exception) {
+//            Result.failure(e)
+//        }
+//    }
 }

@@ -46,8 +46,9 @@ import com.jihan.lucide_icons.lucide
 import kotlinx.coroutines.delay
 
 @Composable
-fun AppealScreen1(appealRepository: AppealRepository,data: Data, navController: NavController) {
+fun AppealScreen1(appealRepository: AppealRepository,infoRepository: InfoRepository,data: Data, navController: NavController) {
     val appealViewModel: AppealViewModel = viewModel(factory = SimpleViewModelFactory { AppealViewModel(appealRepository) })
+    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data ) })
 
     // userEmail 안전하게 가져오기 (기본값 or 안내 메시지 할당)
     val userEmail = data.userEmail ?: ""
@@ -58,11 +59,6 @@ fun AppealScreen1(appealRepository: AppealRepository,data: Data, navController: 
             appealViewModel.loadBlockReason(userEmail)
         }
     }
-
-    val reasonText = appealViewModel.blockReasonDataList.flatMap { it.blockReasons }
-        .distinct()
-        .joinToString(", ")
-        .ifEmpty { "알 수 없음" }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -91,7 +87,7 @@ fun AppealScreen1(appealRepository: AppealRepository,data: Data, navController: 
         Spacer(modifier = Modifier.height(36.dp))
 
         Text(
-            text = "[${data.userName}]님은 [${reasonText}]로 인해 서비스 이용이 영구적으로 정지되었음을 알려드립니다.",
+            text = "[${data.userName}]님은 [사유]로 인해 서비스 이용이 영구적으로 정지되었음을 알려드립니다.",
             style = TextStyle(
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,

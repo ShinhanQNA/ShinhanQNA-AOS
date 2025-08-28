@@ -204,7 +204,7 @@ fun AppNavigation(
 
         composable("alarm") { AlarmScreen(navController) } // 알림 화면 나중에 firebase
 
-        composable("appeal1"){ AppealScreen1(appealRepository, data, navController) } // 차단 당했을 경우 사용자 제한 화면으로 appeal3까지 세트
+        composable("appeal1"){ AppealScreen1(appealRepository, infoRepository, data, navController) } // 차단 당했을 경우 사용자 제한 화면으로 appeal3까지 세트
         composable("appeal2"){ AppealScreen2(appealRepository, data, navController) }
         composable("appeal3"){ AppealScreen3(infoRepository, data, navController) }
 

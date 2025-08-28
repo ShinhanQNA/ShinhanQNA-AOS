@@ -31,16 +31,16 @@ class AppealViewModel(
         }
     }
 
-    fun loadBlockReason(email: String) {
-        viewModelScope.launch {
-            appealRepository.blockReason(email)
-                .onSuccess { data ->
-                    blockReasonDataList = data
-                    Log.d("blockReasonDataList", blockReasonDataList.toString())
-                }
-                .onFailure { error ->
-                    error.message
-                }
-        }
-    }
+//    fun loadBlockReason(email: String) {
+//        viewModelScope.launch {
+//            appealRepository.blockReason(email)
+//                .onSuccess { data ->
+//                    blockReasonDataList = data
+//                    Log.d("blockReasonDataList", blockReasonDataList.toString())
+//                }
+//                .onFailure { error ->
+//                    error.message
+//                }
+//        }
+//    }
 }
