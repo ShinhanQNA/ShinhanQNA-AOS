@@ -17,6 +17,10 @@ class PostViewModel(
     // 게시글 리스트
     var postList by mutableStateOf<List<TitleContentLike>>(emptyList())
 
+    // 내가 쓴 게시글 리스트
+    var myPostList by mutableStateOf<List<MyPostData>>(emptyList())
+        private set
+
     var selectedPost by mutableStateOf<PostDetail?>(null)
         private set
 
@@ -130,4 +134,20 @@ class PostViewModel(
                 }
         }
     }
+    /**
+     * 내가 쓴 게시글 목록 로드
+     */
+    fun loadMyPosts() {
+        viewModelScope.launch {
+            postRepository.getMyPosts()
+                .onSuccess {
+                    myPostList = it
+                }
+                .onFailure { error ->
+                    errorMessage = error.message
+                    Log.e("PostViewModel", "내 게시글 조회 실패: ${error.message}")
+                }
+        }
+    }
+
 }

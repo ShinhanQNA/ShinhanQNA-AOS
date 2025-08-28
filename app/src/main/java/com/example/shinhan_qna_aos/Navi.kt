@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.shinhan_qna_aos.API.APIInterface
+import com.example.shinhan_qna_aos.etc.user.MyWriteScreen
 import com.example.shinhan_qna_aos.servepage.WriteOpenScreen
 import com.example.shinhan_qna_aos.servepage.WritingScreen
 import com.example.shinhan_qna_aos.servepage.api.WriteRepository
@@ -187,6 +188,8 @@ fun AppNavigation(
         composable("myPage") { MypageScreen(authRepository, data, navController) } // 마이페이지
         composable("manager_myPage"){ ManagerScreen(navController, authRepository, data) } // 관리자 마이페이지
 
+        composable("my_page_write") { MyWriteScreen(postRepository, navController) } // 내가 작성한 게시글
+
         composable("notices") { NotificationScreen(data, notificationRepository, navController) } // 공지 화면
         composable( // 공지 상세 화면
             "notices/{id}",
@@ -203,8 +206,8 @@ fun AppNavigation(
         composable("appeal2"){ AppealScreen2(data, navController) }
         composable("appeal3"){ AppealScreen3(infoRepository, data, navController) }
 
-        composable("declaration") { DeclarationScreen(declarationRepository,postRepository,data,navController) }
-        composable("declaration/{postId}" ,arguments = listOf(navArgument("postId") { type = NavType.StringType })
+        composable("declaration") { DeclarationScreen(declarationRepository,postRepository,data,navController) } // 신고된 게시글
+        composable("declaration/{postId}" ,arguments = listOf(navArgument("postId") { type = NavType.StringType }) // 신고된 게시글 상세
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getString("postId") ?: ""
             DeclarationOpenScreen(postId,navController, postRepository)

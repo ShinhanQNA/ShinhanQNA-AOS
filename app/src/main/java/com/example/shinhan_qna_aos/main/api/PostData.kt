@@ -82,3 +82,11 @@ data class Warning(
     @SerializedName("reason") val reason: String,
     @SerializedName("warningDate") val warningDate: String
 )
+
+// 내가 쓴 글 모아보기
+data class MyPostData(
+    @SerializedName("postId") val postID: Int,
+    @SerializedName("title") val title: String,
+    @SerializedName("email") val email : String,
+    @SerializedName("content") val content: String,
+)

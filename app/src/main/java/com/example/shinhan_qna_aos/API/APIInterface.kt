@@ -11,6 +11,7 @@ import com.example.shinhan_qna_aos.main.api.AnswerRequest
 import com.example.shinhan_qna_aos.main.api.GroupID
 import com.example.shinhan_qna_aos.main.api.GroupStatus
 import com.example.shinhan_qna_aos.main.api.GroupStatusRequest
+import com.example.shinhan_qna_aos.main.api.MyPostData
 import com.example.shinhan_qna_aos.main.api.Post
 import com.example.shinhan_qna_aos.main.api.PostData
 import com.example.shinhan_qna_aos.main.api.PostDetail
@@ -179,6 +180,12 @@ interface APIInterface {
         @Path("groupId") groupId: Int,
         @Body groupStatusRequest: GroupStatusRequest,
     ): Response<GroupStatus>
+
+    // 내가 쓴 게시글 조회
+    @GET("/boards/my")
+    suspend fun MyPost(
+        @Header("Authorization") accessToken: String,
+    ): Response<List<MyPostData>>
 
     //답변 조회
     @GET("/answers")
