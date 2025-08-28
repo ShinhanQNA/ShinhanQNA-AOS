@@ -67,5 +67,18 @@ data class PostDetail(
     @SerializedName("warningStatus") val warningStatus: String,
     @SerializedName("writerEmail") val writerEmail: String,
     @SerializedName("imagePath") val imagePath: String?,
+)
 
+// 관리자 유저 경고 및 차단 리퀘스트 값
+data class WarningRequest(
+    @SerializedName("email") val email: String, // 해당 유저 이메일
+    @SerializedName("status") val status: String, // 유저 상태 결정 경고/차단
+    @SerializedName("reason") val reason: String // 이유
+)
+//관리자 유저 경고 및 차단 api
+data class Warning(
+    @SerializedName("warningId") val warningId: Int,
+    @SerializedName("email") val email: String,
+    @SerializedName("reason") val reason: String,
+    @SerializedName("warningDate") val warningDate: String
 )

@@ -7,7 +7,10 @@ import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.LogoutData
 import com.example.shinhan_qna_aos.login.api.RefreshTokenRequest
 import com.example.shinhan_qna_aos.main.api.Answer
+import com.example.shinhan_qna_aos.main.api.AnswerRequest
 import com.example.shinhan_qna_aos.main.api.GroupID
+import com.example.shinhan_qna_aos.main.api.GroupStatus
+import com.example.shinhan_qna_aos.main.api.GroupStatusRequest
 import com.example.shinhan_qna_aos.main.api.Post
 import com.example.shinhan_qna_aos.main.api.PostData
 import com.example.shinhan_qna_aos.main.api.PostDetail
@@ -15,7 +18,11 @@ import com.example.shinhan_qna_aos.main.api.PostFlag
 import com.example.shinhan_qna_aos.main.api.PostLike
 import com.example.shinhan_qna_aos.main.api.ReportReasonBody
 import com.example.shinhan_qna_aos.main.api.TWPostData
+import com.example.shinhan_qna_aos.main.api.Warning
+import com.example.shinhan_qna_aos.main.api.WarningRequest
 import com.example.shinhan_qna_aos.servepage.api.Notices
+import com.example.shinhan_qna_aos.servepage.api.NoticesRequest
+import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationData
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -165,6 +172,14 @@ interface APIInterface {
         @Query("sort") sort : String // data, likes
     ): Response<TWPostData>
 
+    // 게시글 상태 변경 (3주 조회 대기/응답)
+    @PUT("/three-week-opinions/group/{groupId}/status")
+    suspend fun ThreeWeekStatus(
+        @Header("Authorization") accessToken: String,
+        @Path("groupId") groupId: Int,
+        @Body groupStatusRequest: GroupStatusRequest,
+    ): Response<GroupStatus>
+
     //답변 조회
     @GET("/answers")
     suspend fun AnswerPost(
@@ -182,5 +197,62 @@ interface APIInterface {
     suspend fun CancelMember(
         @Header("Authorization") accessToken: String,
     ): Response<LogoutData>
+
+    //관리자 게시글 경고/차단 권한
+    @POST("/admin/users/warning")
+    suspend fun UserWarning(
+        @Header("Authorization") accessToken: String,
+        @Body warningRequest: WarningRequest
+    ): Response<Warning>
+
+    // 답변 작성
+    @POST("/answers")
+    suspend fun AnswerWritePost(
+        @Header("Authorization") accessToken: String,
+        @Body answerRequest: AnswerRequest
+    ): Response<Answer>
+
+    // 답변 수정
+    @PUT("/answers/{id}")
+    suspend fun UpdateAnswerPost(
+        @Header("Authorization") accessToken: String,
+        @Body answerRequest: AnswerRequest,
+        @Path("id") id: Int // 확실하지 않음 명세서랑 다름
+    ): Response<Answer>
+
+    // 답변 삭제
+    @DELETE("/answers/{id}")
+    suspend fun DeleteAnswerPost(
+        @Header("Authorization") accessToken: String,
+        @Path("id") id: Int
+    ): Response<Unit>
+
+    // 공지 작성
+    @POST("/notices")
+    suspend fun NoticesWritePost(
+        @Header("Authorization") accessToken: String,
+        @Body noticesRequest: NoticesRequest
+    ): Response<Notices>
+
+    // 공지 수정
+    @PUT("/notices/{id}")
+    suspend fun UpdateNoticesPost(
+        @Header("Authorization") accessToken: String,
+        @Body noticesRequest: NoticesRequest,
+        @Path("id") id: Int // 확실하지 않음 명세서랑 다름
+    ): Response<Notices>
+
+    // 공지 삭제
+    @DELETE("/notices/{id}")
+    suspend fun DeleteNoticesPost(
+        @Header("Authorization") accessToken: String,
+        @Path("id") id: Int
+    ): Response<Unit>
+
+    // 신고 검토
+    @GET("/admin/boards/reports")
+    suspend fun Declaration(
+        @Header("Authorization") accessToken: String,
+    ):Response<List<DeclarationData>>
 }
 

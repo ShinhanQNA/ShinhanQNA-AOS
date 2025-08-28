@@ -7,3 +7,15 @@ data class Notices(
     val createdAt: String,
     val updatedAt: String
 )
+
+data class NoticesRequest(
+    val title: String,
+    val content: String
+)
+
+data class UiNoticesRequest(
+    val id: Int,
+    val title: String,
+    val content: String,
+    val editMode: Boolean
+)

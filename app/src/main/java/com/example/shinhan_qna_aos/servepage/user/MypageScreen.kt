@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.servepage
+package com.example.shinhan_qna_aos.servepage.user
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,7 +36,6 @@ import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
-import com.example.shinhan_qna_aos.etc.api.WritingViewModel
 import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.api.LoginViewModel

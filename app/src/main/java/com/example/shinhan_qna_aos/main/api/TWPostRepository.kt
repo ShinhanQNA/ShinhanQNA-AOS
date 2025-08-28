@@ -13,7 +13,7 @@ import java.time.LocalDate
 class TWPostRepository (
     private val apiInterface: APIInterface,
     private val data: Data
-){
+) {
     // 년도를 넘겨 3주 의견 데이터 호출 suspend 함수
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun fetchThreeWeekOpinions(): Result<List<GroupID>> {
@@ -30,7 +30,10 @@ class TWPostRepository (
                     Result.failure(Exception("응답 데이터가 없습니다."))
                 }
             } else {
-                Log.e("TWPostRepository", "API 호출 실패 - 코드: ${response.code()}, 메시지: ${response.message()}")
+                Log.e(
+                    "TWPostRepository",
+                    "API 호출 실패 - 코드: ${response.code()}, 메시지: ${response.message()}"
+                )
                 Result.failure(Exception("서버 오류: ${response.code()} ${response.message()}"))
             }
         } catch (e: Exception) {
@@ -52,6 +55,23 @@ class TWPostRepository (
             }
         } catch (e: Exception) {
             Log.e("TWPostRepository", "그룹 상세 API 호출 중 예외", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun putStatus(groupId: Int, status: String): Result<GroupStatus> {
+        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다"))
+        val groupStatusRequest = GroupStatusRequest(status)
+        return try {
+            val response = apiInterface.ThreeWeekStatus("Bearer $accessToken", groupId, groupStatusRequest)
+            if (response.isSuccessful)
+                response.body()?.let {
+                    Result.success(it)
+                } ?: Result.failure(Exception("응답 데이터 없음"))
+            else
+                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()}"))
+        } catch (e: Exception) {
+            Log.e("TWPostRepository", "그룹 상태 변경 API 호출 중 예외", e)
             Result.failure(e)
         }
     }

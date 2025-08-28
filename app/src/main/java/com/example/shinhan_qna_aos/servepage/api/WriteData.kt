@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.etc.api
+package com.example.shinhan_qna_aos.servepage.api
 
 import android.net.Uri
 
@@ -9,9 +9,3 @@ data class WriteData(
     val imageUri: Uri?,
     val isEditMode: Boolean
 )
-
-
-//data class NotificationWriteData (
-//    val title: String? ="",
-//    val content: String? =""
-//)

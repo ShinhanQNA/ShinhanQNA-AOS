@@ -33,7 +33,7 @@ fun SaySomthingScreen(postRepository: PostRepository, data: Data, navController:
                 likeCount = board.likeCount,
                 isAdmin = data.isAdmin,
                 flagsCount = board.flagsCount,
-                banCount = warningStatusToBanCount(board.banCount).toInt(),
+                banCount = board.banCount.toInt(),
                 onClick = { navController.navigate("writeOpen/${board.postID}") }
             )
             Divider()

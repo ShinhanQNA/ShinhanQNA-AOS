@@ -67,25 +67,32 @@ fun SelectedOpinionsScreen(twPostRepository: TWPostRepository, data: Data, navCo
         viewModel(factory = SimpleViewModelFactory { TWPostViewModel(twPostRepository) })
 
     val opinions by twPostViewModel.opinions.collectAsState()
+    val groupStatusMap by twPostViewModel.groupStatusMap.collectAsState()
 
     LaunchedEffect(Unit) {
         twPostViewModel.loadOpinions()
     }
 
-    LazyColumn(modifier = Modifier
-        .fillMaxSize()
-        .padding(bottom = 50.dp)){
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 50.dp)
+    ) {
         items(opinions, key = { it.groupId }) { opinion ->
-            var responseState by remember { mutableStateOf("대기") }
-            println("opinion.selectedMonth = ${opinion.selectedMonth}")
+            val currentStatus = groupStatusMap[opinion.groupId] ?: "응답 상태"
             SelectDataButton(
-                year = LocalDate.now().year,  // GroupID 에 year가 없으니 현재 연도 지정
+                year = LocalDate.now().year,
                 month = opinion.selectedMonth,
-                week = 3, // GroupID만으로는 week 데이터가 없으니 필요시 추가 정의 필요
+                week = 3,
                 isAdmin = data.isAdmin,
-                responseState = responseState,
-                onResponseStateChange = { responseState = it },
-                onSelectDataClick = { navController.navigate("threeWeekOpen/${opinion.groupId}") }
+                responseState = currentStatus,
+                onResponseStateChange = { newStatus ->
+                    // 상태 변경 시 ViewModel에 API 호출
+                    twPostViewModel.GroupStatusPost(opinion.groupId, newStatus)
+                },
+                onSelectDataClick = {
+                    navController.navigate("threeWeekOpen/${opinion.groupId}")
+                }
             )
             Divider()
         }

@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.etc.user
+package com.example.shinhan_qna_aos.servepage.user
 
 import android.util.Log
 import androidx.compose.foundation.Image

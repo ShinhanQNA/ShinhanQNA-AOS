@@ -26,3 +26,11 @@ data class GroupID(
     @SerializedName("selectedMonth") val selectedMonth: Int,
     @SerializedName("groupId") val groupId: Int
 )
+
+data class GroupStatus(
+    @SerializedName("status") val status: String,
+)
+
+data class GroupStatusRequest(
+   val status: String,
+)

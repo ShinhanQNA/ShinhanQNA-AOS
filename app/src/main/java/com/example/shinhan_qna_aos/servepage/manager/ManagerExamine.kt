@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.etc.manager
+package com.example.shinhan_qna_aos.servepage.manager
 
 //import androidx.compose.foundation.background
 //import androidx.compose.foundation.layout.Arrangement

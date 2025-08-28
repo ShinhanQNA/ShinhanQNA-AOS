@@ -21,12 +21,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.shinhan_qna_aos.API.APIInterface
-import com.example.shinhan_qna_aos.etc.WriteOpenScreen
-import com.example.shinhan_qna_aos.etc.WritingScreen
-import com.example.shinhan_qna_aos.etc.api.WriteRepository
-import com.example.shinhan_qna_aos.etc.user.AppealScreen1
-import com.example.shinhan_qna_aos.etc.user.AppealScreen2
-import com.example.shinhan_qna_aos.etc.user.AppealScreen3
+import com.example.shinhan_qna_aos.servepage.WriteOpenScreen
+import com.example.shinhan_qna_aos.servepage.WritingScreen
+import com.example.shinhan_qna_aos.servepage.api.WriteRepository
+import com.example.shinhan_qna_aos.servepage.user.AppealScreen1
+import com.example.shinhan_qna_aos.servepage.user.AppealScreen2
+import com.example.shinhan_qna_aos.servepage.user.AppealScreen3
 import com.example.shinhan_qna_aos.info.api.InfoRepository
 import com.example.shinhan_qna_aos.info.InformationScreen
 import com.example.shinhan_qna_aos.info.WaitScreen
@@ -46,10 +46,15 @@ import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.onboarding.OnboardingScreen
 import com.example.shinhan_qna_aos.servepage.AlarmScreen
-import com.example.shinhan_qna_aos.servepage.MypageScreen
+import com.example.shinhan_qna_aos.servepage.user.MypageScreen
 import com.example.shinhan_qna_aos.servepage.NotificationOpenScreen
 import com.example.shinhan_qna_aos.servepage.NotificationScreen
 import com.example.shinhan_qna_aos.servepage.api.NotificationRepository
+import com.example.shinhan_qna_aos.servepage.manager.DeclarationOpenScreen
+import com.example.shinhan_qna_aos.servepage.manager.DeclarationScreen
+import com.example.shinhan_qna_aos.servepage.manager.ManagerScreen
+import com.example.shinhan_qna_aos.servepage.manager.NotificationWriteScreen
+import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationRepository
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -68,6 +73,7 @@ fun AppNavigation(
     val answerRepository = remember { AnswerRepository(apiInterface,data) }
     val twPostRepository= remember { TWPostRepository(apiInterface, data) }
     val notificationRepository = remember { NotificationRepository(apiInterface, data) }
+    val declarationRepository = remember { DeclarationRepository(data, apiInterface) }
 
     val loginViewModel: LoginViewModel =
         viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository, data) })
@@ -87,10 +93,15 @@ fun AppNavigation(
         if (data.onboarding) {
             initialRoute = "onboarding"
         } else if (loginResult is LoginResult.Success) {
-            Log.d("AppNavigation", "로그인 성공 감지, 서버 상태 조회 시작")
-            infoViewModel.checkAndNavigateUserStatus(data.accessToken ?: "")
-            // 초기 화면은 navigationRoute가 정해질 때까지 null로 둔다
-            initialRoute = null
+            if (data.isAdmin){
+                initialRoute= "main"
+            }
+            else {
+                Log.d("AppNavigation", "로그인 성공 감지, 서버 상태 조회 시작")
+                infoViewModel.checkAndNavigateUserStatus(data.accessToken ?: "")
+                // 초기 화면은 navigationRoute가 정해질 때까지 null로 둔다
+                initialRoute = null
+            }
         } else {
             initialRoute = "login"
         }
@@ -112,13 +123,13 @@ fun AppNavigation(
         navController = navController,
         startDestination = initialRoute!!
     ) {
-        composable("onboarding") { OnboardingScreen(navController, data) }
-        composable("login") { LoginScreen(authRepository, data, navController) }
-        composable("manager_login") { ManagerLoginScreen(authRepository, navController, data) }
-        composable("info") { InformationScreen(infoRepository, data, navController) }
-        composable("wait") { WaitScreen(infoRepository, data, navController) }
+        composable("onboarding") { OnboardingScreen(navController, data) }  // 온보딩
+        composable("login") { LoginScreen(authRepository, data, navController) } //로그인
+        composable("manager_login") { ManagerLoginScreen(authRepository, navController, data) } // 관리자 로그인 화면
+        composable("info") { InformationScreen(infoRepository, data, navController) } // 학생 정보 입력 화면
+        composable("wait") { WaitScreen(infoRepository, data, navController) } // 가입 대기 화면
 
-        composable(
+        composable( // 메인 화면 선택 사항이 많아서 selectedTab으로 원하는 화면으로 조정 가능
             "main?selectedTab={selectedTab}",
             arguments = listOf(navArgument("selectedTab") {
                 type = NavType.IntType
@@ -137,26 +148,26 @@ fun AppNavigation(
                 initialSelectedIndex = selectedTab
             )
         }
-        composable(
+        composable( // 게시글 상세 화면
             "writeOpen/{postId}",
             arguments = listOf(navArgument("postId") { type = NavType.StringType })
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getString("postId") ?: ""
-            WriteOpenScreen(navController, postRepository, writeRepository, data, postId)
+            WriteOpenScreen(navController, postRepository, writeRepository, authRepository, data, postId)
         }
 
-        composable("writeBoard") { WritingScreen(writeRepository, navController) }
-        composable("answer") { AnsweredScreen(answerRepository, navController) }
+        composable("writeBoard") { WritingScreen(writeRepository,answerRepository ,navController, data) } // 게시글 작성 화면
+        composable("answer") { AnsweredScreen(answerRepository, navController) } // 답변 화면
 
-        composable(
+        composable( // 답변 상세 화면
             "answerOpen/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("id") ?: -1
-            AnsweredOpenScreen(answerRepository, navController, id,)
+            AnsweredOpenScreen(answerRepository, navController,data, id)
         }
 
-        composable(
+        composable( // 3주차 게시판 리스트로 있음
             "threeWeekOpen/{groupId}",
             arguments = listOf(navArgument("groupId") { type = NavType.IntType })
         ) { backStackEntry ->
@@ -164,7 +175,7 @@ fun AppNavigation(
             SelectedOpenScreen(groupId, twPostRepository, navController)
         }
 
-        composable(
+        composable( // 3주차 게시판 상세화면
             "threeWeekDetail/{groupId}/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType },navArgument("groupId") { type = NavType.IntType })
         ) { backStackEntry ->
@@ -173,21 +184,31 @@ fun AppNavigation(
             SelectedDetailScreen(groupId , twPostRepository, navController, id)
         }
 
-        composable("myPage") { MypageScreen(authRepository, data, navController) }
-        composable("notices") { NotificationScreen(data, notificationRepository, navController) }
-        composable("alarm") { AlarmScreen(navController) }
+        composable("myPage") { MypageScreen(authRepository, data, navController) } // 마이페이지
+        composable("manager_myPage"){ ManagerScreen(navController, authRepository, data) } // 관리자 마이페이지
 
-        composable(
+        composable("notices") { NotificationScreen(data, notificationRepository, navController) } // 공지 화면
+        composable( // 공지 상세 화면
             "notices/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("id") ?: -1
-            NotificationOpenScreen(id, notificationRepository, navController)
+            NotificationOpenScreen(id,data ,notificationRepository, navController)
         }
+        composable("notices_write"){ NotificationWriteScreen(notificationRepository, navController) } // 관리자 공지 작성 화면
 
-        composable("appeal1"){ AppealScreen1(data, navController) }
+        composable("alarm") { AlarmScreen(navController) } // 알림 화면 나중에 firebase
+
+        composable("appeal1"){ AppealScreen1(data, navController) } // 차단 당했을 경우 사용자 제한 화면으로 appeal3까지 세트
         composable("appeal2"){ AppealScreen2(data, navController) }
         composable("appeal3"){ AppealScreen3(infoRepository, data, navController) }
+
+        composable("declaration") { DeclarationScreen(declarationRepository,postRepository,data,navController) }
+        composable("declaration/{postId}" ,arguments = listOf(navArgument("postId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val postId = backStackEntry.arguments?.getString("postId") ?: ""
+            DeclarationOpenScreen(postId,navController, postRepository)
+        }
     }
 }
 

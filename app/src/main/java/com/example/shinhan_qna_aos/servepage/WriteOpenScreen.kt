@@ -1,4 +1,4 @@
-package com.example.shinhan_qna_aos.etc
+package com.example.shinhan_qna_aos.servepage
 
 import android.content.Context
 import android.net.Uri
@@ -24,10 +24,17 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,10 +53,14 @@ import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.LikeFlagBan
-import com.example.shinhan_qna_aos.ManagerFunctionButton
-import com.example.shinhan_qna_aos.etc.api.WriteData
-import com.example.shinhan_qna_aos.etc.api.WriteRepository
-import com.example.shinhan_qna_aos.etc.api.WritingViewModel
+import com.example.shinhan_qna_aos.ManagerButton
+import com.example.shinhan_qna_aos.PlainInputField
+import com.example.shinhan_qna_aos.servepage.api.WriteData
+import com.example.shinhan_qna_aos.servepage.api.WriteRepository
+import com.example.shinhan_qna_aos.servepage.api.WritingViewModel
+import com.example.shinhan_qna_aos.login.api.AuthRepository
+import com.example.shinhan_qna_aos.login.api.LoginResult
+import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.PostViewModel
 import com.example.shinhan_qna_aos.main.warningStatusToBanCount
@@ -61,10 +72,13 @@ fun WriteOpenScreen(
     navController: NavController,
     postRepository: PostRepository,
     writeRepository: WriteRepository,
+    authRepository: AuthRepository,
     data: Data,
     postId: String,
 ) {
     val context = LocalContext.current
+    val loginViewModel: LoginViewModel =
+        viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository,data) })
     val postViewModel: PostViewModel =
         viewModel(factory = SimpleViewModelFactory { PostViewModel(postRepository) })
     val writingViewModel: WritingViewModel =
@@ -76,6 +90,21 @@ fun WriteOpenScreen(
     // 이미지 선택 런처
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let { writingViewModel.onImageChange(context, it) }
+    }
+
+    val loginResult by loginViewModel.loginResult.collectAsState()
+
+    // 로그인 상태 관찰 후, Idle 이거나 실패 상태면 로그인 화면으로 이동
+    LaunchedEffect(loginResult) {
+        when (loginResult) {
+            is LoginResult.Idle, is LoginResult.Failure -> {
+                navController.navigate("login") {
+                    // 현재 스택 모두 제거하여 뒤로가기 방지
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+            else -> { /* 로그인 상태일 때는 그냥 유지 */ }
+        }
     }
 
     // 첫 진입시 상세 데이터 불러오기
@@ -119,7 +148,19 @@ fun WriteOpenScreen(
                             LikeFlagBan(detail.likes, detail.reportCount, warningStatusToBanCount(detail.warningStatus).toInt(), data)
                             Spacer(modifier = Modifier.height(36.dp))
                             if (data.isAdmin) {
-                                ManagerFunctionButton(data.isNotice)
+                                ManagerFunctionButton(
+                                    onDeleteClick = {
+                                        Log.d("Compose", "삭제 버튼 클릭됨")
+                                        postViewModel.deletePost(postId.toInt())
+                                        navController.popBackStack()
+                                    },
+                                    onWarningClick = { reason ->
+                                        postViewModel.warningUser(
+                                            email = detail.writerEmail,
+                                            reason = reason
+                                        )
+                                    }
+                                )
                             } else {
                                 if(isOwner){
                                     EditDeleteButton(
@@ -338,8 +379,132 @@ fun FlagLikeButton( // 작성자가 아닐때
     }
 }
 
+// 게시판 관리자 버튼
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditDeleteButton( // 작성자
+fun ManagerFunctionButton( onDeleteClick: () -> Unit, onWarningClick: (String) -> Unit) {
+    var showSheet by remember { mutableStateOf(false) }
+    var reason by remember { mutableStateOf("") }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.End
+    ) {
+        ManagerButton(
+            icon = lucide.trash,
+            label = "삭제",
+            background = Color(0xffFC4F4F),
+            onClick = { onDeleteClick() }
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        ManagerButton(
+            icon = lucide.flag,
+            label = "경고",
+            background = Color(0xffFF9F43),
+            onClick = { showSheet = true }
+        )
+    }
+    if (showSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showSheet = false }, // 시트가 닫히도록 요청될 때 (바깥 클릭, 뒤로가기)
+            containerColor = Color.White,
+        ) {
+            Column() {
+                Text("사유 작성",
+                    style = TextStyle(
+                        fontFamily = pretendard,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    ),
+                    modifier = Modifier.padding(20.dp)
+                )
+                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp)){
+                    if (reason.isNullOrEmpty()) {
+                        Text(
+                            text =  "차단 사유는 사용자에게 제공됩니다.\n자세하게 기제해주세요.",
+                            color = Color(0xffDFDFDF),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                            fontFamily = pretendard,
+                            modifier = Modifier.align(Alignment.TopStart).padding(horizontal = 12.dp, vertical = 8.dp)
+                        )
+                    }
+                    PlainInputField(
+                        value = reason,
+                        onValueChange = { reason = it },
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .height(200.dp)
+                    )
+                }
+                Spacer(Modifier.height(16.dp))
+                Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp), horizontalArrangement = Arrangement.End) {
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier
+                        .background(Color(0xffFC4F4F), RoundedCornerShape(12.dp))
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                        .clickable { showSheet = false }  //취소 버튼
+                    ) {
+                    Icon(
+                        painter = painterResource( lucide.x ),
+                        contentDescription = "취소",
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.White
+                    )
+                    Text(
+                        text = "취소",
+                        color = Color.White,
+                        style = TextStyle(
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 14.sp
+                        ),
+                    )
+                }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    // 두 번째 버튼: 삭제
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier
+                            .background(Color(0xff4AD871), RoundedCornerShape(12.dp))
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                            .clickable {
+                                onWarningClick(reason)
+                                reason = ""
+                                showSheet = false
+                            }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.icon_check),
+                            contentDescription = "확인",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.White
+                        )
+                        Text(
+                            text = "확인",
+                            color = Color.White,
+                            style = TextStyle(
+                                fontFamily = pretendard,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 14.sp
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EditDeleteButton( // 작성자(사용자)
     onDeleteClick: () -> Unit,
     onEditClick: () -> Unit
 ) {
@@ -388,7 +553,7 @@ fun EditDeleteButton( // 작성자
         ) {
             Icon(
                 painter = painterResource( lucide.trash ),
-                contentDescription = "삭제/추천",
+                contentDescription = "삭제",
                 modifier = Modifier.size(20.dp),
                 tint = Color.White
             )
@@ -404,10 +569,15 @@ fun EditDeleteButton( // 작성자
         }
     }
 }
-
-@Preview(showBackground = true)
+@Preview(showBackground = false)
 @Composable
 fun WriteOpenScreenPreview(){
 //    WriteOpenScreen()
 //    FunctionButton()
+    Icon(
+        painter = painterResource( lucide.copy_check ),
+        contentDescription = "확인",
+        modifier = Modifier.size(20.dp),
+        tint = Color.White
+    )
 }

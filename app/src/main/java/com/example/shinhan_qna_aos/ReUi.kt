@@ -191,7 +191,7 @@ fun SelectDataButton(
     month: Int,
     week: Int,
     isAdmin: Boolean = false,
-    responseState: String = "응답 상태",  // 👉 단일 String 으로 수정
+    responseState: String = "응답 상태",  //  단일 String 으로 수정
     onResponseStateChange: (String) -> Unit = {},
     onSelectDataClick: () -> Unit
 ) {
@@ -209,7 +209,7 @@ fun SelectDataButton(
             Spacer(Modifier.height(30.dp))
             Box(
                 modifier = Modifier
-                    .background(Color(0xffFF9F43), RoundedCornerShape(20.dp))
+                    .background(if(responseState=="완료")Color(0xff4AD871) else Color(0xffFF9F43), RoundedCornerShape(20.dp))
                     .padding(horizontal = 12.dp, vertical = 2.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -220,7 +220,7 @@ fun SelectDataButton(
                     )
                     Spacer(Modifier.width(4.dp))
                     Text(
-                        responseState, // 👉 여기서 선택된 상태 출력
+                        responseState,
                         style = TextStyle(
                             fontFamily = pretendard,
                             fontWeight = FontWeight.Bold,
@@ -274,11 +274,11 @@ fun TitleContentLikeButton(
 // 관리자용 응답 상태 드롭다운
 @Composable
 fun ManagerDropDown(
-    responseState: String,  // 👉 단일 String 으로 변경
-    responseOptions: List<String> = listOf("대기", "응답 완료"),
+    responseState: String,  // 현재 선택된 상태
+    responseOptions: List<String> = listOf("대기", "완료"),
     onResponseStateChange: (String) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }  // 드롭다운 확장 상태 내부 관리
+    var expanded by remember { mutableStateOf(false) }
     Box {
         Row(
             modifier = Modifier
@@ -289,7 +289,7 @@ fun ManagerDropDown(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = responseState, // 👉 현재 선택된 상태
+                text = responseState,
                 fontSize = 13.sp,
                 fontFamily = pretendard,
                 color = Color.Black
@@ -303,13 +303,14 @@ fun ManagerDropDown(
         }
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(Color.White)  // 배경을 하얀색으로 지정
         ) {
             responseOptions.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option, fontFamily = pretendard, fontSize = 14.sp) },
                     onClick = {
-                        onResponseStateChange(option) // 👉 선택값 변경
+                        onResponseStateChange(option)
                         expanded = false
                     }
                 )
@@ -551,39 +552,15 @@ fun InfoIconCount(
     }
 }
 
-// 게시판관 공지 및에 버튼 *isNotice 로 구별
 @Composable
-fun ManagerFunctionButton(isNotice: Boolean) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        horizontalArrangement = Arrangement.End
-    ) {
-        ManagerButton(
-            icon = if (isNotice) lucide.trash else lucide.list,
-            label = if (isNotice) "삭제" else "검토",
-            background = Color(0xffFC4F4F)
-        )
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        ManagerButton(
-            icon = if (isNotice) R.drawable.square_pen else lucide.flag,
-            label = if (isNotice) "수정" else "경고",
-            background = if (isNotice) Color.Black else Color(0xffFF9F43)
-        )
-    }
-}
-
-@Composable
-fun ManagerButton(icon: Int, label: String, background: Color) {
+fun ManagerButton(icon: Int, label: String, onClick: () -> Unit, background: Color) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         modifier = Modifier
             .background(background, RoundedCornerShape(12.dp))
             .padding(horizontal = 12.dp, vertical = 8.dp)
+            .clickable { onClick() }
     ) {
         Icon(
             painter = painterResource(icon),
@@ -600,5 +577,73 @@ fun ManagerButton(icon: Int, label: String, background: Color) {
                 fontSize = 14.sp
             )
         )
+    }
+}
+
+@Composable
+fun ManagerEditDeleteButton( // 관리자
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit
+) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.End,
+    ) {
+        // 첫 번째 버튼: 삭제
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier
+                .background(Color(0xffFC4F4F), RoundedCornerShape(12.dp))
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .clickable { onDeleteClick() }
+        ) {
+            Icon(
+                painter = painterResource(lucide.trash),
+                contentDescription = "삭제",
+                modifier = Modifier.size(20.dp),
+                tint = Color.White
+            )
+            Text(
+                text = "삭제",
+                color = Color.White,
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp
+                ),
+            )
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // 두 번째 버튼: 수정
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier
+                .background(Color(0xff111111), RoundedCornerShape(12.dp))
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .clickable { onEditClick() }  // 수정 버튼 눌리면 콜백 호출
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.square_pen),
+                contentDescription = "수정",
+                modifier = Modifier.size(20.dp),
+                tint = Color.White
+            )
+            Text(
+                text = "수정",
+                color = Color.White,
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp
+                ),
+            )
+        }
     }
 }
