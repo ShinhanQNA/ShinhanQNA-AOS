@@ -53,12 +53,12 @@ fun AppealScreen1(appealRepository: AppealRepository,infoRepository: InfoReposit
     // userEmail 안전하게 가져오기 (기본값 or 안내 메시지 할당)
     val userEmail = data.userEmail ?: ""
 
-    // email이 빈 문자열이면 호출 안함 → 기본값, 에러 처리 등 옵션 선택
-    LaunchedEffect(userEmail) {
-        if (userEmail.isNotBlank()) {
-            appealViewModel.loadBlockReason(userEmail)
-        }
-    }
+//    // email이 빈 문자열이면 호출 안함 → 기본값, 에러 처리 등 옵션 선택
+//    LaunchedEffect(userEmail) {
+//        if (userEmail.isNotBlank()) {
+//            appealViewModel.loadBlockReason(userEmail)
+//        }
+//    }
 
     Column(
         modifier = Modifier.fillMaxSize()
