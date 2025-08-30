@@ -164,4 +164,24 @@ class PostRepository(
             Result.failure(e)
         }
     }
+
+    /**
+     * 나의 게시글 목록 조회
+     */
+    suspend fun getMyPosts(): Result<List<MyPostData>> {
+        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
+
+        return try {
+            val response = apiInterface.MyPost("Bearer $accessToken")
+            if (response.isSuccessful) {
+                val body = response.body() ?: emptyList()
+                Result.success(body)
+            } else {
+                val errorBody = response.errorBody()?.string() ?: ""
+                Result.failure(Exception("서버 오류: ${response.code()} ${response.message()} $errorBody"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

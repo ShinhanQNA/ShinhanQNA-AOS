@@ -79,7 +79,7 @@ private val data: Data
      */
     fun updateLocalAndNavigate(userResponseWrapper: UserResponseWrapper) {
         val user = userResponseWrapper.user
-        val warnings = userResponseWrapper.warnings.orEmpty()
+        val warnings = userResponseWrapper.warnings?.lastOrNull()  // 마지막 요소 안전하게 가져오기
 
         // 로컬 데이터 업데이트
         data.userStatus = user.status
@@ -87,12 +87,14 @@ private val data: Data
         data.userEmail = user.email
         data.studentCertified = user.studentCertified ?: false
 
-        val hasBlock = warnings.any { it.status == "차단" }
+        val hasBlock = warnings?.status == "차단"
+        val hasFlag = warnings?.status == "경고"
 
         // 화면 분기 결정
         val destination = when {
             hasBlock && !data.isAppealCompleted -> "appeal1"   // 처음 차단, 이의 접수 전
             hasBlock && data.isAppealCompleted -> "appeal3"    // 이미 이의 접수 완료된 경우
+            hasFlag -> "main" // 경고인 경우는 그냥 메인으로
             !data.studentCertified -> "info"
             user.status == "가입 완료" -> "main"
             user.status == "가입 대기 중" -> "wait"

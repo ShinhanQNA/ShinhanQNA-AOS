@@ -243,6 +243,7 @@ fun Selectboard(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(bottom = 50.dp)
             .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
