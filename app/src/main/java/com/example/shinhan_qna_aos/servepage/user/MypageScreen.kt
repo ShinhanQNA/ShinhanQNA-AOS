@@ -121,7 +121,7 @@ fun MypageButton(onLogoutClick:() -> Unit,onMyWriteClick:() -> Unit ,onCancleMem
                 tint = Color.Black,
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable { }
+                    .clickable { onMyWriteClick() }
             )
         }
         Box(

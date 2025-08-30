@@ -48,7 +48,7 @@ class ImageUtils {
                     }
                     fileSizeKB = compressedFile.length() / 1024
                     quality -= 5 // 품질 단계적으로 내리면서 파일 크기 줄임
-                } while (fileSizeKB > 10 * 1024 && quality > 5)
+                } while (fileSizeKB > 8 * 1024 && quality > 5)
 
                 // 조건 만족하면 파일 반환
                 compressedFile
