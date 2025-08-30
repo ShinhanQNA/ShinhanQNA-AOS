@@ -17,6 +17,6 @@ data class ReasonRequest(
 
 // 차단 이유 조회 받기
 data class BlockReasonData(
-    val blockReasons: List<String>,
-    val email: String
+    @SerializedName("blockReasons") val blockReasons: List<String>,
+    @SerializedName("email") val email: String
 )

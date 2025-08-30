@@ -219,7 +219,7 @@ interface APIInterface {
     suspend fun BlockReason(
         @Header("Authorization") accessToken: String,
         @Body reasonRequest: ReasonRequest
-    ): Response<List<BlockReasonData>>
+    ): Response<BlockReasonData>
     /**
      * 관리자 관련
      */

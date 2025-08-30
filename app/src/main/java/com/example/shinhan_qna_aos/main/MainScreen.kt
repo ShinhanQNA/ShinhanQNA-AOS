@@ -57,6 +57,7 @@ import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -85,22 +86,17 @@ fun MainScreen(
             }
         }
     }
-
-    // 매번 MainScreen 진입 혹은 navigationRoute 변경 시 상태 점검
-    LaunchedEffect(Unit) {
-        if(!data.isAdmin) {
-            val accessToken = data.accessToken
-            if (!accessToken.isNullOrBlank()) {
-                infoViewModel.checkAndNavigateUserStatus(accessToken)
-                delay(30000)
-            }
-        }
-    }
-
+//    LaunchedEffect(Unit) {
+//        while (isActive) {
+//            // 유저 상태 조회 API 호출
+//            infoViewModel.checkAndNavigateUserStatus()
+//            delay(60_000)
+//        }
+//    }
     // navigationRoute가 "appeal1" (차단)이면 페이지 이동 처리
     LaunchedEffect(navigationRoute) {
-        if (navigationRoute == "appeal1") {
-            navController.navigate("appeal1") {
+        navigationRoute?.let {
+            navController.navigate(it) {
                 popUpTo("main") { inclusive = true }
                 launchSingleTop = true
             }

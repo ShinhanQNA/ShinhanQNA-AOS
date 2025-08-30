@@ -71,7 +71,7 @@ fun AppNavigation(
     val authRepository = remember { AuthRepository(apiInterface, data) }
     val writeRepository = remember { WriteRepository(apiInterface, data) }
     val postRepository = remember { PostRepository(apiInterface, data) }
-    val infoRepository = remember { InfoRepository(apiInterface) }
+    val infoRepository = remember { InfoRepository(apiInterface, data) }
     val answerRepository = remember { AnswerRepository(apiInterface,data) }
     val twPostRepository= remember { TWPostRepository(apiInterface, data) }
     val notificationRepository = remember { NotificationRepository(apiInterface, data) }
@@ -101,7 +101,7 @@ fun AppNavigation(
             }
             else {
                 Log.d("AppNavigation", "로그인 성공 감지, 서버 상태 조회 시작")
-                infoViewModel.checkAndNavigateUserStatus(data.accessToken ?: "")
+                infoViewModel.checkAndNavigateUserStatus()
                 // 초기 화면은 navigationRoute가 정해질 때까지 null로 둔다
                 initialRoute = null
             }

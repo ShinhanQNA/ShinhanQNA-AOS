@@ -58,6 +58,8 @@ import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.main.api.TWPostViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -69,9 +71,9 @@ fun SelectedOpinionsScreen(twPostRepository: TWPostRepository, data: Data, navCo
     val opinions by twPostViewModel.opinions.collectAsState()
     val groupStatusMap by twPostViewModel.groupStatusMap.collectAsState()
 
-    LaunchedEffect(Unit) {
-        twPostViewModel.loadOpinions()
-    }
+//    LaunchedEffect(Unit) {
+//        twPostViewModel.loadOpinions()
+//    }
 
     LazyColumn(
         modifier = Modifier

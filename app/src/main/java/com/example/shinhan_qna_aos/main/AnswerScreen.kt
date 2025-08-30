@@ -49,6 +49,8 @@ import com.example.shinhan_qna_aos.main.api.AnswerRepository
 import com.example.shinhan_qna_aos.main.api.AnswerViewModel
 import com.example.shinhan_qna_aos.main.api.UiAnswerRequest
 import com.jihan.lucide_icons.lucide
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @Composable
 fun AnsweredScreen(answerRepository: AnswerRepository, navController: NavController) {
@@ -56,10 +58,11 @@ fun AnsweredScreen(answerRepository: AnswerRepository, navController: NavControl
         viewModel(factory = SimpleViewModelFactory { AnswerViewModel(answerRepository) })
 
     val answerList by answerViewModel.answerList.collectAsState()
-    // 최초에 데이터 로드
-    LaunchedEffect(Unit) {
-        answerViewModel.loadAnswers()
-    }
+
+//    // 최초에 데이터 로드
+//    LaunchedEffect(Unit) {
+//        answerViewModel.loadAnswers()
+//    }
 
     LazyColumn(modifier = Modifier
         .fillMaxSize()

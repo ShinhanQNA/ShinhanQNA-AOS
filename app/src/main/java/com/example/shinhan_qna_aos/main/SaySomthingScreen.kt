@@ -13,6 +13,8 @@ import com.example.shinhan_qna_aos.TitleContentCountButton
 import com.example.shinhan_qna_aos.Data
 import com.example.shinhan_qna_aos.main.api.PostRepository
 import com.example.shinhan_qna_aos.main.api.PostViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @Composable
 fun SaySomthingScreen(postRepository: PostRepository, data: Data, navController:NavController) {
@@ -21,9 +23,9 @@ fun SaySomthingScreen(postRepository: PostRepository, data: Data, navController:
 
     val dataList = postViewModel.postList
 
-    LaunchedEffect(Unit) {
-        postViewModel.loadPosts()
-    }
+//    LaunchedEffect(Unit) {
+//        postViewModel.loadPosts()
+//    }
 
     LazyColumn {
         items(dataList, key = { it.postID }) { board ->

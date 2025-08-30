@@ -20,6 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +39,7 @@ import com.example.shinhan_qna_aos.R
 import com.example.shinhan_qna_aos.SimpleViewModelFactory
 import com.example.shinhan_qna_aos.info.api.InfoRepository
 import com.example.shinhan_qna_aos.info.api.InfoViewModel
+import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.api.LoginViewModel
 import com.example.shinhan_qna_aos.servepage.api.AppealRepository
@@ -44,21 +47,23 @@ import com.example.shinhan_qna_aos.servepage.api.AppealViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @Composable
 fun AppealScreen1(appealRepository: AppealRepository,infoRepository: InfoRepository,data: Data, navController: NavController) {
     val appealViewModel: AppealViewModel = viewModel(factory = SimpleViewModelFactory { AppealViewModel(appealRepository) })
-    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data ) })
 
     // userEmail 안전하게 가져오기 (기본값 or 안내 메시지 할당)
     val userEmail = data.userEmail ?: ""
 
-//    // email이 빈 문자열이면 호출 안함 → 기본값, 에러 처리 등 옵션 선택
-//    LaunchedEffect(userEmail) {
-//        if (userEmail.isNotBlank()) {
-//            appealViewModel.loadBlockReason(userEmail)
-//        }
-//    }
+    // email이 빈 문자열이면 호출 안함 → 기본값, 에러 처리 등 옵션 선택
+    LaunchedEffect(userEmail) {
+        if (userEmail.isNotBlank()) {
+            appealViewModel.loadBlockReason(userEmail)
+        }
+    }
+    // ViewModel에서 받은 단일 차단 사유 데이터
+    val blockReasonList = appealViewModel.blockReasonData?.blockReasons ?: emptyList()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -87,7 +92,16 @@ fun AppealScreen1(appealRepository: AppealRepository,infoRepository: InfoReposit
         Spacer(modifier = Modifier.height(36.dp))
 
         Text(
-            text = "[${data.userName}]님은 [사유]로 인해 서비스 이용이 영구적으로 정지되었음을 알려드립니다.",
+            text = buildString {
+                append("[${data.userName}]님은 다음 사유로 인해 서비스 이용이 영구적으로 정지되었음을 알려드립니다.\n\n")
+                if (blockReasonList.isNotEmpty()) {
+                    blockReasonList.forEachIndexed { index, reason ->
+                        append("${index + 1}. $reason\n")
+                    }
+                } else {
+                    append("사유 정보가 없습니다.")
+                }
+            },
             style = TextStyle(
                 fontFamily = pretendard,
                 fontWeight = FontWeight.Normal,
@@ -96,8 +110,6 @@ fun AppealScreen1(appealRepository: AppealRepository,infoRepository: InfoReposit
             lineHeight = 20.sp,
             textAlign = TextAlign.Center,
         )
-        Spacer(modifier = Modifier.height(20.dp))
-
         Text(
             text = "이 결정에 따라 회원님은 더 이상 본 계정으로 로그인하거나 서비스를 이용할 수 없습니다.",
             style = TextStyle(
@@ -223,27 +235,21 @@ fun AppealScreen2(appealRepository: AppealRepository, data: Data, navController:
 
 @Composable
 fun AppealScreen3(infoRepository: InfoRepository, data: Data, navController: NavController) {
-    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data) })
+    val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data)})
 
-    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
+   val navigationRoute by infoViewModel.navigationRoute.collectAsState()
 
-    // 매번 MainScreen 진입 혹은 navigationRoute 변경 시 상태 점검
-    LaunchedEffect(Unit) {
-        val accessToken = data.accessToken
-        if (!accessToken.isNullOrBlank()) {
-            infoViewModel.checkAndNavigateUserStatus(accessToken)
-            delay(30000)
+    LaunchedEffect(navigationRoute) {
+        navigationRoute?.let { route ->
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+            if (route.isNotBlank() && currentRoute != route) {
+                navController.navigate(route) {
+                    popUpTo("appeal3") { inclusive = true }
+                }
+                data.isAppealCompleted = false
+            }
         }
     }
-
-    // navigationRoute가 "appeal1" (차단)이면 페이지 이동 처리
-    LaunchedEffect(navigationRoute) {
-            navController.navigate(navigationRoute!!) {
-                popUpTo("appeal3") { inclusive = true }
-                launchSingleTop = true
-            }
-    }
-
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(horizontal = 20.dp)
