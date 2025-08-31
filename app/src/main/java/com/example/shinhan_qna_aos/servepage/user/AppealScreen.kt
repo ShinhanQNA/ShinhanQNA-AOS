@@ -241,29 +241,6 @@ fun AppealScreen3(infoRepository: InfoRepository, data: Data, navController: Nav
    // 현재 네비게이션 경로를 StateFlow에서 수집
     val navigationRoute by infoViewModel.navigationRoute.collectAsState()
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    // 백그라운드 -> 포어그라운드 복귀 시 상태 체크 및 네비게이션 반영
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                infoViewModel.checkAndNavigateUserStatus()
-                Log.d("Lifecycle", "App resumed - checkAndNavigateUserStatus called")
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        while(isActive){
-            infoViewModel.checkAndNavigateUserStatus()
-            delay(60_000) // 1분 딜레이
-            Log.d("checkAndNavigateUserStatus", "checkAndNavigateUserStatus appeal3 unit 에서 호출")
-        }
-    }
     // 승인, 재차단 등 상태 변화가 감지되면 자동 분기
     LaunchedEffect(navigationRoute) {
         navigationRoute?.let { route ->
@@ -273,7 +250,6 @@ fun AppealScreen3(infoRepository: InfoRepository, data: Data, navController: Nav
                 navController.navigate(route) {
                     popUpTo("appeal3") { inclusive = true }
                 }
-                // 이의신청 완료 값은 메인 또는 appeal1 등 분기에서 InfoViewModel에서 자동 리셋될 수 있음
             }
         }
     }

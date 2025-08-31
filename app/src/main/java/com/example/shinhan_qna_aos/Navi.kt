@@ -4,6 +4,7 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -11,8 +12,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -57,6 +61,11 @@ import com.example.shinhan_qna_aos.servepage.manager.DeclarationScreen
 import com.example.shinhan_qna_aos.servepage.manager.ManagerScreen
 import com.example.shinhan_qna_aos.servepage.manager.NotificationWriteScreen
 import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -65,7 +74,7 @@ fun AppNavigation(
     apiInterface: APIInterface
 ) {
     val context = LocalContext.current
-
+    val lifecycleOwner = LocalLifecycleOwner.current
     // Data & Repository
     val data = remember { Data(context) }
     val authRepository = remember { AuthRepository(apiInterface, data) }
@@ -91,35 +100,71 @@ fun AppNavigation(
     // 앱 최초 진입 시 빠르게 보여줄 초기 화면 결정용 상태
     var initialRoute by remember { mutableStateOf<String?>(null) }
 
-    // 로그인 결과 바뀔 때 초기화 및 서버 상태 요청
+    // 유저 상태 검사를 한 번만 실행했는지 추적하는 플래그
+    var isInitialStatusChecked by remember { mutableStateOf(false) }
+
+    // 앱 최초 진입 시 로그인 결과에 따라 초기 화면 결정
     LaunchedEffect(loginResult) {
         if (data.onboarding) {
             initialRoute = "onboarding"
         } else if (loginResult is LoginResult.Success) {
-            if (data.isAdmin){
-                initialRoute= "main"
-            }
-            else {
+            if (data.isAdmin) {
+                initialRoute = "main"
+            } else if (!isInitialStatusChecked) { // 최초 1회만 유저 상태 확인 호출
                 Log.d("AppNavigation", "로그인 성공 감지, 서버 상태 조회 시작")
                 infoViewModel.checkAndNavigateUserStatus()
-                Log.d("checkAndNavigateUserStatus", "checkAndNavigateUserStatus Navi에서 호출")
-                // 초기 화면은 navigationRoute가 정해질 때까지 null로 둔다
-                initialRoute = null
+                isInitialStatusChecked = true
             }
         } else {
             initialRoute = "login"
         }
     }
 
-    // navigationRoute가 바뀌면 초기 라우트로 고정
+    // navigationRoute가 변경되면 화면 전환
+    // 초기 경로가 확정되지 않았을 때만 initialRoute를 설정하고,
+    // 이미 메인 화면에 진입한 후에는 navigate를 호출
     LaunchedEffect(navigationRoute) {
-        navigationRoute?.let {
-            if (initialRoute != it && it.isNotBlank()) {
-                Log.d("AppNavigation", "navigationRoute 확정: $it")
-                initialRoute = it
+        navigationRoute?.let { route ->
+            if (initialRoute == null) {
+                initialRoute = route
+                Log.d("AppNavigation", "초기 경로 확정: $route")
+            } else if (navController.currentBackStackEntry?.destination?.route != route) {
+                navController.navigate(route) {
+                    popUpTo("main") { inclusive = true }
+                }
+                Log.d("AppNavigation", "네비게이션 경로 변경: $route")
             }
         }
     }
+
+    // 앱 재개 시 및 1분마다 주기적으로 상태 확인
+    // 이 로직을 AppNavigation에서 단독으로 관리하여 중복 호출 제거
+    DisposableEffect(Unit) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                loginViewModel.tryRefreshTokenIfNeeded()
+                infoViewModel.checkAndNavigateUserStatus()
+                Log.d("Lifecycle", "App resumed - 로그인 및 유저 상태 즉시 갱신 호출")
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        val job = CoroutineScope(Dispatchers.Default).launch {
+            while (isActive) {
+                delay(60_000) // 60초
+                loginViewModel.tryRefreshTokenIfNeeded()
+                infoViewModel.checkAndNavigateUserStatus()
+                Log.d("PeriodicCheck", "1분 주기 로그인 및 유저 상태 검사 호출")
+            }
+        }
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            job.cancel()
+        }
+    }
+
     // 초기 라우트가 null 이면 NavHost 렌더링 안 함 (startDestination에 빈값 전달 방지)
     if (initialRoute.isNullOrBlank()) return
 
@@ -145,7 +190,6 @@ fun AppNavigation(
                 postRepository = postRepository,
                 answerRepository = answerRepository,
                 twPostRepository = twPostRepository,
-                authRepository = authRepository,
                 infoRepository = infoRepository,
                 data = data,
                 navController = navController,

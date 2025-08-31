@@ -28,10 +28,6 @@ private val data: Data
     private val _navigationRoute = MutableStateFlow<String?>(null)
     val navigationRoute: StateFlow<String?> = _navigationRoute.asStateFlow()
 
-    init { // 초기화 될때마다 유저 정보 상태 반영
-        checkAndNavigateUserStatus()
-        Log.d("checkAndNavigateUserStatus", "checkAndNavigateUserStatus info init 에서 호출")
-    }
 
     // 이름 변경 시 호출, infoData 내 name 값 갱신
     fun onNameChange(newName: String) {
@@ -100,16 +96,18 @@ private val data: Data
         val destination = when {
             user.status == "차단" && data.isAppealCompleted -> "appeal3" // 차단 & 이의신청 완료 (승인 전까지)
             user.status == "차단" -> "appeal1"  // '차단' 상태이지만 이의신청을 하지 않은 상황/재 차단
-            user.status=="경고" -> "main" // 경고인 경우는 그냥 메인으로
+            user.status == "경고" -> "main" // 경고인 경우는 그냥 메인으로
             !data.studentCertified -> "info"
             user.status == "가입 완료" -> "main"
             user.status == "가입 대기 중" -> "wait"
             else -> "info"
         }
 
-        // 무한 호출 방지: 이전 상태와 다를 때만 변경
+        // 변경 후 (무한 호출 방지)
         if (_navigationRoute.value != destination) {
             _navigationRoute.value = destination
+            Log.d("InfoViewModel", "네비게이션 경로 변경: $destination")
+
         }
     }
 
