@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,6 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.Data
@@ -236,6 +240,22 @@ fun AppealScreen3(infoRepository: InfoRepository, data: Data, navController: Nav
 
    // 현재 네비게이션 경로를 StateFlow에서 수집
     val navigationRoute by infoViewModel.navigationRoute.collectAsState()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    // 백그라운드 -> 포어그라운드 복귀 시 상태 체크 및 네비게이션 반영
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                infoViewModel.checkAndNavigateUserStatus()
+                Log.d("Lifecycle", "App resumed - checkAndNavigateUserStatus called")
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     LaunchedEffect(Unit) {
         while(isActive){
