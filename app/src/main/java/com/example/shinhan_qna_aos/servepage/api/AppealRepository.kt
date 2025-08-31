@@ -7,6 +7,7 @@ class AppealRepository(
     private val apiInterface: APIInterface,
     private val data: Data
 ) {
+    //이의신청
     suspend fun appeal(): Result<List<AppealData>> {
         val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
         return try {

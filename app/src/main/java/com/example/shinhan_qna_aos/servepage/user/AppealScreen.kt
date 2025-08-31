@@ -211,8 +211,7 @@ fun AppealScreen2(appealRepository: AppealRepository, data: Data, navController:
                 .clickable {
                     appealViewModel.loadAppeals()
                     navController.navigate("appeal3")
-                    data.isAppealCompleted = true
-                   },
+                           },
         ) {
             Icon(
                 painter = painterResource(lucide.plus),
@@ -237,19 +236,19 @@ fun AppealScreen2(appealRepository: AppealRepository, data: Data, navController:
 fun AppealScreen3(infoRepository: InfoRepository, data: Data, navController: NavController) {
     val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data)})
 
-   val navigationRoute by infoViewModel.navigationRoute.collectAsState()
-
-    LaunchedEffect(navigationRoute) {
-        navigationRoute?.let { route ->
-            val currentRoute = navController.currentBackStackEntry?.destination?.route
-            if (route.isNotBlank() && currentRoute != route) {
-                navController.navigate(route) {
-                    popUpTo("appeal3") { inclusive = true }
-                }
-                data.isAppealCompleted = false
-            }
-        }
-    }
+//   val navigationRoute by infoViewModel.navigationRoute.collectAsState()
+//
+//    LaunchedEffect(navigationRoute) {
+//        navigationRoute?.let { route ->
+//            val currentRoute = navController.currentBackStackEntry?.destination?.route
+//            if (route.isNotBlank() && currentRoute != route) {
+//                navController.navigate(route) {
+//                    popUpTo("appeal3") { inclusive = true }
+//                }
+//                data.isAppealCompleted = false
+//            }
+//        }
+//    }
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(horizontal = 20.dp)

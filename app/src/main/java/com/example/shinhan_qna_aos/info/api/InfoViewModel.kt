@@ -28,6 +28,11 @@ private val data: Data
     private val _navigationRoute = MutableStateFlow<String?>(null)
     val navigationRoute: StateFlow<String?> = _navigationRoute.asStateFlow()
 
+//    init { // 초기화 될때마다 유저 정보 상태 반영
+//        checkAndNavigateUserStatus()
+//        Log.d("checkAndNavigateUserStatus", "checkAndNavigateUserStatus info init 에서 호출")
+//    }
+
     // 이름 변경 시 호출, infoData 내 name 값 갱신
     fun onNameChange(newName: String) {
         _uiState.value =
@@ -85,12 +90,10 @@ private val data: Data
         data.userStatus = user.status
         data.userName = user.name
         data.userEmail = user.email
-        data.studentCertified = user.studentCertified ?: false
 
         // 화면 분기 결정
         val destination = when {
-            user.status=="차단" && !data.isAppealCompleted -> "appeal1"   // 처음 차단, 이의 접수 전
-            user.status=="차단" && data.isAppealCompleted -> "appeal3"    // 이미 이의 접수 완료된 경우
+            user.status=="차단"  -> "appeal1"   // 처음 차단, 이의 접수 전
             user.status=="경고" -> "main" // 경고인 경우는 그냥 메인으로
             !data.studentCertified -> "info"
             user.status == "가입 완료" -> "main"

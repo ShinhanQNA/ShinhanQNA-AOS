@@ -102,6 +102,7 @@ fun AppNavigation(
             else {
                 Log.d("AppNavigation", "로그인 성공 감지, 서버 상태 조회 시작")
                 infoViewModel.checkAndNavigateUserStatus()
+                Log.d("checkAndNavigateUserStatus", "checkAndNavigateUserStatus Navi에서 호출")
                 // 초기 화면은 navigationRoute가 정해질 때까지 null로 둔다
                 initialRoute = null
             }

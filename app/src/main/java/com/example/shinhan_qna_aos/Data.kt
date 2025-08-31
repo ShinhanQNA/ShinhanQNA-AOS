@@ -59,14 +59,6 @@ class Data(private val context: Context) {
         get() = prefs.getString(KEY_USER_EMAIL, null)
         set(value) = prefs.edit().putString(KEY_USER_EMAIL, value).apply()
 
-    var isNotice: Boolean  // 공지 사항 여부
-        get() = prefs.getBoolean(KEY_IS_NOTICE, false)
-        set(value) = prefs.edit().putBoolean(KEY_IS_NOTICE, value).apply()
-
-    var isAppealCompleted: Boolean
-        get() = prefs.getBoolean("appeal_completed", false)
-        set(value) = prefs.edit().putBoolean("appeal_completed", value).apply()
-
     // 토큰 저장
     fun saveTokens(
         accessToken: String,

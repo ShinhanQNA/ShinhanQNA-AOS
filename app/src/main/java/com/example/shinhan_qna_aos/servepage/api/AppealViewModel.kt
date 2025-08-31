@@ -20,12 +20,12 @@ class AppealViewModel(
     var blockReasonData by mutableStateOf<BlockReasonData?>(null)
         private set
 
-    // 이의 신청 글 불러오기
+    // 이의 신청 불러오기
     fun loadAppeals() {
         viewModelScope.launch {
             appealRepository.appeal()
                 .onSuccess { list ->
-                    appealList = list
+                    appealList = list // 내가 쓴 게스글 리스트로 받음
                 }
                 .onFailure { error ->
                     // 에러 처리 (예: 로그 출력)

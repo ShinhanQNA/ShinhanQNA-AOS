@@ -95,10 +95,14 @@ fun MainScreen(
 //    }
     // navigationRoute가 "appeal1" (차단)이면 페이지 이동 처리
     LaunchedEffect(navigationRoute) {
-        navigationRoute?.let {
-            navController.navigate(it) {
-                popUpTo("main") { inclusive = true }
-                launchSingleTop = true
+        Log.d("checkAndNavigateUserStatus", "checkAndNavigateUserStatus main 에서 호출")
+        navigationRoute?.let { route ->
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+            if (route.isNotBlank() && currentRoute != route) {
+                navController.navigate(route) {
+                    popUpTo("main") { inclusive = true }
+                    launchSingleTop = true
+                }
             }
         }
     }
