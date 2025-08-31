@@ -4,10 +4,10 @@ import com.google.gson.annotations.SerializedName
 
 // 내가 쓴 글 모아보기
 data class AppealData(
-    val postID: Int,
-    val title: String,
-    val email : String,
-    val content: String,
+    val id: Int,
+    val email: String,
+    val createdAt : String,
+    val status: String,
 )
 
 // 차단 이유 조회 이메일 보내주기

@@ -6,14 +6,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shinhan_qna_aos.Data
 import kotlinx.coroutines.launch
 
 class AppealViewModel(
-    private val appealRepository: AppealRepository
+    private val appealRepository: AppealRepository,
+    private val data: Data
 ) : ViewModel() {
 
     // 게시글 목록 상태
-    var appealList by mutableStateOf<List<AppealData>>(emptyList())
+    var appeal by mutableStateOf<AppealData?>(null)
         private set
 
     // 단일 차단 사유 데이터 상태 (null 초기값 허용)
@@ -24,8 +26,8 @@ class AppealViewModel(
     fun loadAppeals() {
         viewModelScope.launch {
             appealRepository.appeal()
-                .onSuccess { list ->
-                    appealList = list // 내가 쓴 게스글 리스트로 받음
+                .onSuccess { data ->
+                    appeal = data // 내가 쓴 게스글 리스트로 받음
                 }
                 .onFailure { error ->
                     // 에러 처리 (예: 로그 출력)

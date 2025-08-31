@@ -16,7 +16,7 @@ class Data(private val context: Context) {
         private const val KEY_USER_NAME = "USER_NAME" // 유저 이름
         private const val KEY_USER_INFO_SUBMITTED = "USER_INFO_SUBMITTED" // 가입 요청 여부
         private const val KEY_USER_EMAIL = "USER_EMAIL"
-        private const val KEY_IS_NOTICE = "IS_NOTICE"
+        private const val KEY_APPEAL_COMPLETED = "APPEAL_COMPLETED" // 이의신청 완료 여부 추가
     }
 
     var accessToken: String?  // 엑세스 토큰
@@ -59,6 +59,10 @@ class Data(private val context: Context) {
         get() = prefs.getString(KEY_USER_EMAIL, null)
         set(value) = prefs.edit().putString(KEY_USER_EMAIL, value).apply()
 
+    var isAppealCompleted: Boolean
+        get() = prefs.getBoolean(KEY_APPEAL_COMPLETED, false)
+        set(value) = prefs.edit().putBoolean(KEY_APPEAL_COMPLETED, value).apply()
+
     // 토큰 저장
     fun saveTokens(
         accessToken: String,
@@ -87,5 +91,11 @@ class Data(private val context: Context) {
         refreshTokenExpiresAt = 0
         isAdmin = false
     }
+
+    // 재차단 등 상태 변경 시 호출해 이의신청 완료 상태를 초기화 가능
+    fun clearAppealCompleted() {
+        isAppealCompleted = false
+    }
+
 }
 

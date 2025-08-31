@@ -86,26 +86,28 @@ fun MainScreen(
             }
         }
     }
-//    LaunchedEffect(Unit) {
-//        while (isActive) {
-//            // 유저 상태 조회 API 호출
-//            infoViewModel.checkAndNavigateUserStatus()
-//            delay(60_000)
-//        }
-//    }
-    // navigationRoute가 "appeal1" (차단)이면 페이지 이동 처리
-    LaunchedEffect(navigationRoute) {
-        Log.d("checkAndNavigateUserStatus", "checkAndNavigateUserStatus main 에서 호출")
-        navigationRoute?.let { route ->
-            val currentRoute = navController.currentBackStackEntry?.destination?.route
-            if (route.isNotBlank() && currentRoute != route) {
-                navController.navigate(route) {
-                    popUpTo("main") { inclusive = true }
-                    launchSingleTop = true
-                }
-            }
+
+    LaunchedEffect(Unit) {
+        while (isActive) {
+            // 유저 상태 조회 API 호출
+            infoViewModel.checkAndNavigateUserStatus()
+            delay(60_000)
+            Log.d("checkAndNavigateUserStatus", "checkAndNavigateUserStatus main unit 에서 호출")
         }
     }
+
+//    // navigationRoute가 "appeal1" (차단)이면 페이지 이동 처리
+//    LaunchedEffect(navigationRoute) {
+//        Log.d("checkAndNavigateUserStatus", "checkAndNavigateUserStatus main 에서 호출")
+//        navigationRoute?.let { route ->
+//            val currentRoute = navController.currentBackStackEntry?.destination?.route
+//            if (route.isNotBlank() && currentRoute != route) {
+//                navController.navigate(route) {
+//                    popUpTo("main") { inclusive = true }
+//                }
+//            }
+//        }
+//    }
 
     var selectedIndex by remember { mutableStateOf(initialSelectedIndex) }
 

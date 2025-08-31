@@ -212,7 +212,7 @@ interface APIInterface {
     @POST("/appeals")
     suspend fun Appeal(
         @Header("Authorization") accessToken: String,
-    ): Response<List<AppealData>>
+    ): Response<AppealData>
 
     // 사용자 차단 이유 조회
     @POST("admin/users/block-reasons")

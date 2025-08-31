@@ -51,7 +51,7 @@ import kotlinx.coroutines.isActive
 
 @Composable
 fun AppealScreen1(appealRepository: AppealRepository,infoRepository: InfoRepository,data: Data, navController: NavController) {
-    val appealViewModel: AppealViewModel = viewModel(factory = SimpleViewModelFactory { AppealViewModel(appealRepository) })
+    val appealViewModel: AppealViewModel = viewModel(factory = SimpleViewModelFactory { AppealViewModel(appealRepository,data) })
 
     // userEmail 안전하게 가져오기 (기본값 or 안내 메시지 할당)
     val userEmail = data.userEmail ?: ""
@@ -94,12 +94,9 @@ fun AppealScreen1(appealRepository: AppealRepository,infoRepository: InfoReposit
         Text(
             text = buildString {
                 append("[${data.userName}]님은 다음 사유로 인해 서비스 이용이 영구적으로 정지되었음을 알려드립니다.\n\n")
-                if (blockReasonList.isNotEmpty()) {
-                    blockReasonList.forEachIndexed { index, reason ->
-                        append("${index + 1}. $reason\n")
-                    }
-                } else {
-                    append("사유 정보가 없습니다.")
+                // 뒤에서 2개 요소만 취함
+                blockReasonList.takeLast(2).forEachIndexed { index, reason ->
+                    append("${index + 1}. $reason\n")
                 }
             },
             style = TextStyle(
@@ -151,7 +148,7 @@ fun AppealScreen1(appealRepository: AppealRepository,infoRepository: InfoReposit
 @Composable
 fun AppealScreen2(appealRepository: AppealRepository, data: Data, navController: NavController) {
 
-    val appealViewModel: AppealViewModel = viewModel(factory = SimpleViewModelFactory { AppealViewModel(appealRepository) })
+    val appealViewModel: AppealViewModel = viewModel(factory = SimpleViewModelFactory { AppealViewModel(appealRepository,data) })
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -210,8 +207,9 @@ fun AppealScreen2(appealRepository: AppealRepository, data: Data, navController:
                 .padding(horizontal = 12.dp, vertical = 8.dp)
                 .clickable {
                     appealViewModel.loadAppeals()
+                    data.isAppealCompleted = true
                     navController.navigate("appeal3")
-                           },
+                   },
         ) {
             Icon(
                 painter = painterResource(lucide.plus),
@@ -236,19 +234,30 @@ fun AppealScreen2(appealRepository: AppealRepository, data: Data, navController:
 fun AppealScreen3(infoRepository: InfoRepository, data: Data, navController: NavController) {
     val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data)})
 
-//   val navigationRoute by infoViewModel.navigationRoute.collectAsState()
-//
-//    LaunchedEffect(navigationRoute) {
-//        navigationRoute?.let { route ->
-//            val currentRoute = navController.currentBackStackEntry?.destination?.route
-//            if (route.isNotBlank() && currentRoute != route) {
-//                navController.navigate(route) {
-//                    popUpTo("appeal3") { inclusive = true }
-//                }
-//                data.isAppealCompleted = false
-//            }
-//        }
-//    }
+   // 현재 네비게이션 경로를 StateFlow에서 수집
+    val navigationRoute by infoViewModel.navigationRoute.collectAsState()
+
+    LaunchedEffect(Unit) {
+        while(isActive){
+            infoViewModel.checkAndNavigateUserStatus()
+            delay(60_000) // 1분 딜레이
+            Log.d("checkAndNavigateUserStatus", "checkAndNavigateUserStatus appeal3 unit 에서 호출")
+        }
+    }
+    // 승인, 재차단 등 상태 변화가 감지되면 자동 분기
+    LaunchedEffect(navigationRoute) {
+        navigationRoute?.let { route ->
+            // 현재 라우트와 다르다면 해당 화면으로 이동(예: main, appeal1 등)
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+            if (route.isNotBlank() && currentRoute != route) {
+                navController.navigate(route) {
+                    popUpTo("appeal3") { inclusive = true }
+                }
+                // 이의신청 완료 값은 메인 또는 appeal1 등 분기에서 InfoViewModel에서 자동 리셋될 수 있음
+            }
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(horizontal = 20.dp)

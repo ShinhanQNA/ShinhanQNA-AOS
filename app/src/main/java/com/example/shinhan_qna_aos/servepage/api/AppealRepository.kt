@@ -8,13 +8,17 @@ class AppealRepository(
     private val data: Data
 ) {
     //이의신청
-    suspend fun appeal(): Result<List<AppealData>> {
+    suspend fun appeal(): Result<AppealData> {
         val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다."))
         return try {
             val response = apiInterface.Appeal("Bearer $accessToken")
             if (response.isSuccessful) {
-                val body = response.body() ?: emptyList()
-                Result.success(body)
+                val body = response.body()
+                if(body != null) {
+                    Result.success(body)
+                }else{
+                    Result.failure(Exception("응답 데이터 없음"))
+                }
             } else {
                 val errorBody = response.errorBody()?.string() ?: ""
                 Result.failure(Exception("서버 오류: ${response.code()} ${response.message()} $errorBody"))
