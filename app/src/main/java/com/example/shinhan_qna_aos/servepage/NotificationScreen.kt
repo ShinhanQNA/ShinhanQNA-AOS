@@ -140,7 +140,7 @@ fun NotificationOpenScreen(id:Int,data: Data ,notificationRepository: Notificati
     val selectedNotices by notificationViewModel.selectedNotices.collectAsState()
     val uiState = notificationViewModel.noticesState
 
-    Column(modifier = Modifier.systemBarsPadding().fillMaxSize()) {
+    Column(modifier = Modifier.systemBarsPadding().fillMaxSize().background(Color.White)) {
         TopBar(if (uiState.editMode) "게시글 수정" else null) {
             if (uiState.editMode) {
                 navController.navigate("notices/${id}")
