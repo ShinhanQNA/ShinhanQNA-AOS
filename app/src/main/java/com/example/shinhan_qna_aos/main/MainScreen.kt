@@ -193,7 +193,7 @@ fun TopIcon(navController: NavController, data: Data){
                 }
         ){
             Icon(
-                painter = painterResource(R.drawable.shield_user),
+                painter = painterResource(if(data.isAdmin)R.drawable.shield_user else lucide.user),
                 contentDescription = null,
                 tint = Color.Black,
                 modifier = Modifier.size(16.dp)

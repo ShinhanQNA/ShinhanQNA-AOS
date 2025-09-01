@@ -130,7 +130,7 @@ fun AppNavigation(
                 Log.d("AppNavigation", "초기 경로 확정: $route")
             } else if (navController.currentBackStackEntry?.destination?.route != route) {
                 navController.navigate(route) {
-                    popUpTo("main") { inclusive = true }
+                    popUpTo(0) { inclusive = true }
                 }
                 Log.d("AppNavigation", "네비게이션 경로 변경: $route")
             }
