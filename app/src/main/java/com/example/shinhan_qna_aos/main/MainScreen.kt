@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,6 +42,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.shinhan_qna_aos.R
@@ -57,6 +61,7 @@ import com.example.shinhan_qna_aos.main.api.TWPostRepository
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -64,49 +69,27 @@ fun MainScreen(
     postRepository: PostRepository,
     answerRepository: AnswerRepository,
     twPostRepository: TWPostRepository,
-    authRepository: AuthRepository,
     infoRepository: InfoRepository,
     data: Data,
     navController: NavController,
     initialSelectedIndex: Int = 0
 ){
-    val loginViewModel: LoginViewModel = viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository,data) })
     val infoViewModel: InfoViewModel = viewModel(factory = SimpleViewModelFactory { InfoViewModel(infoRepository, data)})
 
-    val loginResult by loginViewModel.loginResult.collectAsState()
     val navigationRoute by infoViewModel.navigationRoute.collectAsState()
 
-    LaunchedEffect(loginResult) {
-        Log.d("main","로그인 검사")
-        if (loginResult is LoginResult.Failure) {
-            // 토큰 만료 또는 인증 실패시 로그인 화면으로 이동
-            navController.navigate("login") {
-                popUpTo("main") { inclusive = true }
-            }
-        }
-    }
-
-    // 매번 MainScreen 진입 혹은 navigationRoute 변경 시 상태 점검
-    LaunchedEffect(Unit) {
-        if(!data.isAdmin) {
-            val accessToken = data.accessToken
-            if (!accessToken.isNullOrBlank()) {
-                infoViewModel.checkAndNavigateUserStatus(accessToken)
-                delay(30000)
-            }
-        }
-    }
-
-    // navigationRoute가 "appeal1" (차단)이면 페이지 이동 처리
     LaunchedEffect(navigationRoute) {
-        if (navigationRoute == "appeal1") {
-            navController.navigate("appeal1") {
-                popUpTo("main") { inclusive = true }
-                launchSingleTop = true
+        navigationRoute?.let { route ->
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+            if (route.isNotBlank() && currentRoute != route) {
+                navController.navigate(route) {
+                    // popUpTo를 사용하여 뒤로 가기 시 무한 루프에 빠지는 것을 방지합니다.
+                    popUpTo("main") { inclusive = true }
+                }
+                Log.d("Navigation", "화면 이동: $route")
             }
         }
     }
-
     var selectedIndex by remember { mutableStateOf(initialSelectedIndex) }
 
     Box(modifier = Modifier

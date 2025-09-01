@@ -31,11 +31,6 @@ class PostViewModel(
     var hasLiked by mutableStateOf(false)
         private set
 
-    init {
-        // ViewModel 초기화 시 목록 불러오기
-        loadPosts()
-    }
-
     /**
      * 게시글 목록 로드
      */

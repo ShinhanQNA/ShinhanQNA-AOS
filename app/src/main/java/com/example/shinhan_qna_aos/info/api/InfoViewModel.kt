@@ -7,9 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.ImageUtils
 import com.example.shinhan_qna_aos.Data
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class InfoViewModel(
@@ -24,6 +27,7 @@ private val data: Data
     // 네비게이션 경로 상태
     private val _navigationRoute = MutableStateFlow<String?>(null)
     val navigationRoute: StateFlow<String?> = _navigationRoute.asStateFlow()
+
 
     // 이름 변경 시 호출, infoData 내 name 값 갱신
     fun onNameChange(newName: String) {
@@ -61,15 +65,13 @@ private val data: Data
      */
     fun submitStudentInfo(context: Context) {
         viewModelScope.launch {
-            val accessToken = data.accessToken ?: return@launch
-
             val imageUri = _uiState.value.imageUri
             val compressedFile = ImageUtils.compressImage(context, imageUri)
             if (compressedFile == null) return@launch
 
-            val submitResult = infoRepository.submitStudentInfo(accessToken, _uiState.value, compressedFile)
+            val submitResult = infoRepository.submitStudentInfo(_uiState.value, compressedFile)
             if (submitResult.isSuccess) {
-                checkAndNavigateUserStatus(accessToken)
+                checkAndNavigateUserStatus()
             }
         }
     }
@@ -79,44 +81,51 @@ private val data: Data
      */
     fun updateLocalAndNavigate(userResponseWrapper: UserResponseWrapper) {
         val user = userResponseWrapper.user
-        val warnings = userResponseWrapper.warnings?.lastOrNull()  // 마지막 요소 안전하게 가져오기
 
         // 로컬 데이터 업데이트
         data.userStatus = user.status
         data.userName = user.name
         data.userEmail = user.email
-        data.studentCertified = user.studentCertified ?: false
 
-        val hasBlock = warnings?.status == "차단"
-        val hasFlag = warnings?.status == "경고"
+        // 승인 상태이면 이의신청 완료 상태 리셋
+        if (user.status == "가입 완료") {
+            resetAppealCompleted()
+        }
 
         // 화면 분기 결정
         val destination = when {
-            hasBlock && !data.isAppealCompleted -> "appeal1"   // 처음 차단, 이의 접수 전
-            hasBlock && data.isAppealCompleted -> "appeal3"    // 이미 이의 접수 완료된 경우
-            hasFlag -> "main" // 경고인 경우는 그냥 메인으로
+            user.status == "차단" && data.isAppealCompleted -> "appeal3" // 차단 & 이의신청 완료 (승인 전까지)
+            user.status == "차단" -> "appeal1"  // '차단' 상태이지만 이의신청을 하지 않은 상황/재 차단
+            user.status == "경고" -> "main" // 경고인 경우는 그냥 메인으로
             !data.studentCertified -> "info"
             user.status == "가입 완료" -> "main"
             user.status == "가입 대기 중" -> "wait"
             else -> "info"
         }
 
-        // 무한 호출 방지: 이전 상태와 다를 때만 변경
+        // 변경 후 (무한 호출 방지)
         if (_navigationRoute.value != destination) {
             _navigationRoute.value = destination
+            Log.d("InfoViewModel", "네비게이션 경로 변경: $destination")
+
         }
     }
 
     // 유저 정보 서버 조회 후 상태 갱신 및 네비게이션 분기 함수
-    fun checkAndNavigateUserStatus(accessToken: String) {
+    fun checkAndNavigateUserStatus() {
         viewModelScope.launch {
-            Log.d("InfoViewModel", "Checking user status from server")
-            val result = infoRepository.checkUserStatus(accessToken)
+            Log.d("InfoViewModel", "checkAndNavigateUserStatus 호출됨")
+            val result = infoRepository.checkUserStatus()
             result.getOrNull()?.let {
+                Log.d("InfoViewModel", "checkAndNavigateUserStatus 성공 결과 반영")
                 updateLocalAndNavigate(it)
             } ?: run {
                 Log.e("InfoViewModel", "Failed to get user status")
             }
         }
+    }
+    // 이의신청 완료 상태 리셋을 위한 함수(승인/재차단 등 필요시 사용)
+    fun resetAppealCompleted() {
+        data.clearAppealCompleted()
     }
 }

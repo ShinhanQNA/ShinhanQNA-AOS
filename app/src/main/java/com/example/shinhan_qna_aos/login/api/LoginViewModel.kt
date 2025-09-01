@@ -7,8 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.shinhan_qna_aos.Data
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.user.UserApiClient
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
