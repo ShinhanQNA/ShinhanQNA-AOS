@@ -29,4 +29,12 @@ class AccessionViewModel(private val accessionRepository: AccessionRepository ) 
                 .onSuccess { accessiondetail=it }
         }
     }
+
+    // 유저 상태 변경
+    fun UserStatus(email: String, status: String) {
+        viewModelScope.launch {
+            accessionRepository.userStatus(email, status)
+                .onSuccess { LoadAccession() }
+        }
+    }
 }

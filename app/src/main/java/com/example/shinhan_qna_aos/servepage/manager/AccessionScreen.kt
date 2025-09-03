@@ -167,7 +167,10 @@ fun AccessionDetailScreen(
                         .fillMaxWidth()
                         .padding(bottom = 20.dp)){
                     Button(
-                        onClick = {},
+                        onClick = {
+                            accessionViewModel.UserStatus(email,"가입 거절")
+                            navController.popBackStack()
+                                  },
                         contentPadding = PaddingValues(0.dp),
                         colors = ButtonDefaults.buttonColors(Color(0xffFC4F4F)),
                         shape = RoundedCornerShape(12.dp)
@@ -195,7 +198,10 @@ fun AccessionDetailScreen(
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Button(
-                        onClick = {},
+                        onClick = {
+                            accessionViewModel.UserStatus(email,"가입 완료")
+                            navController.popBackStack()
+                                  },
                         contentPadding = PaddingValues(0.dp),
                         colors = ButtonDefaults.buttonColors(Color(0xff4AD871)),
                         shape = RoundedCornerShape(12.dp)

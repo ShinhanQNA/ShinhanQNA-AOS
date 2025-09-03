@@ -28,7 +28,9 @@ import com.example.shinhan_qna_aos.servepage.api.NoticesRequest
 import com.example.shinhan_qna_aos.servepage.api.ReasonRequest
 import com.example.shinhan_qna_aos.servepage.manager.api.AccessionData
 import com.example.shinhan_qna_aos.servepage.manager.api.AccessionDetailData
+import com.example.shinhan_qna_aos.servepage.manager.api.AccessionUserState
 import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationData
+import com.example.shinhan_qna_aos.servepage.manager.api.UserStatusRequest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -295,5 +297,12 @@ interface APIInterface {
         @Header("Authorization") accessToken: String,
         @Path("email") email: String,
     ): Response<AccessionDetailData>
+
+    // 유저 가입 상태 변경
+    @PUT("/admin/users/status")
+    suspend fun AdminUserStatus(
+        @Header("Authorization") accessToken: String,
+        @Body userStatusRequest: UserStatusRequest,
+    ): Response<AccessionUserState>
 }
 
