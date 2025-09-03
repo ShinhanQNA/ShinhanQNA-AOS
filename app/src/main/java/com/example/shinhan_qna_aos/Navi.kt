@@ -104,8 +104,8 @@ fun AppNavigation(
     // 앱 최초 진입 시 빠르게 보여줄 초기 화면 결정용 상태
     var initialRoute by remember { mutableStateOf<String?>(null) }
 
-    // 유저 상태 검사를 한 번만 실행했는지 추적하는 플래그
-    var isInitialStatusChecked by remember { mutableStateOf(false) }
+//    // 유저 상태 검사를 한 번만 실행했는지 추적하는 플래그
+//    var isInitialStatusChecked by remember { mutableStateOf(false) }
 
     // 앱 최초 진입 시 로그인 결과에 따라 초기 화면 결정
     LaunchedEffect(loginResult) {
@@ -114,11 +114,12 @@ fun AppNavigation(
         } else if (loginResult is LoginResult.Success) {
             if (data.isAdmin) {
                 initialRoute = "main"
-            } else if (!isInitialStatusChecked) { // 최초 1회만 유저 상태 확인 호출
+            }
+//            else if (!isInitialStatusChecked) { // 최초 1회만 유저 상태 확인 호출
                 Log.d("AppNavigation", "로그인 성공 감지, 서버 상태 조회 시작")
                 infoViewModel.checkAndNavigateUserStatus()
-                isInitialStatusChecked = true
-            }
+//                isInitialStatusChecked = true
+//            }
         } else {
             initialRoute = "login"
         }
