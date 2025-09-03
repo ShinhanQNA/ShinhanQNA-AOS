@@ -37,6 +37,8 @@ import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.api.LoginViewModel
+import com.example.shinhan_qna_aos.servepage.manager.api.AccessionRepository
+import com.example.shinhan_qna_aos.servepage.manager.api.AccessionViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
@@ -66,6 +68,7 @@ fun ManagerScreen(navController: NavController, authRepository: AuthRepository, 
         ) {
             TopBar("관리자", {navController.popBackStack()})
             ManagerMypageButton(
+                accessionClick = { navController.navigate("accession") },
                 onLogoutClick = { loginViewModel.logout() },
                 onDeclarationClick = { navController.navigate("declaration") }
             )
@@ -84,7 +87,7 @@ fun ManagerScreen(navController: NavController, authRepository: AuthRepository, 
 }
 
 @Composable
-fun ManagerMypageButton(onLogoutClick:() -> Unit, onDeclarationClick:() -> Unit){
+fun ManagerMypageButton(accessionClick:() -> Unit, onLogoutClick:() -> Unit, onDeclarationClick:() -> Unit){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -94,7 +97,8 @@ fun ManagerMypageButton(onLogoutClick:() -> Unit, onDeclarationClick:() -> Unit)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(24.dp),
+                .height(24.dp)
+                .clickable { accessionClick() },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {

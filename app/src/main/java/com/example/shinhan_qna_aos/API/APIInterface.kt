@@ -26,6 +26,8 @@ import com.example.shinhan_qna_aos.servepage.api.BlockReasonData
 import com.example.shinhan_qna_aos.servepage.api.Notices
 import com.example.shinhan_qna_aos.servepage.api.NoticesRequest
 import com.example.shinhan_qna_aos.servepage.api.ReasonRequest
+import com.example.shinhan_qna_aos.servepage.manager.api.AccessionData
+import com.example.shinhan_qna_aos.servepage.manager.api.AccessionDetailData
 import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationData
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -280,5 +282,18 @@ interface APIInterface {
     suspend fun Declaration(
         @Header("Authorization") accessToken: String,
     ):Response<List<DeclarationData>>
+
+    // 가입 대기 검토
+    @GET("/admin/pending")
+    suspend fun Accession(
+        @Header("Authorization") accessToken: String,
+    ):Response<List<AccessionData>>
+
+    // 가입 대기 검토 상세
+    @GET("/admin/pending/{email}")
+    suspend fun AccessionDetail(
+        @Header("Authorization") accessToken: String,
+        @Path("email") email: String,
+    ): Response<AccessionDetailData>
 }
 

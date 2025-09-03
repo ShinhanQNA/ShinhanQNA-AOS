@@ -437,72 +437,81 @@ fun Caution() {
     }
 }
 
-//// 제목이 학생 이름, 학번, 학년, 전공 + 날짜
-//@Composable
-//fun TitleYearButton(name: String, studentid:String, grade:String ,major:String,year: Int, month:Int, day:Int) {
-//    Column(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .background(color = Color.White)
-//            .padding(horizontal = 20.dp, vertical = 16.dp)
-//    ) {
-//        Text(
-//            "${name}/${studentid}/${grade}/${major}/",
-//            color = Color.Black,
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Bold,
-//                fontSize = 16.sp
-//            ),
-//            overflow = TextOverflow.Ellipsis
-//        )
-//        Spacer(modifier = Modifier.height(8.dp))
-//        Text(
-//            "${year}년 ${month}월 ${day}일",
-//            color = Color(0xffA5A5A5),
-//            style = TextStyle(
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Normal,
-//                fontSize = 14.sp
-//            ),
-//        )
-//    }
-//}
-//
-//// 관리자 학생 정보 단일 필드 컴포저블
-//@Composable
-//fun ManagerStudentInfo(title: String, info: String, modifier: Modifier = Modifier) {
-//    Column(
-//        modifier = modifier,
-//        verticalArrangement = Arrangement.spacedBy(8.dp)
-//    ) {
-//        Text(
-//            title,
-//            style = TextStyle(
-//                color = Color.Black,
-//                fontFamily = pretendard,
-//                fontWeight = FontWeight.Normal,
-//                fontSize = 14.sp
-//            )
-//        )
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .border(1.dp, Color(0xffdfdfdf), RoundedCornerShape(10.dp))
-//                .padding(horizontal = 12.dp, vertical = 8.dp)
-//        ) {
-//            Text(
-//                info,
-//                style = TextStyle(
-//                    fontFamily = pretendard,
-//                    fontWeight = FontWeight.Normal,
-//                    fontSize = 15.sp,
-//                    color = Color.Black
-//                ),
-//            )
-//        }
-//    }
-//}
+// 제목이 학생 이름, 학번, 학년, 전공
+@Composable
+fun TitleYearButton(
+    name: String,
+    studentid: String,
+    grade: String,
+    major: String,
+    modifier: Modifier = Modifier, // Modifier 받아서 조합 가능하게
+    onClick: () -> Unit = {}      // 클릭 람다 기본 제공
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = Color.White)
+            .clickable { onClick() }      // 클릭 처리 추가!
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+    ) {
+        Text(
+            "$studentid $name",
+            color = Color.Black,
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            ),
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            "$major 학과 ${grade}학년",
+            color = Color(0xffA5A5A5),
+            style = TextStyle(
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
+            ),
+        )
+    }
+}
+
+
+// 관리자 학생 정보 단일 필드 컴포저블
+@Composable
+fun ManagerStudentInfo(title: String, info: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            title,
+            style = TextStyle(
+                color = Color.Black,
+                fontFamily = pretendard,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp
+            )
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.dp, Color(0xffdfdfdf), RoundedCornerShape(10.dp))
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+        ) {
+            Text(
+                info,
+                style = TextStyle(
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 15.sp,
+                    color = Color.Black
+                ),
+            )
+        }
+    }
+}
 // 좋아요, 신고, 차단 아이콘과 카운트 컴포저블
 @Composable
 fun LikeFlagBan(likeCount: Int, flagsCount: Int, banCount: Int, data:Data) {
