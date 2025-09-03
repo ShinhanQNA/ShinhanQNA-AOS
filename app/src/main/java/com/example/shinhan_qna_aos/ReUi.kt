@@ -191,7 +191,7 @@ fun SelectDataButton(
     month: Int,
     week: Int,
     isAdmin: Boolean = false,
-    responseState: String = "응답 상태",  //  단일 String 으로 수정
+    responseState: String,  //  단일 String 으로 수정
     onResponseStateChange: (String) -> Unit = {},
     onSelectDataClick: () -> Unit
 ) {
@@ -275,7 +275,7 @@ fun TitleContentLikeButton(
 @Composable
 fun ManagerDropDown(
     responseState: String,  // 현재 선택된 상태
-    responseOptions: List<String> = listOf("대기", "완료"),
+    responseOptions: List<String> = listOf("응답 대기", "완료"),
     onResponseStateChange: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }

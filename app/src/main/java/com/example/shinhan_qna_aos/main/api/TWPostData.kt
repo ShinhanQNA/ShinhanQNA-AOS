@@ -24,7 +24,8 @@ data class GroupList(
 
 data class GroupID(
     @SerializedName("selectedMonth") val selectedMonth: Int,
-    @SerializedName("groupId") val groupId: Int
+    @SerializedName("groupId") val groupId: Int,
+    @SerializedName("responseStatus") val responseStatus: String, // 완료, 응답 대기
 )
 
 data class GroupStatus(

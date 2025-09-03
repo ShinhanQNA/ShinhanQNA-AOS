@@ -76,7 +76,6 @@ fun SelectedOpinionsScreen(twPostRepository: TWPostRepository, data: Data, navCo
         viewModel(factory = SimpleViewModelFactory { TWPostViewModel(twPostRepository) })
 
     val opinions by twPostViewModel.opinions.collectAsState()
-    val groupStatusMap by twPostViewModel.groupStatusMap.collectAsState()
 
     // 주기적 로딩 작업을 관리하는 Job 상태
     var periodicJob by remember { mutableStateOf<Job?>(null) }
@@ -116,13 +115,12 @@ fun SelectedOpinionsScreen(twPostRepository: TWPostRepository, data: Data, navCo
             .padding(bottom = 50.dp)
     ) {
         items(opinions, key = { it.groupId }) { opinion ->
-            val currentStatus = groupStatusMap[opinion.groupId] ?: "응답 상태"
             SelectDataButton(
                 year = LocalDate.now().year,
                 month = opinion.selectedMonth,
                 week = 3,
                 isAdmin = data.isAdmin,
-                responseState = currentStatus,
+                responseState = opinion.responseStatus,
                 onResponseStateChange = { newStatus ->
                     // 상태 변경 시 ViewModel에 API 호출
                     twPostViewModel.GroupStatusPost(opinion.groupId, newStatus)
