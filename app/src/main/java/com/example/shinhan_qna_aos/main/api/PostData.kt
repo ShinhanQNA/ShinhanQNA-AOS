@@ -80,7 +80,8 @@ data class Warning(
     @SerializedName("warningId") val warningId: Int,
     @SerializedName("email") val email: String,
     @SerializedName("reason") val reason: String,
-    @SerializedName("warningDate") val warningDate: String
+    @SerializedName("warningDate") val warningDate: String,
+    @SerializedName("message") val message: String? = ""
 )
 
 // 내가 쓴 글 모아보기

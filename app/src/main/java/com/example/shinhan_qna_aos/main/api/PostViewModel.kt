@@ -111,24 +111,23 @@ class PostViewModel(
     }
 
     // 경고/차단
-    fun warningUser(email: String, status: String = "경고", reason: String) {
+    fun warningUser(email: String, status: String, reason: String) {
         viewModelScope.launch {
-            postRepository.PostWarning(email, status, reason)  // status 전달 수정
-                .onSuccess {
-                    // 경고/차단 성공 시 처리 (예: 글 목록 재로드)
-                    loadPosts()
-                }
-                .onFailure { error ->
-                    if (error.message?.contains("이미 경고된 사용자") == true && status == "경고") {
-                        // 경고 중복 에러 케이스라면, 차단으로 재시도
+            postRepository.PostWarning(email, status, reason)
+                .onSuccess { warning ->
+                    if (warning.message == "이미 경고된 사용자 입니다.") {
+                        // 경고 중복 시 차단 재시도
                         warningUser(email, "차단", reason)
                     } else {
-                        // 그 외 에러 처리
-                        errorMessage = error.message
+                        loadPosts()
                     }
+                }
+                .onFailure { error ->
+                    errorMessage = error.message
                 }
         }
     }
+
     /**
      * 내가 쓴 게시글 목록 로드
      */

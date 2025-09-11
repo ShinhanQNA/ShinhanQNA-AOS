@@ -58,11 +58,15 @@ import com.example.shinhan_qna_aos.servepage.api.AppealRepository
 import com.example.shinhan_qna_aos.servepage.api.NotificationRepository
 import com.example.shinhan_qna_aos.servepage.manager.AccessionDetailScreen
 import com.example.shinhan_qna_aos.servepage.manager.AccessionScreen
+import com.example.shinhan_qna_aos.servepage.manager.BanClearDetailScreen
+import com.example.shinhan_qna_aos.servepage.manager.BanClearPostScreen
+import com.example.shinhan_qna_aos.servepage.manager.BanClearScreen
 import com.example.shinhan_qna_aos.servepage.manager.DeclarationOpenScreen
 import com.example.shinhan_qna_aos.servepage.manager.DeclarationScreen
 import com.example.shinhan_qna_aos.servepage.manager.ManagerScreen
 import com.example.shinhan_qna_aos.servepage.manager.NotificationWriteScreen
 import com.example.shinhan_qna_aos.servepage.manager.api.AccessionRepository
+import com.example.shinhan_qna_aos.servepage.manager.api.BanClearRepository
 import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -90,6 +94,7 @@ fun AppNavigation(
     val declarationRepository = remember { DeclarationRepository(data, apiInterface) }
     val appealRepository = remember { AppealRepository(apiInterface, data) }
     val accessionRepository = remember{ AccessionRepository(data, apiInterface) }
+    val banClearRepository = remember { BanClearRepository(apiInterface, data) }
 
     val loginViewModel: LoginViewModel =
         viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository, data) })
@@ -206,7 +211,7 @@ fun AppNavigation(
             arguments = listOf(navArgument("postId") { type = NavType.StringType })
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getString("postId") ?: ""
-            WriteOpenScreen(navController, postRepository, writeRepository, authRepository, data, postId)
+            WriteOpenScreen(navController, postRepository, writeRepository, data, postId)
         }
 
         composable("writeBoard") { WritingScreen(writeRepository,answerRepository ,navController, data) } // 게시글 작성 화면
@@ -265,10 +270,24 @@ fun AppNavigation(
             DeclarationOpenScreen(postId,navController, postRepository)
         }
 
-        composable("accession") { AccessionScreen(accessionRepository, navController) }
-        composable("accessionDetail/{email}", arguments = listOf(navArgument("email") { type = NavType.StringType })) { backStackEntry ->
+        composable("accession") { AccessionScreen(accessionRepository, navController) } // 가입 신청자
+        composable("accessionDetail/{email}", arguments = listOf(navArgument("email") { type = NavType.StringType }) // 가입 신청 상세 글
+        ) { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
             AccessionDetailScreen(accessionRepository, navController, email)
+        }
+
+        composable("banclear") { BanClearScreen(banClearRepository, navController) } // 가입 신청자
+        composable("banclearDetail/{email}", arguments = listOf(navArgument("email") { type = NavType.StringType }) // 가입 신청 상세 글
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            BanClearDetailScreen(banClearRepository, navController, email)
+        }
+        composable("banclearDetail/{email}/{postId}", arguments = listOf(navArgument("email") { type = NavType.StringType },navArgument("postId") { type = NavType.StringType }) // 가입 신청 상세 글
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            val postId = backStackEntry.arguments?.getString("postId") ?: ""
+            BanClearPostScreen(banClearRepository, navController, email, postId.toInt(), data)
         }
     }
 }

@@ -70,7 +70,8 @@ fun ManagerScreen(navController: NavController, authRepository: AuthRepository, 
             ManagerMypageButton(
                 accessionClick = { navController.navigate("accession") },
                 onLogoutClick = { loginViewModel.logout() },
-                onDeclarationClick = { navController.navigate("declaration") }
+                onDeclarationClick = { navController.navigate("declaration") },
+                banClearonClick = { navController.navigate("banclear") }
             )
             Spacer(modifier = Modifier.height(16.dp))
             Caution()
@@ -87,7 +88,7 @@ fun ManagerScreen(navController: NavController, authRepository: AuthRepository, 
 }
 
 @Composable
-fun ManagerMypageButton(accessionClick:() -> Unit, onLogoutClick:() -> Unit, onDeclarationClick:() -> Unit){
+fun ManagerMypageButton(accessionClick:() -> Unit, onLogoutClick:() -> Unit, onDeclarationClick:() -> Unit, banClearonClick:() -> Unit){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,7 +118,7 @@ fun ManagerMypageButton(accessionClick:() -> Unit, onLogoutClick:() -> Unit, onD
                 tint = Color.Black,
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable { }
+                    .clickable { accessionClick() }
             )
         }
         Row(
@@ -143,13 +144,14 @@ fun ManagerMypageButton(accessionClick:() -> Unit, onLogoutClick:() -> Unit, onD
                 tint = Color.Black,
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable { }
+                    .clickable {onDeclarationClick() }
             )
         }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(24.dp),
+                .height(24.dp)
+                .clickable { banClearonClick() },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -168,7 +170,7 @@ fun ManagerMypageButton(accessionClick:() -> Unit, onLogoutClick:() -> Unit, onD
                 tint = Color.Black,
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable { }
+                    .clickable { banClearonClick() }
             )
         }
         Box(

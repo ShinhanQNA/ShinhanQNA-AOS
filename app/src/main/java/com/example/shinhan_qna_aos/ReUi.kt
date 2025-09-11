@@ -47,21 +47,6 @@ import coil.compose.AsyncImage
 import com.example.shinhan_qna_aos.main.api.TitleContentLike
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
-//
-//// 데이터 클래스 임의
-//data class TitleContentLike(
-//    val title: String,
-//    val content: String,
-//    val likeCount: Int,
-//    val flagsCount: Int = 0,
-//    val banCount: Int = 0,
-//    val responseState: String = "응답 상태"
-//)
-//
-//data class TitleContent(val title: String, val content: String)
-//data class SelectData(val year: Int,val month: Int, val week: Int, val count: Int, val responseState: String = "응답 상태")
-//data class StringData(val content:String)
-//data class TitleYearData(val name: String,val studentid: String, val grade: String,val major: String,val year: Int,val month: Int,val day: Int)
 
 val TitleTextStyle = TextStyle(
     fontFamily = pretendard,
@@ -441,7 +426,7 @@ fun Caution() {
 @Composable
 fun TitleYearButton(
     name: String,
-    studentid: String,
+    studentid: String?,
     grade: String,
     major: String,
     modifier: Modifier = Modifier, // Modifier 받아서 조합 가능하게

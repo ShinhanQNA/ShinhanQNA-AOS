@@ -72,13 +72,10 @@ fun WriteOpenScreen(
     navController: NavController,
     postRepository: PostRepository,
     writeRepository: WriteRepository,
-    authRepository: AuthRepository,
     data: Data,
     postId: String,
 ) {
     val context = LocalContext.current
-//    val loginViewModel: LoginViewModel =
-//        viewModel(factory = SimpleViewModelFactory { LoginViewModel(authRepository,data) })
     val postViewModel: PostViewModel =
         viewModel(factory = SimpleViewModelFactory { PostViewModel(postRepository) })
     val writingViewModel: WritingViewModel =
@@ -91,21 +88,6 @@ fun WriteOpenScreen(
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let { writingViewModel.onImageChange(context, it) }
     }
-
-//    val loginResult by loginViewModel.loginResult.collectAsState()
-//
-//    // 로그인 상태 관찰 후, Idle 이거나 실패 상태면 로그인 화면으로 이동
-//    LaunchedEffect(loginResult) {
-//        when (loginResult) {
-//            is LoginResult.Idle, is LoginResult.Failure -> {
-//                navController.navigate("login") {
-//                    // 현재 스택 모두 제거하여 뒤로가기 방지
-//                    popUpTo(0) { inclusive = true }
-//                }
-//            }
-//            else -> { /* 로그인 상태일 때는 그냥 유지 */ }
-//        }
-//    }
 
     // 첫 진입시 상세 데이터 불러오기
     LaunchedEffect(postId) {
@@ -160,6 +142,7 @@ fun WriteOpenScreen(
                                     onWarningClick = { reason ->
                                         postViewModel.warningUser(
                                             email = detail.writerEmail,
+                                            status = "경고",
                                             reason = reason
                                         )
                                     }

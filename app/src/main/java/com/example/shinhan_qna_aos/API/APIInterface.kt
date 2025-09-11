@@ -29,6 +29,9 @@ import com.example.shinhan_qna_aos.servepage.api.ReasonRequest
 import com.example.shinhan_qna_aos.servepage.manager.api.AccessionData
 import com.example.shinhan_qna_aos.servepage.manager.api.AccessionDetailData
 import com.example.shinhan_qna_aos.servepage.manager.api.AccessionUserState
+import com.example.shinhan_qna_aos.servepage.manager.api.BanClearData
+import com.example.shinhan_qna_aos.servepage.manager.api.BanClearUser
+import com.example.shinhan_qna_aos.servepage.manager.api.Board
 import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationData
 import com.example.shinhan_qna_aos.servepage.manager.api.UserStatusRequest
 import okhttp3.MultipartBody
@@ -304,5 +307,26 @@ interface APIInterface {
         @Header("Authorization") accessToken: String,
         @Body userStatusRequest: UserStatusRequest,
     ): Response<AccessionUserState>
+
+    // 이의 제기 신청자 리스트
+    @GET("/admin/appeals")
+    suspend fun BanClear(
+        @Header("Authorization") accessToken: String,
+    ):Response<List<BanClearData>>
+
+    // 이의 제기 신청자 상세 조회
+    @GET("/admin/appeals/{email}")
+    suspend fun BanClearDetail(
+        @Header("Authorization") accessToken: String,
+        @Path("email") email: String,
+    ): Response<BanClearUser>
+
+    // 이의 제기 신청자 개별 게시글
+    @GET("/admin/appeals/{email}/boards/{postId}")
+    suspend fun BanClearDetailBoard(
+        @Header("Authorization") accessToken: String,
+        @Path("email") email: String,
+        @Path("postId") postId: Int,
+    ): Response<Board>
 }
 
