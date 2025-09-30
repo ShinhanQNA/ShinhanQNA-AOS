@@ -265,11 +265,16 @@ fun AppNavigation(
         composable("appeal3"){ AppealScreen3(infoRepository, data, navController) }
 
         composable("declaration") { DeclarationScreen(declarationRepository,postRepository,data,navController) } // 신고된 게시글
-        composable("declaration/{postId}/{reportId}" ,arguments = listOf(navArgument("postId") { type = NavType.StringType }) // 신고된 게시글 상세
+        composable( // 신고된 게시글 상세
+            "declaration/{postId}/{reportId}",
+            arguments = listOf(
+                navArgument("postId") { type = NavType.StringType },
+                navArgument("reportId") { type = NavType.IntType }
+            )
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getString("postId") ?: ""
-            val reportId = backStackEntry.arguments?.getString("reportId") ?: ""
-            DeclarationOpenScreen(postId,reportId.toInt(),navController, postRepository,declarationRepository)
+            val reportId = backStackEntry.arguments?.getInt("reportId") ?: -1
+            DeclarationOpenScreen(postId, reportId, navController, postRepository, declarationRepository)
         }
 
         composable("accession") { AccessionScreen(accessionRepository, navController) } // 가입 신청자

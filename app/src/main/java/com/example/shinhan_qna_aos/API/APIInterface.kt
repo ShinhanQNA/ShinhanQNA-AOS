@@ -44,6 +44,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
@@ -292,10 +293,10 @@ interface APIInterface {
     ):Response<List<DeclarationData>>
 
     // 신고 게시글 반려
-    @DELETE("/admin/boards/reports/reject")
+    @HTTP(method = "DELETE", path = "/admin/boards/reports/reject", hasBody = true)
     suspend fun DeclarationReject(
         @Header("Authorization") accessToken: String,
-        @Body declarationRequest : DeclarationRequest
+        @Body declarationRequest: DeclarationRequest
     ): Response<DeclarationResponse>
 
     // 가입 대기 검토

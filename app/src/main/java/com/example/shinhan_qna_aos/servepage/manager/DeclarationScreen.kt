@@ -145,6 +145,16 @@ fun DeclarationOpenScreen(postId: String, reportId: Int, navController: NavContr
     }
 
     val postDetail = postViewModel.selectedPost
+    val writerEmail = postDetail?.writerEmail ?: ""
+
+    // API 호출 결과 감지하여 네비게이션 처리
+    val rejectResult = declarationViewModel.rejectResult
+    LaunchedEffect(rejectResult) {
+        if (rejectResult == true) {
+            navController.popBackStack()
+            declarationViewModel.resetRejectResult()
+        }
+    }
 
     Column(modifier = Modifier.systemBarsPadding().fillMaxSize().background(Color.White)) {
         TopBar(null) { navController.navigate("declaration") { popUpTo("declaration/${postId}") { inclusive = true } } }
@@ -164,7 +174,9 @@ fun DeclarationOpenScreen(postId: String, reportId: Int, navController: NavContr
                         icon = lucide.arrow_big_left_dash,
                         label = "반려",
                         background = Color(0xffFC4F4F),
-                        onClick = { declarationViewModel.DeclarationReject(reportId) }
+                        onClick = {
+                            declarationViewModel.DeclarationReject(reportId)
+                        }
                     )
 
                     Spacer(modifier = Modifier.width(16.dp))
@@ -255,7 +267,7 @@ fun DeclarationOpenScreen(postId: String, reportId: Int, navController: NavContr
                             .padding(horizontal = 12.dp, vertical = 8.dp)
                             .clickable {
                                 postViewModel.warningUser(
-                                    email = postDetail?.writerEmail ?: "",
+                                    email = writerEmail,
                                     status = "경고",
                                     reason = reason,
                                     postId = postId

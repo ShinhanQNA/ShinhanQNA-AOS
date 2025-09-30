@@ -23,9 +23,9 @@ data class DeclarationUIModel(
 )
 
 data class DeclarationRequest(
-    val reportId: Int
+    @SerializedName("reportId")val reportId: Int
 )
 
 data class DeclarationResponse(
-    val message: String
+    @SerializedName("message")val message: String
 )
