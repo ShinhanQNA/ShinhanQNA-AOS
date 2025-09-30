@@ -43,4 +43,11 @@ class BanClearViewModel( private val banClearRepository: BanClearRepository) : V
             .onFailure { Log.e("BanClearViewModel",  "이의 신청 상세 게시글 에러: ${it.message}") }
         }
     }
+
+    // 이의 제기 상태 변경
+    fun banStatus(status:String,appealId : Int) {
+        viewModelScope.launch {
+            banClearRepository.banStatus(status, appealId)
+        }
+    }
 }

@@ -66,4 +66,24 @@ class BanClearRepository(
             return Result.failure(e)
         }
     }
+
+    //이의 제기 상태 변경
+    suspend fun banStatus(status:String, appealId : Int):Result<BanClearStatusResponse>{
+        val accesstoken = data.accessToken ?: return Result.failure(Exception("로그인 정보가 없음"))
+        try {
+            val response = apiService.BanClearStatus("Bearer $accesstoken",appealId, BanClearStatus(status) )
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body!=null){
+                    return Result.success(body)
+                }else{
+                    return Result.failure(Exception("Response body is null"))
+                }
+            }else{
+                return Result.failure(Exception("에러: ${response.code()}"))
+                }
+            }catch (e:Exception){
+                return Result.failure(e)
+        }
+    }
 }

@@ -187,16 +187,19 @@ fun BanClearDetailScreen(
                 modifier = Modifier
                     .background(Color(0xffFC4F4F), RoundedCornerShape(12.dp))
                     .padding(horizontal = 12.dp, vertical = 8.dp)
-                    .clickable { }
+                    .clickable {
+                        banClearViewModel.banStatus("거절", banClearDetail!!.id)
+                        navController.popBackStack()
+                    }
             ) {
                 Icon(
                     painter = painterResource(lucide.x),
-                    contentDescription = "취소",
+                    contentDescription = "거절",
                     modifier = Modifier.size(20.dp),
                     tint = Color.White
                 )
                 Text(
-                    text = "취소",
+                    text = "거절",
                     color = Color.White,
                     style = TextStyle(
                         fontFamily = pretendard,
@@ -213,15 +216,19 @@ fun BanClearDetailScreen(
                 modifier = Modifier
                     .background(Color(0xff4AD871), RoundedCornerShape(12.dp))
                     .padding(horizontal = 12.dp, vertical = 8.dp)
+                    .clickable {
+                        banClearViewModel.banStatus("승인", banClearDetail!!.id)
+                        navController.popBackStack()
+                    }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.icon_check),
-                    contentDescription = "확인",
+                    contentDescription = "승인",
                     modifier = Modifier.size(20.dp),
                     tint = Color.White
                 )
                 Text(
-                    text = "확인",
+                    text = "승인",
                     color = Color.White,
                     style = TextStyle(
                         fontFamily = pretendard,

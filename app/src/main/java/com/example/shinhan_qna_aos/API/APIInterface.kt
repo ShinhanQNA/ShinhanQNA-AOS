@@ -30,6 +30,8 @@ import com.example.shinhan_qna_aos.servepage.manager.api.AccessionData
 import com.example.shinhan_qna_aos.servepage.manager.api.AccessionDetailData
 import com.example.shinhan_qna_aos.servepage.manager.api.AccessionUserState
 import com.example.shinhan_qna_aos.servepage.manager.api.BanClearData
+import com.example.shinhan_qna_aos.servepage.manager.api.BanClearStatus
+import com.example.shinhan_qna_aos.servepage.manager.api.BanClearStatusResponse
 import com.example.shinhan_qna_aos.servepage.manager.api.BanClearUser
 import com.example.shinhan_qna_aos.servepage.manager.api.Board
 import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationData
@@ -328,5 +330,12 @@ interface APIInterface {
         @Path("email") email: String,
         @Path("postId") postId: Int,
     ): Response<Board>
+
+    @PUT("/admin/appeals/{appealId}/status")
+    suspend fun BanClearStatus(
+        @Header("Authorization") accessToken: String,
+        @Path("appealId") appealId: Int,
+        @Body banClearStatus: BanClearStatus
+    ):Response<BanClearStatusResponse>
 }
 

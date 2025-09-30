@@ -37,3 +37,15 @@ data class Board(
     @SerializedName("writerEmail") val writerEmail: String,
     @SerializedName("imagePath") val imagePath: String?
 )
+
+// 이의 제기 상태 변경
+data class BanClearStatus(
+    @SerializedName("status") val status : String //기본:대기 -> 승인 OR 거절
+)
+
+data class BanClearStatusResponse(
+    @SerializedName("id") val id: Int,
+    @SerializedName("email") val email: String,
+    @SerializedName("createdAt") val createdAt: String,
+    @SerializedName("status") val status: String
+)
