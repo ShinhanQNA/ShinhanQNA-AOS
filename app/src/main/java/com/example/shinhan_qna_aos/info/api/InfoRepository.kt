@@ -2,6 +2,7 @@ package com.example.shinhan_qna_aos.info.api
 
 import com.example.shinhan_qna_aos.API.APIInterface
 import com.example.shinhan_qna_aos.Data
+import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -12,16 +13,31 @@ import java.io.File
 class InfoRepository(private val apiInterface: APIInterface, private val data:Data) {
 
     // 서버로부터 유저 가입 상태 조회 API 호출
-    suspend fun checkUserStatus(): Result<UserResponseWrapper> {
+    // 4. checkUserStatus 함수 (role로 분기 처리, Gson으로 변환)
+    suspend fun checkUserStatus(): Result<Any> {
         val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 결과가 없습니다."))
         return try {
             val response = apiInterface.UserCheck("Bearer $accessToken")
             if (response.isSuccessful) {
-                response.body()?.let {
-                    Result.success(it)
-                } ?: Result.failure(Exception("Empty response body"))
+                val body = response.body() ?: return Result.failure(Exception("Empty response body"))
+
+                // Gson 인스턴스 생성
+                val gson = Gson()
+
+                // 일단 role 필드만 추출
+                val userElement = body.getAsJsonObject("user")
+                val role = userElement?.get("role")?.asString
+
+                if (role == "학생") {
+                    // 학생인 경우 UserResponseWrapper로 변환
+                    val userWrapper = gson.fromJson(body, UserResponseWrapper::class.java)
+                    Result.success(userWrapper)
+                } else {
+                    // 관리자일 경우 AdminResponse로 변환
+                    val adminResponse = gson.fromJson(body, AdminResponse::class.java)
+                    Result.success(adminResponse)
+                }
             } else {
-                // 500 등 실패 응답에 message나 status 들어올 수 있어 적절히 처리
                 val errorMsg = response.errorBody()?.string() ?: "Unknown error"
                 Result.failure(Exception("Error ${response.code()}: $errorMsg"))
             }

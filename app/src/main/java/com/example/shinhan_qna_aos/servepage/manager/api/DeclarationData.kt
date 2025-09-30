@@ -13,10 +13,19 @@ data class DeclarationData (
 
 data class DeclarationUIModel(
     val postID: Int,
+    val reportId: Int,
     val title: String,
     val content: String,
     val likeCount: Int,
     val flagsCount: Int, // 신고 횟수
     val banCount: Int,   // 경고/밴 횟수
     val status: String   // 게시글 상태
+)
+
+data class DeclarationRequest(
+    val reportId: Int
+)
+
+data class DeclarationResponse(
+    val message: String
 )

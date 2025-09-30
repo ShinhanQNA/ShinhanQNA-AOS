@@ -47,10 +47,12 @@ data class Warning(
     val status: String
 )
 
-
-// ui
-//data class InfoUiState(
-//    val infoData: InfoData = InfoData(),
-//    var navigateTo: String? = null
-//)
-
+// 2. 관리자 응답 데이터 클래스 (예시 해당 필드에 맞춤)
+data class AdminResponse(
+    val id: String,
+    val password: String,
+    val role: String,
+    val name: String,
+    val status: String,
+    val refreshToken: String
+)
