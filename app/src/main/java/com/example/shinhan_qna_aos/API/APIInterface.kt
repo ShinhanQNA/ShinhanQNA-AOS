@@ -1,6 +1,7 @@
 package com.example.shinhan_qna_aos.API
 
 import com.example.shinhan_qna_aos.info.api.InfoResponse
+import com.example.shinhan_qna_aos.info.api.UserResponseWrapper
 import com.example.shinhan_qna_aos.login.api.AdminRequest
 import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.LogoutData
@@ -37,13 +38,13 @@ import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationData
 import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationRequest
 import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationResponse
 import com.example.shinhan_qna_aos.servepage.manager.api.UserStatusRequest
-import com.google.gson.JsonObject
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
@@ -101,11 +102,10 @@ interface APIInterface {
     ): Response<InfoResponse>
 
     //유저 정보 조회
-    @Headers("Content-Type: application/json")
     @GET("/users/me")
     suspend fun UserCheck(
         @Header("Authorization") accessToken: String
-    ): Response<JsonObject>
+    ): Response<UserResponseWrapper>
 
     //게시글 조회
     @Headers("Content-Type: application/json")
@@ -293,10 +293,10 @@ interface APIInterface {
     ):Response<List<DeclarationData>>
 
     // 신고 게시글 반려
-    @DELETE("/admin/boards/reports/reject")
+    @HTTP(method = "DELETE", path = "/admin/boards/reports/reject", hasBody = true)
     suspend fun DeclarationReject(
         @Header("Authorization") accessToken: String,
-        @Body declarationRequest : DeclarationRequest
+        @Body declarationRequest: DeclarationRequest
     ): Response<DeclarationResponse>
 
     // 가입 대기 검토
