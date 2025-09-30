@@ -4,22 +4,24 @@ import com.google.gson.annotations.SerializedName
 
 // 이의 제기 신청자 조회
 data class BanClearData (
-    @SerializedName("createdAt") val createdAt: String,
-    @SerializedName("year") val year: String,
+    @SerializedName("id") val id: Int,
+    @SerializedName("email") val email: String,
     @SerializedName("name") val name: String,
     @SerializedName("students") val students: String,
-    @SerializedName("id") val id: Int,
-    @SerializedName("department") val department: String
+    @SerializedName("year") val year: String,
+    @SerializedName("department") val department: String,
+    @SerializedName("createdAt") val createdAt: String,
 )
 
 // 이의 제기 신청자 상세조회
 data class BanClearUser(
-    @SerializedName("id") val id: String,
-    @SerializedName("boards") val boards: List<Board>,
+    @SerializedName("id") val id: Int,
+    @SerializedName("email") val email: String,
     @SerializedName("name") val name: String,
-    @SerializedName("department") val department: String,
+    @SerializedName("students") val students: String,
     @SerializedName("year") val year: String,
-    @SerializedName("students") val students: String
+    @SerializedName("department") val department: String,
+    @SerializedName("boards") val boards: List<Board>
 )
 
 // 이의 제기 신청자 개별 게시글

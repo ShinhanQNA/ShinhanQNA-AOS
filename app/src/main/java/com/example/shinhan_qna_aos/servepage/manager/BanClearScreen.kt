@@ -56,7 +56,7 @@ fun BanClearScreen(
         .background(Color.White)
     ){
         Column {
-            TopBar("가입 요청 검토", { navController.popBackStack() })
+            TopBar("이의 제기 검토", { navController.popBackStack() })
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -70,7 +70,7 @@ fun BanClearScreen(
                         major = banClearList.department,
                         grade = banClearList.year,
                         onClick = {
-                            navController.navigate("banclearDetail/${banClearList.id}")
+                            navController.navigate("banclearDetail/${banClearList.email}")
                         }
                     )
                     Divider()
@@ -92,12 +92,12 @@ fun BanClearScreen(
 fun BanClearDetailScreen(
     banClearRepository: BanClearRepository,
     navController: NavController,
-    id : String
+    email : String
 ){
     val banClearViewModel: BanClearViewModel = viewModel(factory = SimpleViewModelFactory { BanClearViewModel(banClearRepository) })
 
-    LaunchedEffect(id) {
-        banClearViewModel.LoadBanClearDetail(id)
+    LaunchedEffect(email) {
+        banClearViewModel.LoadBanClearDetail(email)
     }
 
     val banClearDetail = banClearViewModel.banClearDetail
@@ -132,7 +132,7 @@ fun BanClearDetailScreen(
                         isAdmin =  true,
                         flagsCount = boarddata.reportCount,
                         banCount = warningStatusToBanCount(boarddata.warningStatus).toInt(),
-                        onClick = {navController.navigate("banclearPost/${id}/${boarddata.postId}")}
+                        onClick = {navController.navigate("banclearPost/${email}/${boarddata.postId}")}
                     )
                     Divider()
                 }

@@ -111,15 +111,15 @@ class PostViewModel(
     }
 
     // 경고/차단
-    fun warningUser(email: String, status: String, reason: String) {
+    fun warningUser(email: String, status: String, reason: String, postId: String) {
         viewModelScope.launch {
             postRepository.PostWarning(email, status, reason)
                 .onSuccess { warning ->
                     if (warning.message == "이미 경고된 사용자 입니다.") {
                         // 경고 중복 시 차단 재시도
-                        warningUser(email, "차단", reason)
+                        warningUser(email, "차단", reason, postId)
                     } else {
-                        loadPosts()
+                        loadPostDetail(postId)  // 상세 정보 다시 조회
                     }
                 }
                 .onFailure { error ->

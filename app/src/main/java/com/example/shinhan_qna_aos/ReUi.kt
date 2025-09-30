@@ -194,7 +194,10 @@ fun SelectDataButton(
             Spacer(Modifier.height(30.dp))
             Box(
                 modifier = Modifier
-                    .background(if(responseState=="완료")Color(0xff4AD871) else Color(0xffFF9F43), RoundedCornerShape(20.dp))
+                    .background(
+                        if (responseState == "완료") Color(0xff4AD871) else Color(0xffFF9F43),
+                        RoundedCornerShape(20.dp)
+                    )
                     .padding(horizontal = 12.dp, vertical = 2.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -354,7 +357,8 @@ fun DetailContent(
     imagePath: String? = null  // 이미지 URL 또는 Uri 문자열 (null 가능)
 ) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(Color.White)
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
@@ -427,8 +431,8 @@ fun Caution() {
 fun TitleYearButton(
     name: String,
     studentid: String?,
-    grade: String,
-    major: String,
+    grade: String?,
+    major: String?,
     modifier: Modifier = Modifier, // Modifier 받아서 조합 가능하게
     onClick: () -> Unit = {}      // 클릭 람다 기본 제공
 ) {
@@ -440,7 +444,7 @@ fun TitleYearButton(
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
         Text(
-            "$studentid $name",
+            "${studentid ?:"없음"} $name",
             color = Color.Black,
             style = TextStyle(
                 fontFamily = pretendard,
@@ -451,7 +455,7 @@ fun TitleYearButton(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            "$major 학과 ${grade}학년",
+            "${major?:"없음"} 학과 ${grade?:"없음"}학년",
             color = Color(0xffA5A5A5),
             style = TextStyle(
                 fontFamily = pretendard,

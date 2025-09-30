@@ -143,7 +143,8 @@ fun WriteOpenScreen(
                                         postViewModel.warningUser(
                                             email = detail.writerEmail,
                                             status = "경고",
-                                            reason = reason
+                                            reason = reason,
+                                            postId = postId
                                         )
                                     }
                                 )
