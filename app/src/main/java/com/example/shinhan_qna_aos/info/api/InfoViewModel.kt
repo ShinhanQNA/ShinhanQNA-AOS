@@ -86,6 +86,7 @@ private val data: Data
         data.userStatus = user.status
         data.userName = user.name
         data.userEmail = user.email
+        data.studentCertified = user.studentCertified == true
 
         // 승인 상태이면 이의신청 완료 상태 리셋
         if (user.status == "가입 완료") {
@@ -97,7 +98,7 @@ private val data: Data
             user.status == "차단" && data.isAppealCompleted -> "appeal3" // 차단 & 이의신청 완료 (승인 전까지)
             user.status == "차단" -> "appeal1"  // '차단' 상태이지만 이의신청을 하지 않은 상황/재 차단
             user.status == "경고" -> "main" // 경고인 경우는 그냥 메인으로
-            !data.studentCertified -> "info"
+            user.studentCertified == false -> "info"
             user.status == "가입 완료" -> "main"
             user.status == "가입 대기 중" -> "wait"
             else -> "info"

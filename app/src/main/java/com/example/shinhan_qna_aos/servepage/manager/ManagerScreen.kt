@@ -37,6 +37,8 @@ import com.example.shinhan_qna_aos.TopBar
 import com.example.shinhan_qna_aos.login.api.AuthRepository
 import com.example.shinhan_qna_aos.login.api.LoginResult
 import com.example.shinhan_qna_aos.login.api.LoginViewModel
+import com.example.shinhan_qna_aos.servepage.manager.api.AccessionRepository
+import com.example.shinhan_qna_aos.servepage.manager.api.AccessionViewModel
 import com.example.shinhan_qna_aos.ui.theme.pretendard
 import com.jihan.lucide_icons.lucide
 
@@ -66,8 +68,10 @@ fun ManagerScreen(navController: NavController, authRepository: AuthRepository, 
         ) {
             TopBar("관리자", {navController.popBackStack()})
             ManagerMypageButton(
+                accessionClick = { navController.navigate("accession") },
                 onLogoutClick = { loginViewModel.logout() },
-                onDeclarationClick = { navController.navigate("declaration") }
+                onDeclarationClick = { navController.navigate("declaration") },
+                banClearonClick = { navController.navigate("banclear") }
             )
             Spacer(modifier = Modifier.height(16.dp))
             Caution()
@@ -84,7 +88,7 @@ fun ManagerScreen(navController: NavController, authRepository: AuthRepository, 
 }
 
 @Composable
-fun ManagerMypageButton(onLogoutClick:() -> Unit, onDeclarationClick:() -> Unit){
+fun ManagerMypageButton(accessionClick:() -> Unit, onLogoutClick:() -> Unit, onDeclarationClick:() -> Unit, banClearonClick:() -> Unit){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -94,7 +98,8 @@ fun ManagerMypageButton(onLogoutClick:() -> Unit, onDeclarationClick:() -> Unit)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(24.dp),
+                .height(24.dp)
+                .clickable { accessionClick() },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -113,7 +118,7 @@ fun ManagerMypageButton(onLogoutClick:() -> Unit, onDeclarationClick:() -> Unit)
                 tint = Color.Black,
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable { }
+                    .clickable { accessionClick() }
             )
         }
         Row(
@@ -139,13 +144,14 @@ fun ManagerMypageButton(onLogoutClick:() -> Unit, onDeclarationClick:() -> Unit)
                 tint = Color.Black,
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable { }
+                    .clickable {onDeclarationClick() }
             )
         }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(24.dp),
+                .height(24.dp)
+                .clickable { banClearonClick() },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -164,7 +170,7 @@ fun ManagerMypageButton(onLogoutClick:() -> Unit, onDeclarationClick:() -> Unit)
                 tint = Color.Black,
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable { }
+                    .clickable { banClearonClick() }
             )
         }
         Box(

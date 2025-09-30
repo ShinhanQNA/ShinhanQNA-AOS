@@ -32,10 +32,6 @@ class TWPostViewModel(private val repository: TWPostRepository) : ViewModel() {
     private val _selectedMonth = MutableStateFlow(0)
     val selectedMonth = _selectedMonth.asStateFlow()
 
-    //그룹 상태
-    private val _groupStatusMap = MutableStateFlow<Map<Int, String>>(emptyMap())
-    val groupStatusMap = _groupStatusMap.asStateFlow()
-
     @RequiresApi(Build.VERSION_CODES.O)
     fun loadOpinions() {
         viewModelScope.launch {
@@ -45,11 +41,6 @@ class TWPostViewModel(private val repository: TWPostRepository) : ViewModel() {
                 Log.d("TWPostViewModel", "의견 데이터 요청 성공")
                 val opinions = result.getOrNull() ?: emptyList()
                 _opinions.value = opinions
-
-                // 상태도 초기화
-                val initialStatusMap = opinions.associate { it.groupId to "대기" } // 기본값 설정 필요 시
-                _groupStatusMap.value = initialStatusMap
-
             } else {
                 val error = result.exceptionOrNull()?.localizedMessage ?: "알 수 없는 오류"
                 Log.e("TWPostViewModel", "의견 데이터 요청 실패: $error")
@@ -82,15 +73,15 @@ class TWPostViewModel(private val repository: TWPostRepository) : ViewModel() {
             loadGroupDetailPosts(groupId, newSort)
         }
     }
+
     // 그룹 상태 변경
+    @RequiresApi(Build.VERSION_CODES.O)
     fun GroupStatusPost(groupId: Int, status: String) {
         viewModelScope.launch {
             val result = repository.putStatus(groupId, status)
             if (result.isSuccess) {
-                val newStatus = result.getOrNull()?.status ?: status
-                _groupStatusMap.value = _groupStatusMap.value.toMutableMap().apply {
-                    put(groupId, newStatus)
-                }
+                loadOpinions()
+                Log.d("TWPostViewModel", "그룹 상태 변경 성공")
             } else {
                 Log.e("TWPostViewModel", "그룹 상태 변경 실패: ${result.exceptionOrNull()?.localizedMessage}")
             }

@@ -26,7 +26,16 @@ import com.example.shinhan_qna_aos.servepage.api.BlockReasonData
 import com.example.shinhan_qna_aos.servepage.api.Notices
 import com.example.shinhan_qna_aos.servepage.api.NoticesRequest
 import com.example.shinhan_qna_aos.servepage.api.ReasonRequest
+import com.example.shinhan_qna_aos.servepage.manager.api.AccessionData
+import com.example.shinhan_qna_aos.servepage.manager.api.AccessionDetailData
+import com.example.shinhan_qna_aos.servepage.manager.api.AccessionUserState
+import com.example.shinhan_qna_aos.servepage.manager.api.BanClearData
+import com.example.shinhan_qna_aos.servepage.manager.api.BanClearStatus
+import com.example.shinhan_qna_aos.servepage.manager.api.BanClearStatusResponse
+import com.example.shinhan_qna_aos.servepage.manager.api.BanClearUser
+import com.example.shinhan_qna_aos.servepage.manager.api.Board
 import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationData
+import com.example.shinhan_qna_aos.servepage.manager.api.UserStatusRequest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -280,5 +289,53 @@ interface APIInterface {
     suspend fun Declaration(
         @Header("Authorization") accessToken: String,
     ):Response<List<DeclarationData>>
+
+    // 가입 대기 검토
+    @GET("/admin/pending")
+    suspend fun Accession(
+        @Header("Authorization") accessToken: String,
+    ):Response<List<AccessionData>>
+
+    // 가입 대기 검토 상세
+    @GET("/admin/pending/{email}")
+    suspend fun AccessionDetail(
+        @Header("Authorization") accessToken: String,
+        @Path("email") email: String,
+    ): Response<AccessionDetailData>
+
+    // 유저 가입 상태 변경
+    @PUT("/admin/users/status")
+    suspend fun AdminUserStatus(
+        @Header("Authorization") accessToken: String,
+        @Body userStatusRequest: UserStatusRequest,
+    ): Response<AccessionUserState>
+
+    // 이의 제기 신청자 리스트
+    @GET("/admin/appeals")
+    suspend fun BanClear(
+        @Header("Authorization") accessToken: String,
+    ):Response<List<BanClearData>>
+
+    // 이의 제기 신청자 상세 조회
+    @GET("/admin/appeals/{email}")
+    suspend fun BanClearDetail(
+        @Header("Authorization") accessToken: String,
+        @Path("email") email: String,
+    ): Response<BanClearUser>
+
+    // 이의 제기 신청자 개별 게시글
+    @GET("/admin/appeals/{email}/boards/{postId}")
+    suspend fun BanClearDetailBoard(
+        @Header("Authorization") accessToken: String,
+        @Path("email") email: String,
+        @Path("postId") postId: Int,
+    ): Response<Board>
+
+    @PUT("/admin/appeals/{appealId}/status")
+    suspend fun BanClearStatus(
+        @Header("Authorization") accessToken: String,
+        @Path("appealId") appealId: Int,
+        @Body banClearStatus: BanClearStatus
+    ):Response<BanClearStatusResponse>
 }
 
