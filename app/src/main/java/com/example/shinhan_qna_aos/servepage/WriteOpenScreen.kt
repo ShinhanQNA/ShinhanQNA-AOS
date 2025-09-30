@@ -455,7 +455,7 @@ fun ManagerFunctionButton( onDeleteClick: () -> Unit, onWarningClick: (String) -
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    // 두 번째 버튼: 삭제
+                    // 두 번째 버튼: 확인
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp),

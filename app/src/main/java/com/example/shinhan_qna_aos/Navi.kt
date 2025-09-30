@@ -68,6 +68,7 @@ import com.example.shinhan_qna_aos.servepage.manager.NotificationWriteScreen
 import com.example.shinhan_qna_aos.servepage.manager.api.AccessionRepository
 import com.example.shinhan_qna_aos.servepage.manager.api.BanClearRepository
 import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationRepository
+import com.example.shinhan_qna_aos.servepage.user.RefuseScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -109,8 +110,8 @@ fun AppNavigation(
     // 앱 최초 진입 시 빠르게 보여줄 초기 화면 결정용 상태
     var initialRoute by remember { mutableStateOf<String?>(null) }
 
-//    // 유저 상태 검사를 한 번만 실행했는지 추적하는 플래그
-//    var isInitialStatusChecked by remember { mutableStateOf(false) }
+    // 유저 상태 검사를 한 번만 실행했는지 추적하는 플래그
+    var isInitialStatusChecked by remember { mutableStateOf(false) }
 
     // 앱 최초 진입 시 로그인 결과에 따라 초기 화면 결정
     LaunchedEffect(loginResult) {
@@ -120,11 +121,11 @@ fun AppNavigation(
             if (data.isAdmin) {
                 initialRoute = "main"
             }
-//            else if (!isInitialStatusChecked) { // 최초 1회만 유저 상태 확인 호출
+            else if (!isInitialStatusChecked) { // 최초 1회만 유저 상태 확인 호출
                 Log.d("AppNavigation", "로그인 성공 감지, 서버 상태 조회 시작")
                 infoViewModel.checkAndNavigateUserStatus()
-//                isInitialStatusChecked = true
-//            }
+                isInitialStatusChecked = true
+            }
         } else {
             initialRoute = "login"
         }
@@ -187,7 +188,7 @@ fun AppNavigation(
         composable("manager_login") { ManagerLoginScreen(authRepository, navController, data) } // 관리자 로그인 화면
         composable("info") { InformationScreen(infoRepository, data, navController) } // 학생 정보 입력 화면
         composable("wait") { WaitScreen(infoRepository, data, navController) } // 가입 대기 화면
-
+        composable("refuse") { RefuseScreen(data, navController) }
         composable( // 메인 화면 선택 사항이 많아서 selectedTab으로 원하는 화면으로 조정 가능
             "main?selectedTab={selectedTab}",
             arguments = listOf(navArgument("selectedTab") {
@@ -264,10 +265,11 @@ fun AppNavigation(
         composable("appeal3"){ AppealScreen3(infoRepository, data, navController) }
 
         composable("declaration") { DeclarationScreen(declarationRepository,postRepository,data,navController) } // 신고된 게시글
-        composable("declaration/{postId}" ,arguments = listOf(navArgument("postId") { type = NavType.StringType }) // 신고된 게시글 상세
+        composable("declaration/{postId}/{reportId}" ,arguments = listOf(navArgument("postId") { type = NavType.StringType }) // 신고된 게시글 상세
         ) { backStackEntry ->
             val postId = backStackEntry.arguments?.getString("postId") ?: ""
-            DeclarationOpenScreen(postId,navController, postRepository)
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: ""
+            DeclarationOpenScreen(postId,reportId.toInt(),navController, postRepository,declarationRepository)
         }
 
         composable("accession") { AccessionScreen(accessionRepository, navController) } // 가입 신청자

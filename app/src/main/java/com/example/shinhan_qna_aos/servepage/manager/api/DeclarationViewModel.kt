@@ -18,4 +18,12 @@ class DeclarationViewModel(private val declarationRepository: DeclarationReposit
                 .onSuccess { declarationList = it }
         }
     }
+
+    // 신고 반려
+    fun DeclarationReject(reportId: Int) {
+        viewModelScope.launch {
+            declarationRepository.declarationReject(reportId)
+                .onSuccess { LoadDeclaration() }
+        }
+    }
 }

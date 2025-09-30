@@ -24,4 +24,22 @@ class DeclarationRepository (
             Result.failure(e)
         }
     }
+
+    // 신고 게시글 반려
+    suspend fun declarationReject(reportId: Int): Result<DeclarationResponse> {
+        val accessToken = data.accessToken ?: return Result.failure(Exception("로그인 토큰이 없습니다"))
+        return try {
+            val response = apiInterface.DeclarationReject("Bearer $accessToken", DeclarationRequest(reportId))
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    Result.success(it)
+                } ?: Result.failure(Exception("응답 데이터가 없습니다."))
+            } else {
+                val errorMsg = response.errorBody()?.string() ?: "알 수 없는 오류"
+                Result.failure(Exception("Error ${response.code()}: $errorMsg"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

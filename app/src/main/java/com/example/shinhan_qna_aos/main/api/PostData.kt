@@ -77,11 +77,16 @@ data class WarningRequest(
 )
 //관리자 유저 경고 및 차단 api
 data class Warning(
+    @SerializedName("userWarning") val userWarning: UserWarning,
+    @SerializedName("message") val message: String
+)
+
+data class UserWarning(
     @SerializedName("warningId") val warningId: Int,
     @SerializedName("email") val email: String,
     @SerializedName("reason") val reason: String,
     @SerializedName("warningDate") val warningDate: String,
-    @SerializedName("message") val message: String? = ""
+    @SerializedName("status") val status: String
 )
 
 // 내가 쓴 글 모아보기

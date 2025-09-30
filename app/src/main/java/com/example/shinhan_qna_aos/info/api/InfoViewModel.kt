@@ -101,6 +101,7 @@ private val data: Data
             user.studentCertified == false -> "info"
             user.status == "가입 완료" -> "main"
             user.status == "가입 대기 중" -> "wait"
+            user.status == "거절" -> "refuse"
             else -> "info"
         }
 
@@ -117,16 +118,19 @@ private val data: Data
         viewModelScope.launch {
             Log.d("InfoViewModel", "checkAndNavigateUserStatus 호출됨")
             val result = infoRepository.checkUserStatus()
-            result.getOrNull()?.let {
+            val userResponseWrapper = result.getOrNull() as? UserResponseWrapper
+            if (userResponseWrapper != null) {
                 Log.d("InfoViewModel", "checkAndNavigateUserStatus 성공 결과 반영")
-                updateLocalAndNavigate(it)
-            } ?: run {
-                Log.e("InfoViewModel", "Failed to get user status")
+                updateLocalAndNavigate(userResponseWrapper)
+            } else {
+                Log.e("InfoViewModel", "Failed to get user status or response is not user")
             }
         }
     }
+
     // 이의신청 완료 상태 리셋을 위한 함수(승인/재차단 등 필요시 사용)
     fun resetAppealCompleted() {
         data.clearAppealCompleted()
     }
+
 }
