@@ -283,7 +283,7 @@ fun AppNavigation(
             val email = backStackEntry.arguments?.getString("email") ?: ""
             BanClearDetailScreen(banClearRepository, navController, email)
         }
-        composable("banclearDetail/{email}/{postId}", arguments = listOf(navArgument("email") { type = NavType.StringType },navArgument("postId") { type = NavType.StringType }) // 가입 신청 상세 글
+        composable("banclearPost/{email}/{postId}", arguments = listOf(navArgument("email") { type = NavType.StringType },navArgument("postId") { type = NavType.StringType }) // 가입 신청 상세 글
         ) { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
             val postId = backStackEntry.arguments?.getString("postId") ?: ""
