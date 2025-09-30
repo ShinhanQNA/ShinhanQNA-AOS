@@ -118,13 +118,20 @@ private val data: Data
         viewModelScope.launch {
             Log.d("InfoViewModel", "checkAndNavigateUserStatus 호출됨")
             val result = infoRepository.checkUserStatus()
-            val userResponseWrapper = result.getOrNull() as? UserResponseWrapper
-            if (userResponseWrapper != null) {
-                Log.d("InfoViewModel", "checkAndNavigateUserStatus 성공 결과 반영")
-                updateLocalAndNavigate(userResponseWrapper)
-            } else {
-                Log.e("InfoViewModel", "Failed to get user status or response is not user")
+            val userResponseWrapper = result.getOrNull()
+
+            if (userResponseWrapper == null) {
+                Log.e("InfoViewModel", "Failed to get user status: response is null")
+                return@launch
             }
+
+            val user = userResponseWrapper.user
+            if (user == null) { // 추가: user가 null인 경우 방어 처리
+                Log.e("InfoViewModel", "User data is null in response")
+                return@launch
+            }
+
+            updateLocalAndNavigate(userResponseWrapper)
         }
     }
 

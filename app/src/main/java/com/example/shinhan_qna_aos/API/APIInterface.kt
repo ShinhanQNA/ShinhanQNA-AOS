@@ -1,6 +1,7 @@
 package com.example.shinhan_qna_aos.API
 
 import com.example.shinhan_qna_aos.info.api.InfoResponse
+import com.example.shinhan_qna_aos.info.api.UserResponseWrapper
 import com.example.shinhan_qna_aos.login.api.AdminRequest
 import com.example.shinhan_qna_aos.login.api.LoginTokensResponse
 import com.example.shinhan_qna_aos.login.api.LogoutData
@@ -37,7 +38,6 @@ import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationData
 import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationRequest
 import com.example.shinhan_qna_aos.servepage.manager.api.DeclarationResponse
 import com.example.shinhan_qna_aos.servepage.manager.api.UserStatusRequest
-import com.google.gson.JsonObject
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -101,11 +101,10 @@ interface APIInterface {
     ): Response<InfoResponse>
 
     //유저 정보 조회
-    @Headers("Content-Type: application/json")
     @GET("/users/me")
     suspend fun UserCheck(
         @Header("Authorization") accessToken: String
-    ): Response<JsonObject>
+    ): Response<UserResponseWrapper>
 
     //게시글 조회
     @Headers("Content-Type: application/json")
