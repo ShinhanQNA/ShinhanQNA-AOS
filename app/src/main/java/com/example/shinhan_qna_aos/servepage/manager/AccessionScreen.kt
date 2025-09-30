@@ -107,127 +107,145 @@ fun AccessionDetailScreen(
     navController: NavController,
     email: String
 ) {
-    val accessionViewModel: AccessionViewModel = viewModel(factory = SimpleViewModelFactory {AccessionViewModel(accessionRepository)})
+    val accessionViewModel: AccessionViewModel =
+        viewModel(factory = SimpleViewModelFactory { AccessionViewModel(accessionRepository) })
     val accessionDetail = accessionViewModel.accessiondetail
 
     // 상세 데이터 이메일로 불러오기
     LaunchedEffect(email) {
         accessionViewModel.LoadAccessionDetail(email)
     }
-
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            .padding(bottom = 25.dp)
     ) {
-        TopBar("", {navController.popBackStack()}) // 타이틀 없을 땐 공백
-        ManagerStudentInfo("이름", accessionDetail?.name ?: "", modifier = Modifier.padding(horizontal = 20.dp))
-        Spacer(modifier = Modifier.height(20.dp))
-        Row(
+        Column(
             modifier = Modifier
-                .padding(horizontal = 20.dp) // 좌우 간격 유지
-                .fillMaxWidth(), // Row가 화면 전체를 차지하게
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                .fillMaxSize()
         ) {
-            ManagerStudentInfo("학번", accessionDetail?.students ?: "", modifier = Modifier.weight(0.7f))
-            ManagerStudentInfo("학년", accessionDetail?.year ?: "", modifier = Modifier.weight(0.3f))
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        ManagerStudentInfo("학과", "소프트웨어융합", modifier = Modifier.padding(horizontal = 20.dp))
-        Spacer(modifier = Modifier.height(20.dp))
-        Text(
-            "재학 확인서 첨부(학생증, 재학증명서)",
-            style = TextStyle(
-                color = Color.Black,
-                fontFamily = pretendard,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp
-            ),
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        LazyColumn(
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp) // 좌우 간격 유지
-        ) {
-            item {
-                if (accessionDetail?.imagePath?.isNotEmpty() == true) {
-                    AsyncImage(
-                        model = accessionDetail.imagePath,
-                        contentDescription = "첨부 이미지",
-                        modifier = Modifier.width(300.dp),
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+            TopBar("", { navController.popBackStack() }) // 타이틀 없을 땐 공백
+            ManagerStudentInfo(
+                "이름",
+                accessionDetail?.name ?: "",
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 20.dp) // 좌우 간격 유지
+                    .fillMaxWidth(), // Row가 화면 전체를 차지하게
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                ManagerStudentInfo(
+                    "학번",
+                    accessionDetail?.students ?: "",
+                    modifier = Modifier.weight(0.7f)
+                )
+                ManagerStudentInfo(
+                    "학년",
+                    accessionDetail?.year ?: "",
+                    modifier = Modifier.weight(0.3f)
+                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            ManagerStudentInfo("학과", "소프트웨어융합", modifier = Modifier.padding(horizontal = 20.dp))
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                "재학 확인서 첨부(학생증, 재학증명서)",
+                style = TextStyle(
+                    color = Color.Black,
+                    fontFamily = pretendard,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp
+                ),
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyColumn(
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp) // 좌우 간격 유지
+            ) {
+                item {
+                    if (accessionDetail?.imagePath?.isNotEmpty() == true) {
+                        AsyncImage(
+                            model = accessionDetail.imagePath,
+                            contentDescription = "첨부 이미지",
+                            modifier = Modifier.width(300.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }
-            item {
-                Row (
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 20.dp)){
-                    Button(
-                        onClick = {
-                            accessionViewModel.UserStatus(email,"가입 거절")
-                            navController.popBackStack()
-                                  },
-                        contentPadding = PaddingValues(0.dp),
-                        colors = ButtonDefaults.buttonColors(Color(0xffFC4F4F)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(lucide.x),
-                                contentDescription = "거절",
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Text(
-                                "거절",
-                                style = TextStyle(
-                                    color = Color.White,
-                                    fontFamily = pretendard,
-                                    fontWeight = FontWeight.Normal,
-                                    fontSize = 14.sp
-                                ),
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Button(
-                        onClick = {
-                            accessionViewModel.UserStatus(email,"가입 완료")
-                            navController.popBackStack()
-                                  },
-                        contentPadding = PaddingValues(0.dp),
-                        colors = ButtonDefaults.buttonColors(Color(0xff4AD871)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Done,
-                                contentDescription = "승인",
-                                modifier = Modifier.size(20.dp),
-                                tint = Color.White
-                            )
-                            Text(
-                                "승인",
-                                style = TextStyle(
-                                    color = Color.White,
-                                    fontFamily = pretendard,
-                                    fontWeight = FontWeight.Normal,
-                                    fontSize = 14.sp
-                                ),
-                            )
-                        }
-                    }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 18.dp)
+                .align(Alignment.BottomCenter),   // 바닥에 고정
+            horizontalArrangement = Arrangement.End
+        ) {
+            Button(
+                onClick = {
+                    accessionViewModel.UserStatus(email, "가입 거절")
+                    navController.popBackStack()
+                },
+                contentPadding = PaddingValues(0.dp),
+                colors = ButtonDefaults.buttonColors(Color(0xffFC4F4F)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(lucide.x),
+                        contentDescription = "거절",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        "거절",
+                        style = TextStyle(
+                            color = Color.White,
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 14.sp
+                        ),
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Button(
+                onClick = {
+                    accessionViewModel.UserStatus(email, "가입 완료")
+                    navController.popBackStack()
+                },
+                contentPadding = PaddingValues(0.dp),
+                colors = ButtonDefaults.buttonColors(Color(0xff4AD871)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Done,
+                        contentDescription = "승인",
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.White
+                    )
+                    Text(
+                        "승인",
+                        style = TextStyle(
+                            color = Color.White,
+                            fontFamily = pretendard,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 14.sp
+                        ),
+                    )
                 }
             }
         }
